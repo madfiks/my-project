@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Психомост: Забытые Воспоминания</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Основные стили для body и game-container */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #1a1a2e; /* Темный фон */
+            color: #e0e0e0; /* Светлый текст */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .game-container {
+            background-color: #16213e; /* Немного светлее темный фон для контейнера */
+            border-radius: 1.5rem; /* Скругленные углы */
+            padding: 2rem;
+            max-width: 900px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            transition: background-color 1s ease-in-out, background-image 1s ease-in-out; /* Плавный переход для фонов */
+            overflow: hidden; /* Обрезает содержимое, выходящее за границы, для эффектов */
+            position: relative; /* Для позиционирования псевдоэлементов/слоев */
+        }
+
+        /* Анимации фонов */
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 15px rgba(255, 0, 0, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(255, 0, 0, 0.6); }
+            100% { box-shadow: 0 0 15px rgba(255, 0, 0, 0.3); }
+        }
+
+        @keyframes digital-flow {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+
+        @keyframes subtle-glow {
+            0% { filter: brightness(1); }
+            50% { filter: brightness(1.1); }
+            100% { filter: brightness(1); }
+        }
+
+        /* Классы фонов для разных сцен */
+        .bg-prologue {
+            background-color: #0d0d1a;
+            animation: pulse-red 2s infinite alternate;
+        }
+
+        .bg-nova-lab {
+            background: linear-gradient(135deg, #16213e, #0f3460);
+            position: relative;
+            z-index: 1;
+        }
+        .bg-nova-lab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: linear-gradient(0deg, transparent 50%, rgba(25, 255, 255, 0.05) 50%),
+                               linear-gradient(90deg, transparent 50%, rgba(25, 255, 255, 0.05) 50%);
+            background-size: 20px 20px;
+            z-index: -1;
+            opacity: 0.2;
+            animation: digital-flow 100s linear infinite;
+        }
+
+        .bg-megapolis {
+            background: linear-gradient(45deg, #1a1a2e, #0d1226);
+            position: relative;
+            z-index: 1;
+        }
+        .bg-megapolis::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: radial-gradient(circle at bottom right, rgba(0, 200, 255, 0.1), transparent 50%),
+                               radial-gradient(circle at top left, rgba(255, 100, 0, 0.08), transparent 50%);
+            background-size: 100% 100%;
+            animation: subtle-glow 8s infinite alternate;
+            z-index: -1;
+        }
+
+        .bg-psychobridge {
+            background: linear-gradient(180deg, #0f3460, #16213e);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .bg-psychobridge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="1" fill="%23e94560" opacity="0.5"/></svg>'); /* Маленькие пульсирующие точки */
+            background-size: 20px 20px;
+            animation: digital-flow 30s linear infinite;
+            z-index: -1;
+            opacity: 0.3;
+        }
+        .bg-psychobridge::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(233, 69, 96, 0.1) 10%, transparent 80%);
+            animation: pulse-red 4s infinite alternate;
+            z-index: -1;
+        }
+
+        .bg-climax {
+            background: linear-gradient(180deg, #2a0000, #0a0a0a);
+            animation: pulse-red 1s infinite alternate; /* Более агрессивное пульсирование */
+            position: relative;
+            z-index: 1;
+        }
+        .bg-climax::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><line x1="0" y1="0" x2="100" y2="100" stroke="%23ff0000" stroke-width="1" opacity="0.3"/><line x1="100" y1="0" x2="0" y2="100" stroke="%23ff0000" stroke-width="1" opacity="0.3"/></svg>'); /* Сетка из красных линий */
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: digital-flow 5s linear infinite;
+        }
+
+        /* Стиль для кнопок характеристик */
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #b0b0b0;
+            flex-grow: 1; /* Позволяет элементам расти и занимать доступное пространство */
+            min-width: 120px; /* Минимальная ширина для мобильных */
+            justify-content: center; /* Центрирование содержимого */
+            position: relative; /* Для позиционирования всплывающих изменений */
+        }
+        .stat-value {
+            font-weight: bold;
+            color: #e94560; /* Акцентный цвет */
+        }
+
+        /* Стили для прогресс-баров характеристик */
+        .progress-bar-container {
+            width: 60px; /* Ширина полоски */
+            height: 8px; /* Высота полоски */
+            background-color: #3b3b4d;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #e94560; /* Цвет заполнения */
+            width: 0%; /* Изначально 0% */
+            transition: width 0.5s ease-out; /* Плавное изменение ширины */
+            border-radius: 4px;
+        }
+        /* Дополнительные цвета для репутаций */
+        .progress-bar-fill.rep-nova-lab { background-color: #00bcd4; } /* Cyan */
+        .progress-bar-fill.rep-ghosts { background-color: #9c27b0; } /* Purple */
+        .progress-bar-fill.rep-rafi { background-color: #ff9800; } /* Orange */
+
+        /* Стили для всплывающих изменений характеристик */
+        .stat-change-feedback {
+            position: absolute;
+            top: -15px; /* Выше стата */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.9rem;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            pointer-events: none; /* Не блокирует клики */
+        }
+        .stat-change-feedback.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px); /* Анимация вверх */
+        }
+        .stat-change-feedback.increase {
+            color: #4CAF50; /* Зеленый для увеличения */
+        }
+        .stat-change-feedback.decrease {
+            color: #e94560; /* Красный для уменьшения */
+        }
+
+        /* Стили для кнопок выбора */
+        .choice-button {
+            background-color: #0f3460; /* Синевато-серый цвет кнопки */
+            color: #ffffff;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out;
+            cursor: pointer;
+            font-size: 1rem;
+            text-align: left;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .choice-button:hover {
+            background-color: #1a4f8a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+        }
+        .choice-button:active {
+            background-color: #0c2d54;
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        .choice-button:disabled {
+            background-color: #3b3b4d;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        /* Стили для контейнера мини-игр */
+        .mini-game-container {
+            background-color: #0f3460;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+        /* Стили для Canvas */
+        canvas {
+            background-color: #2e2e4a;
+            border-radius: 0.75rem;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
+            width: 100%; /* Делаем canvas адаптивным */
+            max-width: 600px; /* Максимальная ширина для консистентности */
+            height: 400px; /* Фиксированная высота для canvas, соотношение сторон поддерживается JS */
+        }
+        /* Стили для Memory Hack мини-игры */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .memory-card {
+            background-color: #2e2e4a;
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem; /* Больший размер шрифта для эмодзи */
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            color: transparent; /* Изначально скрываем эмодзи */
+            user-select: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            perspective: 1000px; /* Для 3D-эффекта переворота */
+        }
+        .memory-card .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .memory-card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        .memory-card .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+        }
+        .memory-card .card-front {
+            background-color: #2e2e4a;
+            color: transparent;
+        }
+        .memory-card .card-back {
+            background-color: #3f6fa0;
+            color: #ffffff;
+            transform: rotateY(180deg);
+        }
+        .memory-card.matched .card-back {
+            background-color: #4CAF50; /* Зеленый для совпадений */
+            color: #ffffff;
+            cursor: default;
+        }
+        /* Стили для Decryptor мини-игры */
+        .decryptor-input-group {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            flex-wrap: wrap; /* Разрешить перенос для маленьких экранов */
+            justify-content: center;
+        }
+        .decryptor-input {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 1.2rem;
+            border-radius: 8px;
+            border: 1px solid #4a4a66;
+            background-color: #1a1a2e;
+            color: #ffffff;
+            outline: none;
+        }
+        .decryptor-button {
+            background-color: #e94560;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s;
+        }
+        .decryptor-button:hover {
+            background-color: #ff6f88;
+        }
+        /* Стили для Energy Flow мини-игры */
+        .energy-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .energy-input {
+            width: 80px;
+            padding: 0.5rem;
+            font-size: 1.1rem;
+            text-align: center;
+            border-radius: 0.5rem;
+            border: 1px solid #4a4a66;
+            background-color: #1a1a2e;
+            color: #ffffff;
+            outline: none;
+        }
+        .energy-buttons button {
+            background-color: #0f3460;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            border: none;
+            margin: 0 0.25rem;
+            transition: background-color 0.2s;
+        }
+        .energy-buttons button:hover {
+            background-color: #1a4f8a;
+        }
+        /* Стили для кнопок сохранения/загрузки */
+        .save-load-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            flex-wrap: wrap; /* Для адаптации на мобильных */
+        }
+        .save-load-button {
+            background-color: #4CAF50; /* Зеленый для сохранения/загрузки */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+        .save-load-button:hover {
+            background-color: #6bc071;
+            transform: translateY(-2px);
+        }
+
+        /* Классы для эффекта перехода */
+        .scene-transition-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out; /* Время перехода */
+            z-index: 100; /* Поверх всего */
+            pointer-events: none; /* Не блокирует клики */
+        }
+        .scene-transition-overlay.fade-out {
+            opacity: 1;
+        }
+        .scene-transition-overlay.fade-in {
+            opacity: 0;
+        }
+
+        /* Стили для модального окна журнала */
+        .modal { /* Base style for all modals */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+            padding: 1rem;
+        }
+        .modal-content {
+            background-color: #16213e;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 700px;
+            width: 100%;
+            height: 80vh;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: auto;
+        }
+        .modal-close-button {
+            background-color: #e94560;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s ease-in-out;
+            align-self: flex-end;
+        }
+        .modal-close-button:hover {
+            background-color: #ff6f88;
+        }
+        .journal-entry {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed #3b3b4d;
+        }
+        .journal-entry:last-child {
+            border-bottom: none;
+        }
+        .journal-entry h4 {
+            font-weight: bold;
+            color: #00bcd4;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Specific styles for save/load modal */
+        .save-load-slot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #0f3460;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0.5rem;
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            gap: 0.5rem;
+        }
+        .save-load-slot-info {
+            flex-grow: 1;
+        }
+        .save-load-slot-buttons button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s ease-in-out;
+            margin-left: 0.5rem;
+        }
+        .save-load-slot-buttons button.load {
+            background-color: #00bcd4;
+        }
+        .save-load-slot-buttons button:hover {
+            filter: brightness(1.2);
+        }
+        .save-load-slot-buttons button:disabled {
+            background-color: #3b3b4d;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container" class="game-container bg-prologue">
+        <h1 class="text-3xl font-bold text-center text-red-400 mb-4">Психомост: Забытые Воспоминания</h1>
+
+        <div class="flex flex-wrap justify-center gap-4 mb-4">
+            <div class="stat-item">
+                <span class="font-bold">Логика:</span> <span id="logic-stat" class="stat-value">0</span>
+                <div class="progress-bar-container"><div id="logic-bar" class="progress-bar-fill"></div></div>
+                <div id="logic-feedback" class="stat-change-feedback"></div>
+            </div>
+            <div class="stat-item">
+                <span class="font-bold">Эмпатия:</span> <span id="empathy-stat" class="stat-value">0</span>
+                <div class="progress-bar-container"><div id="empathy-bar" class="progress-bar-fill"></div></div>
+                <div id="empathy-feedback" class="stat-change-feedback"></div>
+            </div>
+            <div class="stat-item">
+                <span class="font-bold">Синхронизация:</span> <span id="sync-stat" class="stat-value">0</span>
+                <div class="progress-bar-container"><div id="sync-bar" class="progress-bar-fill"></div></div>
+                <div id="sync-feedback" class="stat-change-feedback"></div>
+            </div>
+            <div class="stat-item">
+                <span class="font-bold">Репутация Нова Лаб:</span> <span id="nova-lab-rep-stat" class="stat-value">0</span>
+                <div class="progress-bar-container"><div id="nova-lab-rep-bar" class="progress-bar-fill rep-nova-lab"></div></div>
+                <div id="nova-lab-rep-feedback" class="stat-change-feedback"></div>
+            </div>
+            <div class="stat-item">
+                <span class="font-bold">Репутация Призраков:</span> <span id="ghosts-rep-stat" class="stat-value">0</span>
+                <div class="progress-bar-container"><div id="ghosts-rep-bar" class="progress-bar-fill rep-ghosts"></div></div>
+                <div id="ghosts-rep-feedback" class="stat-change-feedback"></div>
+            </div>
+            <div class="stat-item">
+                <span class="font-bold">Репутация Рафи:</span> <span id="rafi-rep-stat" class="stat-value">0</span>
+                <div class="progress-bar-container"><div id="rafi-rep-bar" class="progress-bar-fill rep-rafi"></div></div>
+                <div id="rafi-rep-feedback" class="stat-change-feedback"></div>
+            </div>
+        </div>
+
+        <div class="save-load-buttons">
+            <button id="save-game-button" class="save-load-button">Сохранить игру 💾</button>
+            <button id="load-game-button" class="save-load-button">Загрузить игру 📂</button>
+            <button id="open-journal-button" class="save-load-button">Журнал 📔</button>
+        </div>
+
+        <div id="narrative-text" class="text-lg mb-6 leading-relaxed text-gray-300">
+        </div>
+
+        <div id="choices-container" class="flex flex-col gap-3">
+        </div>
+
+        <div id="mini-game-section" class="mini-game-container hidden">
+            <h3 id="mini-game-title" class="text-2xl font-bold text-red-300 mb-3"></h3>
+            <div id="mini-game-content" class="w-full">
+            </div>
+            <button id="mini-game-submit" class="decryptor-button hidden">Завершить</button>
+            <p id="mini-game-message" class="text-red-300"></p>
+        </div>
+
+        <div id="transition-overlay" class="scene-transition-overlay"></div>
+
+        <div id="journal-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2 class="text-3xl font-bold text-center text-red-400 mb-4">Журнал Воспоминаний</h2>
+                <div id="journal-entries" class="text-left">
+                </div>
+                <button id="journal-close-button" class="modal-close-button">Закрыть</button>
+            </div>
+        </div>
+
+        <div id="save-load-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2 class="text-3xl font-bold text-center text-red-400 mb-4">Сохранение / Загрузка Игры</h2>
+                <div id="save-load-slots-container" class="flex flex-col gap-2">
+                </div>
+                <button id="save-load-close-button" class="modal-close-button">Закрыть</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Клиентское представление состояния игры (НЕ авторитетное, служит для отображения)
+        let clientGameState = {
+            logic: 5,
+            empathy: 5,
+            synchronization: 5,
+            reputationNovaLab: 0,
+            reputationGhosts: 0,
+            reputationRafi: 0,
+            secretPathCounter: 0,
+            novaLabIsHostile: false,
+            currentScene: 'prologue', // Отслеживается для рендеринга на клиенте
+            currentMiniGame: null,
+            journal: {}, // Будет заполнено данными сервера или специфичной логикой клиента
+            // Состояния мини-игр, управляемые на стороне клиента во время активной игры
+            memoryHack: {
+                cards: [],
+                flippedCards: [],
+                matchedPairs: 0,
+                attempts: 0,
+                symbols: ['🧠', '👻', '🗝️', '💡', '🔗', '🌐', '🛡️', '⚡']
+            },
+            decryptor: {
+                inputValues: [], // Клиент управляет вводом для мини-игры
+            },
+            energyFlow: {
+                node1: 5, node2: 5, node3: 5, maxEnergy: 5, totalEnergy: 15
+            },
+            laserMaze: {
+                playerX: 50, playerY: 200, playerSize: 20, lasers: [], laserSpeed: 2, gameRunning: false, canvas: null, ctx: null, animationFrameId: null
+            }
+        };
+
+        // Элементы DOM (без изменений)
+        const gameContainerElem = document.getElementById('game-container');
+        const narrativeTextElem = document.getElementById('narrative-text');
+        const choicesContainerElem = document.getElementById('choices-container');
+        const logicStatElem = document.getElementById('logic-stat');
+        const empathyStatElem = document.getElementById('empathy-stat');
+        const syncStatElem = document.getElementById('sync-stat');
+        const novaLabRepStatElem = document.getElementById('nova-lab-rep-stat');
+        const ghostsRepStatElem = document.getElementById('ghosts-rep-stat');
+        const rafiRepStatElem = document.getElementById('rafi-rep-stat');
+
+        // Элементы прогресс-баров
+        const logicBar = document.getElementById('logic-bar');
+        const empathyBar = document.getElementById('empathy-bar');
+        const syncBar = document.getElementById('sync-bar');
+        const novaLabRepBar = document.getElementById('nova-lab-rep-bar');
+        const ghostsRepBar = document.getElementById('ghosts-rep-bar');
+        const rafiRepBar = document.getElementById('rafi-rep-bar');
+
+        // Элементы обратной связи по изменению характеристик
+        const logicFeedback = document.getElementById('logic-feedback');
+        const empathyFeedback = document.getElementById('empathy-feedback');
+        const syncFeedback = document.getElementById('sync-feedback');
+        const novaLabRepFeedback = document.getElementById('nova-lab-rep-feedback');
+        const ghostsRepFeedback = document.getElementById('ghosts-rep-feedback');
+        const rafiRepFeedback = document.getElementById('rafi-rep-feedback');
+
+        const miniGameSectionElem = document.getElementById('mini-game-section');
+        const miniGameTitleElem = document.getElementById('mini-game-title');
+        const miniGameContentElem = document.getElementById('mini-game-content');
+        const miniGameSubmitBtn = document.getElementById('mini-game-submit');
+        const miniGameMessageElem = document.getElementById('mini-game-message');
+        const saveGameButton = document.getElementById('save-game-button');
+        const loadGameButton = document.getElementById('load-game-button');
+        const openJournalButton = document.getElementById('open-journal-button');
+        const journalModal = document.getElementById('journal-modal');
+        const journalEntriesContainer = document.getElementById('journal-entries');
+        const journalCloseButton = document.getElementById('journal-close-button');
+        const transitionOverlay = document.getElementById('transition-overlay');
+
+        const saveLoadModal = document.getElementById('save-load-modal');
+        const saveLoadSlotsContainer = document.getElementById('save-load-slots-container');
+        const saveLoadCloseButton = document.getElementById('save-load-close-button');
+
+        const NUM_SAVE_SLOTS = 5;
+        const AUTOSAVE_SLOT = 'autosave';
+        const QUICKSAVE_SLOT = 'quicksave';
+
+        // Генерируем или получаем Client ID
+        let clientId = localStorage.getItem('psychobridge_clientId');
+        if (!clientId) {
+            clientId = 'player_' + Date.now() + '_' + Math.random().toString(36).substring(2, 15); // Уникальный ID для каждого игрока
+            localStorage.setItem('psychobridge_clientId', clientId);
+        }
+        console.log('Ваш Client ID:', clientId);
+
+        // Функция обновления отображения статистики
+        function updateStatsUI() {
+            logicStatElem.textContent = clientGameState.logic;
+            empathyStatElem.textContent = clientGameState.empathy;
+            syncStatElem.textContent = clientGameState.synchronization;
+            novaLabRepStatElem.textContent = clientGameState.reputationNovaLab;
+            ghostsRepStatElem.textContent = clientGameState.reputationGhosts;
+            rafiRepStatElem.textContent = clientGameState.reputationRafi;
+
+            const maxPrimaryStat = 15;
+            const maxReputation = 10;
+
+            logicBar.style.width = `${(clientGameState.logic / maxPrimaryStat) * 100}%`;
+            empathyBar.style.width = `${(clientGameState.empathy / maxPrimaryStat) * 100}%`;
+            syncBar.style.width = `${(clientGameState.synchronization / maxPrimaryStat) * 100}%`;
+
+            novaLabRepBar.style.width = `${(Math.max(0, clientGameState.reputationNovaLab) / maxReputation) * 100}%`;
+            ghostsRepBar.style.width = `${(Math.max(0, clientGameState.reputationGhosts) / maxReputation) * 100}%`;
+            rafiRepBar.style.width = `${(Math.max(0, clientGameState.reputationRafi) / maxReputation) * 100}%`;
+        }
+
+        // Функция для показа временных сообщений (без модального окна)
+        function showTemporaryMessage(element, message, duration = 3000) {
+            const originalContent = element.innerHTML;
+            element.innerHTML = message;
+            element.classList.remove('hidden');
+
+            setTimeout(() => {
+                element.innerHTML = originalContent;
+                if (element.id === miniGameMessageElem.id) {
+                   element.classList.add('hidden');
+                }
+            }, duration);
+        }
+
+        // Функция для показа обратной связи по изменению характеристик
+        function showStatFeedback(statElementId, valueChange) {
+            const feedbackElement = document.getElementById(statElementId + '-feedback');
+            if (!feedbackElement) return;
+
+            feedbackElement.textContent = (valueChange > 0 ? '⬆️ +' : '⬇️ ') + Math.abs(valueChange);
+            feedbackElement.classList.remove('increase', 'decrease');
+            if (valueChange > 0) {
+                feedbackElement.classList.add('increase');
+            } else if (valueChange < 0) {
+                feedbackElement.classList.add('decrease');
+            }
+            feedbackElement.classList.add('show');
+
+            setTimeout(() => {
+                feedbackElement.classList.remove('show');
+                feedbackElement.textContent = '';
+            }, 1000);
+        }
+
+        // Функция для форматирования даты сохранения
+        function formatSaveDate(timestamp) {
+            if (!timestamp) return 'Пустой слот';
+            const date = new Date(timestamp);
+            return date.toLocaleString('ru-RU', {
+                year: 'numeric', month: 'numeric', day: 'numeric',
+                hour: '2-digit', minute: '2-digit'
+            });
+        }
+
+        // Функция для открытия модального окна сохранения/загрузки
+        function openSaveLoadModal() {
+            sendAction({ type: 'request_save_slots' });
+        }
+
+        // Функция для закрытия модального окна сохранения/загрузки
+        function closeSaveLoadModal() {
+            saveLoadModal.classList.add('hidden');
+        }
+
+        // Функция для обновления содержимого модального окна сохранения/загрузки
+        function updateSaveLoadModal(slotsData) {
+            saveLoadSlotsContainer.innerHTML = '';
+            slotsData.forEach(slot => {
+                addSaveLoadSlot(slot.id, slot.displayName, slot.data);
+            });
+            saveLoadModal.classList.remove('hidden');
+        }
+
+        function addSaveLoadSlot(slotName, displayName, slotData) {
+            const slotElem = document.createElement('div');
+            slotElem.classList.add('save-load-slot');
+
+            let saveTime = null;
+            let saveScenePreview = '';
+
+            if (slotData && slotData.timestamp) {
+                saveTime = slotData.timestamp;
+                saveScenePreview = slotData.currentSceneDisplayName ? `Сцена: ${slotData.currentSceneDisplayName}` : 'Неизвестная сцена';
+            }
+
+            slotElem.innerHTML = `
+                <div class="save-load-slot-info">
+                    <span class="font-bold">${displayName}:</span> ${formatSaveDate(saveTime)}<br>
+                    <span class="text-sm text-gray-400">${saveScenePreview || 'Нет данных'}</span>
+                </div>
+                <div class="save-load-slot-buttons">
+                    <button class="save-slot-button" data-slot="${slotName}">Сохранить</button>
+                    <button class="load-slot-button load" data-slot="${slotName}" ${!slotData ? 'disabled' : ''}>Загрузить</button>
+                </div>
+            `;
+            saveLoadSlotsContainer.appendChild(slotElem);
+        }
+
+        saveGameButton.addEventListener('click', openSaveLoadModal);
+        loadGameButton.addEventListener('click', openSaveLoadModal);
+        saveLoadCloseButton.addEventListener('click', closeSaveLoadModal);
+
+        saveLoadSlotsContainer.addEventListener('click', (event) => {
+            if (event.target.classList.contains('save-slot-button')) {
+                const slot = event.target.dataset.slot;
+                sendAction({ type: 'save_game', slotName: slot });
+            } else if (event.target.classList.contains('load-slot-button')) {
+                const slot = event.target.dataset.slot;
+                sendAction({ type: 'load_game', slotName: slot });
+            }
+        });
+
+        // Функция открытия журнала
+        function openJournal() {
+            journalEntriesContainer.innerHTML = '';
+            let hasEntries = false;
+            for (const key in clientGameState.journal) {
+                if (clientGameState.journal[key].unlocked) {
+                    const entry = document.createElement('div');
+                    entry.classList.add('journal-entry');
+                    entry.innerHTML = `<h4>${clientGameState.journal[key].title}</h4><p>${clientGameState.journal[key].content}</p>`;
+                    if (clientGameState.journal[key].key) {
+                        entry.innerHTML += `<p class="font-mono text-green-400 mt-2">${clientGameState.journal[key].key}</p>`;
+                    }
+                    journalEntriesContainer.appendChild(entry);
+                    hasEntries = true;
+                }
+            }
+            if (!hasEntries) {
+                journalEntriesContainer.innerHTML = '<p class="text-center text-gray-400">Журнал пуст. Начните свое приключение, чтобы разблокировать записи!</p>';
+            }
+            journalModal.classList.remove('hidden');
+        }
+
+        function closeJournal() {
+            journalModal.classList.add('hidden');
+        }
+        journalCloseButton.addEventListener('click', closeJournal);
+        openJournalButton.addEventListener('click', openJournal);
+
+
+        // Функция проверки выполнения требований на клиенте (для дизейбла кнопок)
+        function checkRequirements(requirements) {
+            if (!requirements) return true;
+            for (const stat in requirements) {
+                if (clientGameState.hasOwnProperty(stat) && clientGameState[stat] < requirements[stat]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // Функция для эффекта "печатания" текста
+        let typeWriterIndex = 0;
+        let typeWriterText = '';
+        let typeWriterElement = null;
+        let typeWriterSpeed = 20;
+
+        function typeWriterEffect(element, text, speed) {
+            typeWriterElement = element;
+            typeWriterText = text;
+            typeWriterSpeed = speed;
+            typeWriterIndex = 0;
+            typeWriterElement.innerHTML = '';
+            typeNextCharacter();
+        }
+
+        function typeNextCharacter() {
+            if (typeWriterIndex < typeWriterText.length) {
+                if (typeWriterText.substring(typeWriterIndex, typeWriterIndex + 1) === '<') {
+                    const tagEnd = typeWriterText.indexOf('>', typeWriterIndex);
+                    if (tagEnd !== -1) {
+                        typeWriterElement.innerHTML += typeWriterText.substring(typeWriterIndex, tagEnd + 1);
+                        typeWriterIndex = tagEnd + 1;
+                    } else {
+                        typeWriterElement.innerHTML += typeWriterText.charAt(typeWriterIndex);
+                        typeWriterIndex++;
+                    }
+                } else {
+                    typeWriterElement.innerHTML += typeWriterText.charAt(typeWriterIndex);
+                    typeWriterIndex++;
+                }
+                setTimeout(typeNextCharacter, typeWriterSpeed);
+            }
+        }
+
+
+        // Функция рендеринга текущей сцены, получает данные от сервера
+        const renderSceneFromData = (scene) => {
+            if (!scene) {
+                console.error("Данные сцены не получены.");
+                narrativeTextElem.innerHTML = "Ошибка: Данные сцены не получены. Пожалуйста, перезагрузите игру.";
+                return;
+            }
+
+            transitionOverlay.classList.add('fade-out');
+
+            setTimeout(() => {
+                clientGameState.currentScene = scene.id;
+
+                gameContainerElem.className = 'game-container';
+                if (scene.background) {
+                    gameContainerElem.classList.add(scene.background);
+                }
+
+                typeWriterEffect(narrativeTextElem, scene.text, 20);
+
+                choicesContainerElem.innerHTML = '';
+                miniGameSectionElem.classList.add('hidden');
+                miniGameContentElem.innerHTML = '';
+                miniGameSubmitBtn.classList.add('hidden');
+                miniGameMessageElem.textContent = '';
+
+                const textDisplayDuration = scene.text.length * typeWriterSpeed;
+                setTimeout(() => {
+                    if (scene.isEnding) {
+                        const restartButton = document.createElement('button');
+                        restartButton.classList.add('choice-button');
+                        restartButton.textContent = 'Начать заново';
+                        restartButton.onclick = () => sendAction({ type: 'restart_game' });
+                        choicesContainerElem.appendChild(restartButton);
+                    } else if (scene.miniGame) {
+                        startMiniGame(scene.miniGame.type, scene.miniGame.config);
+                    } else if (scene.choices) {
+                        scene.choices.forEach((choice, index) => {
+                            const button = document.createElement('button');
+                            button.classList.add('choice-button');
+                            button.textContent = choice.text;
+                            const requirementsMet = checkRequirements(choice.requirements);
+                            button.disabled = !requirementsMet;
+                            if (!requirementsMet) {
+                                const requiredStats = Object.entries(choice.requirements).map(([stat, val]) => {
+                                    let statName = '';
+                                    if (stat === 'logic') statName = 'Логика';
+                                    if (stat === 'empathy') statName = 'Эмпатия';
+                                    if (stat === 'synchronization') statName = 'Синхронизация';
+                                    return `Требуется: ${statName} ${val}`;
+                                }).join(', ');
+                                button.title = requiredStats;
+                            }
+
+                            button.onclick = () => {
+                                sendAction({
+                                    type: 'make_choice',
+                                    sceneId: clientGameState.currentScene,
+                                    choiceIndex: index
+                                });
+                            };
+                            choicesContainerElem.appendChild(button);
+                        });
+                    }
+                }, textDisplayDuration + 100);
+
+                transitionOverlay.classList.remove('fade-out');
+            }, 800);
+        };
+
+        function renderSceneFromState(sceneId) {
+            sendAction({ type: 'request_scene_data', sceneId: sceneId });
+        }
+
+        // Соединение WebSocket
+        const socket = new WebSocket("ws://abcd1234.ngrok.io:8080");
+ // Или ваш IP/домен сервера
+
+        socket.onopen = () => {
+            console.log("🟢 Подключено к серверу!");
+            // Отправляем Client ID при первом подключении
+            sendAction({ type: 'client_connect' });
+            // Запрашиваем начальное состояние игры
+            sendAction({ type: 'request_initial_state' });
+        };
+
+        socket.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            console.log("📨 Сообщение от сервера:", message);
+
+            switch (message.type) {
+                case 'game_state_update':
+                    // Обновляем состояние игры на клиенте на основе авторитетного состояния сервера
+                    Object.assign(clientGameState, message.state);
+                    updateStatsUI();
+                    // Важно: renderSceneFromState вызывается только если сцена изменилась,
+                    // или если это первое получение состояния.
+                    // Избегаем повторного рендеринга, если просто обновились статы без смены сцены.
+                    if (clientGameState.currentScene !== message.state.currentScene || !document.getElementById('choices-container').hasChildNodes()) {
+                        renderSceneFromState(message.state.currentScene);
+                    }
+                    break;
+                case 'scene_data':
+                    // Сервер присылает данные текущей сцены
+                    renderSceneFromData(message.data);
+                    break;
+                case 'narrative_effect':
+                    showTemporaryMessage(narrativeTextElem, message.narrative, 1500);
+                    break;
+                case 'mini_game_start':
+                    startMiniGame(message.gameType, message.config);
+                    break;
+                case 'mini_game_message':
+                    showTemporaryMessage(miniGameMessageElem, message.text, 1500);
+                    break;
+                case 'save_ack':
+                    showTemporaryMessage(narrativeTextElem, message.message, 2000);
+                    break;
+                case 'save_slots_data':
+                    // Обновляем модальное окно сохранения/загрузки с данными, полученными от сервера
+                    updateSaveLoadModal(message.slots);
+                    break;
+                case 'load_data':
+                    // Это будет содержать полное gameState из сохраненных данных сервера
+                    // и вызовет полное перерендеринг
+                    Object.assign(clientGameState, message.state);
+                    // Важно обновить журнал на основе загруженного состояния
+                    // Сервер теперь присылает полный объект journal, а не только journalUnlocked
+                    clientGameState.journal = message.state.journal; // Полностью заменяем
+                    
+                    updateStatsUI();
+                    closeSaveLoadModal(); // Закрываем модальное окно после загрузки
+                    renderSceneFromState(clientGameState.currentScene); // Рендерим сцену из загруженного состояния
+                    showTemporaryMessage(narrativeTextElem, message.message, 2000);
+                    break;
+                case 'error':
+                    showTemporaryMessage(narrativeTextElem, message.message, 3000);
+                    console.error('Ошибка от сервера:', message.message);
+                    break;
+                case 'server_broadcast': // Сообщение от админки для всех клиентов
+                    alert(`Сообщение от Администратора: ${message.message}`);
+                    break;
+            }
+        };
+
+        socket.onclose = () => {
+            console.log("🔴 Отключено от сервера.");
+            showTemporaryMessage(narrativeTextElem, "Соединение с сервером потеряно. Пожалуйста, перезагрузите игру.", 5000);
+        };
+
+        socket.onerror = (error) => {
+            console.error("❌ Ошибка WebSocket:", error);
+            showTemporaryMessage(narrativeTextElem, "Ошибка соединения с сервером. Проверьте консоль.", 5000);
+        };
+
+        // Функция для отправки действий на сервер
+        function sendAction(actionObject) {
+            actionObject.clientId = clientId; // Добавляем clientId к каждому сообщению
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify(actionObject));
+            } else {
+                console.warn("WebSocket не открыт. Невозможно отправить действие.");
+            }
+        }
+
+        // ФУНКЦИИ МИНИ-ИГР (большей частью остаются на клиенте)
+        function startMiniGame(gameType, config) {
+            clientGameState.currentMiniGame = gameType;
+            miniGameSectionElem.classList.remove('hidden');
+            miniGameMessageElem.textContent = '';
+
+            if (gameType === 'memoryHack') {
+                startMemoryHackGame(config);
+            } else if (gameType === 'decryptor') {
+                startDecryptorGame(config);
+            } else if (gameType === 'energyFlow') {
+                startEnergyFlowGame(config);
+            } else if (gameType === 'laserMaze') {
+                startLaserMazeGame(config);
+            }
+        }
+
+        function endMiniGame(success, outcomeConfig) {
+            if (clientGameState.laserMaze.gameRunning) {
+                clientGameState.laserMaze.gameRunning = false;
+                cancelAnimationFrame(clientGameState.laserMaze.animationFrameId);
+                document.removeEventListener('keydown', handleLaserMazeInput);
+            }
+
+            miniGameSectionElem.classList.add('hidden');
+            miniGameContentElem.innerHTML = '';
+            miniGameSubmitBtn.classList.add('hidden');
+
+            sendAction({
+                type: 'mini_game_result',
+                game: clientGameState.currentMiniGame,
+                success: success,
+            });
+
+            clientGameState.currentMiniGame = null;
+        }
+
+
+        // Memory Hack Mini-Game
+        function startMemoryHackGame(config) {
+            miniGameSectionElem.classList.remove('hidden');
+            miniGameTitleElem.textContent = 'Взлом Памяти: Синхронизируйте Фрагменты';
+            miniGameContentElem.innerHTML = '<div id="memory-grid" class="memory-grid"></div><p id="memory-attempts-left" class="text-sm text-gray-400 mt-2"></p>';
+            miniGameSubmitBtn.classList.add('hidden');
+
+            const memoryGridElem = document.getElementById('memory-grid');
+            const attemptsLeftElem = document.getElementById('memory-attempts-left');
+
+            clientGameState.memoryHack.cards = [];
+            clientGameState.memoryHack.flippedCards = [];
+            clientGameState.memoryHack.matchedPairs = 0;
+            clientGameState.memoryHack.attempts = clientGameState.synchronization > 0 ? Math.floor(clientGameState.synchronization * 1.5) + 5 : 5;
+
+            let shuffledSymbols = [...clientGameState.memoryHack.symbols, ...clientGameState.memoryHack.symbols];
+            shuffledSymbols.sort(() => Math.random() - 0.5);
+
+            shuffledSymbols.forEach((symbol, index) => {
+                const card = document.createElement('div');
+                card.classList.add('memory-card');
+                card.dataset.symbol = symbol;
+                card.dataset.index = index;
+                card.innerHTML = `<div class="card-inner"><div class="card-face card-front"></div><div class="card-face card-back">${symbol}</div></div>`;
+                memoryGridElem.appendChild(card);
+                clientGameState.memoryHack.cards.push(card);
+
+                card.addEventListener('click', () => flipCard(card, config));
+            });
+            attemptsLeftElem.textContent = `Попыток осталось: ${clientGameState.memoryHack.attempts}`;
+        }
+
+        function flipCard(card, config) {
+            if (card.classList.contains('flipped') || card.classList.contains('matched') || clientGameState.memoryHack.flippedCards.length === 2) {
+                return;
+            }
+
+            card.classList.add('flipped');
+            clientGameState.memoryHack.flippedCards.push(card);
+
+            if (clientGameState.memoryHack.flippedCards.length === 2) {
+                clientGameState.memoryHack.attempts--;
+                document.getElementById('memory-attempts-left').textContent = `Попыток осталось: ${clientGameState.memoryHack.attempts}`;
+                const [card1, card2] = clientGameState.memoryHack.flippedCards;
+
+                if (card1.dataset.symbol === card2.dataset.symbol) {
+                    card1.classList.add('matched');
+                    card2.classList.add('matched');
+                    clientGameState.memoryHack.matchedPairs++;
+                    clientGameState.memoryHack.flippedCards = [];
+                    miniGameMessageElem.textContent = 'Совпадение! ✅';
+                    miniGameMessageElem.classList.remove('hidden');
+
+                    if (clientGameState.memoryHack.matchedPairs === clientGameState.memoryHack.symbols.length) {
+                        setTimeout(() => {
+                            endMiniGame(true, config.success);
+                        }, 500);
+                    }
+                } else {
+                    miniGameMessageElem.textContent = 'Не совпало. ❌';
+                    miniGameMessageElem.classList.remove('hidden');
+                    setTimeout(() => {
+                        card1.classList.remove('flipped');
+                        card2.classList.remove('flipped');
+                        clientGameState.memoryHack.flippedCards = [];
+                        miniGameMessageElem.classList.add('hidden');
+
+                        if (clientGameState.memoryHack.attempts <= 0) {
+                            endMiniGame(false, config.failure);
+                        }
+                    }, 1000);
+                }
+            }
+        }
+
+        // Decryptor Mini-Game
+        function startDecryptorGame(config) {
+            miniGameSectionElem.classList.remove('hidden');
+            miniGameTitleElem.textContent = 'Дешифратор: Введите Ключ';
+            miniGameContentElem.innerHTML = '<div id="decryptor-input-group" class="decryptor-input-group"></div>';
+            miniGameSubmitBtn.classList.remove('hidden');
+
+            const keyLength = config.correctKey.length;
+            const inputGroup = document.getElementById('decryptor-input-group');
+            clientGameState.decryptor.inputValues = Array(keyLength).fill('');
+
+            for (let i = 0; i < keyLength; i++) {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.maxLength = 1;
+                input.classList.add('decryptor-input', 'bg-gray-700', 'text-white', 'p-2', 'rounded');
+                input.dataset.index = i;
+                input.addEventListener('input', (e) => {
+                    e.target.value = e.target.value.toUpperCase();
+                    clientGameState.decryptor.inputValues[i] = e.target.value;
+                    if (e.target.value && i < keyLength - 1) {
+                        inputGroup.children[i + 1].focus();
+                    }
+                });
+                 input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && e.target.value === '' && i > 0) {
+                        inputGroup.children[i - 1].focus();
+                    }
+                });
+                inputGroup.appendChild(input);
+            }
+            miniGameSubmitBtn.onclick = () => checkDecryptor(config);
+        }
+
+        function checkDecryptor(config) {
+            const enteredKey = clientGameState.decryptor.inputValues.join('');
+            if (enteredKey === config.correctKey) {
+                miniGameMessageElem.textContent = 'Ключ успешно дешифрован! ✅';
+                miniGameMessageElem.classList.remove('hidden');
+                endMiniGame(true, config.success);
+            } else {
+                miniGameMessageElem.textContent = 'Неверный ключ. Попробуйте еще. ❌';
+                miniGameMessageElem.classList.remove('hidden');
+                setTimeout(() => { miniGameMessageElem.classList.add('hidden'); }, 1500);
+                endMiniGame(false, config.failure);
+            }
+        }
+
+        // Energy Flow Mini-Game
+        function startEnergyFlowGame(config) {
+            miniGameSectionElem.classList.remove('hidden');
+            miniGameTitleElem.textContent = 'Поток Энергии: Балансировка Цепей';
+            miniGameContentElem.innerHTML = `
+                <div class="energy-node">
+                    <label>Узел 1 (Высокий >8): <span id="energy-node1-value">${clientGameState.energyFlow.node1}</span></label>
+                    <div class="energy-buttons">
+                        <button data-node="node1" data-change="-1">-</button>
+                        <button data-node="node1" data-change="1">+</button>
+                    </div>
+                </div>
+                <div class="energy-node">
+                    <label>Узел 2 (Низкий <3): <span id="energy-node2-value">${clientGameState.energyFlow.node2}</span></label>
+                    <div class="energy-buttons">
+                        <button data-node="node2" data-change="-1">-</button>
+                        <button data-node="node2" data-change="1">+</button>
+                    </div>
+                </div>
+                <div class="energy-node">
+                    <label>Узел 3 (Низкий <3): <span id="energy-node3-value">${clientGameState.energyFlow.node3}</span></label>
+                    <div class="energy-buttons">
+                        <button data-node="node3" data-change="-1">-</button>
+                        <button data-node="node3" data-change="1">+</button>
+                    </div>
+                </div>
+                <p class="text-sm text-gray-400 mt-2">Всего энергии: <span id="total-energy-value">${clientGameState.energyFlow.node1 + clientGameState.energyFlow.node2 + clientGameState.energyFlow.node3}</span></p>
+                <p id="energy-flow-message" class="text-red-300"></p>
+            `;
+            miniGameSubmitBtn.classList.remove('hidden');
+            miniGameSubmitBtn.textContent = 'Проверить Баланс';
+
+            const energyButtons = miniGameContentElem.querySelectorAll('.energy-buttons button');
+            energyButtons.forEach(button => {
+                button.addEventListener('click', (e) => adjustEnergy(e.target.dataset.node, parseInt(e.target.dataset.change), config));
+            });
+            miniGameSubmitBtn.onclick = () => checkEnergyFlow(config);
+        }
+
+        function adjustEnergy(node, change, config) {
+            const currentNodeValue = clientGameState.energyFlow[node];
+            // const currentTotalEnergy = clientGameState.energyFlow.node1 + clientGameState.energyFlow.node2 + clientGameState.energyFlow.node3;
+
+            if (change < 0 && currentNodeValue <= 0) {
+                 miniGameMessageElem.textContent = 'Узел пуст! ⚡';
+                miniGameMessageElem.classList.remove('hidden');
+                setTimeout(() => { miniGameMessageElem.classList.add('hidden'); }, 1500);
+                return;
+            }
+
+            if (change > 0 && currentNodeValue >= 15) {
+                 miniGameMessageElem.textContent = 'Узел переполнен! ⚡';
+                miniGameMessageElem.classList.remove('hidden');
+                setTimeout(() => { miniGameMessageElem.classList.add('hidden'); }, 1500);
+                return;
+            }
+
+
+            clientGameState.energyFlow[node] += change;
+            document.getElementById(`energy-${node}-value`).textContent = clientGameState.energyFlow[node];
+            document.getElementById('total-energy-value').textContent = clientGameState.energyFlow.node1 + clientGameState.energyFlow.node2 + clientGameState.energyFlow.node3;
+        }
+
+
+        function checkEnergyFlow(config) {
+            const node1 = clientGameState.energyFlow.node1;
+            const node2 = clientGameState.energyFlow.node2;
+            const node3 = clientGameState.energyFlow.node3;
+
+            if (node1 > 8 && node2 < 3 && node3 < 3) {
+                miniGameMessageElem.textContent = 'Баланс установлен! ✅';
+                miniGameMessageElem.classList.remove('hidden');
+                endMiniGame(true, config.success);
+            } else {
+                miniGameMessageElem.textContent = 'Баланс не достигнут. Попробуйте еще. ❌';
+                miniGameMessageElem.classList.remove('hidden');
+                setTimeout(() => { miniGameMessageElem.classList.add('hidden'); }, 1500);
+                endMiniGame(false, config.failure);
+            }
+        }
+
+
+        // Laser Maze Mini-Game
+        function startLaserMazeGame(config) {
+            miniGameSectionElem.classList.remove('hidden');
+            miniGameTitleElem.textContent = 'Лазерный Лабиринт: Стелс-Проникновение';
+            miniGameContentElem.innerHTML = '<canvas id="laser-maze-canvas" width="600" height="400" class="border"></canvas>';
+            miniGameSubmitBtn.classList.add('hidden');
+
+            clientGameState.laserMaze.canvas = document.getElementById('laser-maze-canvas');
+            clientGameState.laserMaze.ctx = clientGameState.laserMaze.canvas.getContext('2d');
+            clientGameState.laserMaze.playerX = 50;
+            clientGameState.laserMaze.playerY = clientGameState.laserMaze.canvas.height / 2;
+            clientGameState.laserMaze.lasers = [];
+            clientGameState.laserMaze.gameRunning = true;
+
+            for (let i = 0; i < (clientGameState.synchronization > 8 ? 3 : 5); i++) {
+                clientGameState.laserMaze.lasers.push({
+                    x: Math.random() * (clientGameState.laserMaze.canvas.width - 100) + 100,
+                    y: Math.random() * clientGameState.laserMaze.canvas.height,
+                    length: 150,
+                    direction: Math.random() < 0.5 ? 1 : -1
+                });
+            }
+
+            document.addEventListener('keydown', handleLaserMazeInput);
+
+            function gameLoop() {
+                if (!clientGameState.laserMaze.gameRunning) {
+                    cancelAnimationFrame(clientGameState.laserMaze.animationFrameId);
+                    return;
+                }
+                updateLaserMaze();
+                drawLaserMaze();
+                clientGameState.laserMaze.animationFrameId = requestAnimationFrame(gameLoop);
+            }
+
+            function updateLaserMaze() {
+                clientGameState.laserMaze.lasers.forEach(laser => {
+                    laser.y += clientGameState.laserMaze.laserSpeed * laser.direction;
+                    if (laser.y < 0 || laser.y > clientGameState.laserMaze.canvas.height) {
+                        laser.direction *= -1;
+                    }
+                });
+
+                clientGameState.laserMaze.lasers.forEach(laser => {
+                    if (checkCollision(clientGameState.laserMaze.playerX, clientGameState.laserMaze.playerY, clientGameState.laserMaze.playerSize, laser)) {
+                        clientGameState.laserMaze.gameRunning = false;
+                        document.removeEventListener('keydown', handleLaserMazeInput);
+                        endMiniGame(false, config.failure);
+                    }
+                });
+
+                if (clientGameState.laserMaze.playerX + clientGameState.laserMaze.playerSize / 2 >= clientGameState.laserMaze.canvas.width - 20) {
+                    clientGameState.laserMaze.gameRunning = false;
+                    document.removeEventListener('keydown', handleLaserMazeInput);
+                    endMiniGame(true, config.success);
+                }
+            }
+
+            function drawLaserMaze() {
+                const ctx = clientGameState.laserMaze.ctx;
+                const canvas = clientGameState.laserMaze.canvas;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                ctx.fillStyle = '#e94560';
+                ctx.fillRect(clientGameState.laserMaze.playerX - clientGameState.laserMaze.playerSize / 2, clientGameState.laserMaze.playerY - clientGameState.laserMaze.playerSize / 2, clientGameState.laserMaze.playerSize, clientGameState.laserMaze.playerSize);
+
+                ctx.fillStyle = '#ff0000';
+                clientGameState.laserMaze.lasers.forEach(laser => {
+                    ctx.fillRect(laser.x, laser.y, 5, laser.length);
+                });
+            }
+
+            function checkCollision(playerX, playerY, playerSize, laser) {
+                return playerX < laser.x + 5 &&
+                       playerX + playerSize > laser.x &&
+                       playerY < laser.y + laser.length &&
+                       playerY + playerSize > laser.y;
+            }
+
+            function handleLaserMazeInput(event) {
+                const playerSpeed = 15;
+                switch (event.key) {
+                    case 'ArrowUp':
+                    case 'w':
+                    case 'W':
+                        clientGameState.laserMaze.playerY = Math.max(0 + clientGameState.laserMaze.playerSize / 2, clientGameState.laserMaze.playerY - playerSpeed);
+                        break;
+                    case 'ArrowDown':
+                    case 's':
+                    case 'S':
+                        clientGameState.laserMaze.playerY = Math.min(clientGameState.laserMaze.canvas.height - clientGameState.laserMaze.playerSize / 2, clientGameState.laserMaze.playerY + playerSpeed);
+                        break;
+                    case 'ArrowLeft':
+                    case 'a':
+                    case 'A':
+                        clientGameState.laserMaze.playerX = Math.max(0 + clientGameState.laserMaze.playerSize / 2, clientGameState.laserMaze.playerX - playerSpeed);
+                        break;
+                    case 'ArrowRight':
+                    case 'd':
+                    case 'D':
+                        clientGameState.laserMaze.playerX = Math.min(clientGameState.laserMaze.canvas.width - clientGameState.laserMaze.playerSize / 2, clientGameState.laserMaze.playerX + playerSpeed);
+                        break;
+                }
+            }
+            gameLoop();
+        }
+
+        window.onload = () => {
+            sendAction({ type: 'request_initial_state' });
+        };
+    </script>
+</body>
+</html>

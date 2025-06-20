@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Психомост Админка</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #2a0000; /* Темный фон, возможно, красный для админки */
+            color: #e0e0e0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Выравнивание по верхнему краю */
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #0a0a0a; /* Еще темнее */
+            padding: 30px;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        h1 {
+            color: #ff4500; /* Оранжево-красный заголовок */
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+        .section-title {
+            color: #e94560; /* Акцентный цвет для подзаголовков */
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #3b3b4d;
+            padding-bottom: 0.5rem;
+        }
+        .controls-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .control-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex-grow: 1;
+            min-width: 200px;
+        }
+        button {
+            background-color: #e94560;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            font-size: 1rem;
+            text-align: center;
+        }
+        button:hover {
+            background-color: #ff6f88;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
+        }
+        button:active {
+            background-color: #d1304c;
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        input[type="text"], input[type="number"], select {
+            background-color: #16213e;
+            border: 1px solid #0f3460;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            color: #e0e0e0;
+            font-size: 1rem;
+            width: 100%;
+        }
+        .log-output {
+            background-color: #0d0d1a;
+            border: 1px solid #1a1a2e;
+            height: 400px;
+            overflow-y: scroll;
+            padding: 1rem;
+            font-family: monospace;
+            font-size: 0.85em;
+            color: #a0a0a0;
+            border-radius: 0.75rem;
+            box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.3);
+        }
+        .log-entry {
+            margin-bottom: 0.3rem;
+            word-break: break-all;
+        }
+        .log-entry.info { color: #a0a0a0; }
+        .log-entry.warn { color: #ffeb3b; } /* Желтый */
+        .log-entry.error { color: #f44336; } /* Красный */
+        .log-entry.success { color: #4CAF50; } /* Зеленый */
+        .log-entry.debug { color: #87ceeb; } /* Светло-голубой для DEBUG */
+
+        /* Стили для блока состояния игрока */
+        #player-state-display {
+            background-color: #16213e;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid #0f3460;
+            margin-top: 1rem;
+        }
+        #player-state-display h3 {
+            color: #00bcd4;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+        #player-state-display p {
+            margin-bottom: 0.3rem;
+        }
+        #player-journal-display {
+            background-color: #16213e;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid #0f3460;
+            margin-top: 1rem;
+        }
+        #player-journal-display ul {
+            list-style: disc;
+            margin-left: 1.5rem;
+        }
+        #player-journal-display li {
+            margin-bottom: 0.3rem;
+        }
+        .journal-entry-admin {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+            background-color: #0f3460;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        .journal-entry-admin input[type="checkbox"] {
+            margin-right: 5px;
+            transform: scale(1.2); /* Увеличиваем чекбокс для лучшей видимости */
+        }
+        .journal-entry-admin .journal-content-input {
+            flex-grow: 1;
+            background-color: #2e2e4a; /* Более светлый фон для инпута */
+        }
+        .journal-entry-admin button {
+            padding: 0.3rem 0.8rem;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Панель Администратора Психомост</h1>
+
+        <div class="controls-group">
+            <div class="control-item">
+                <span class="section-title">Состояние подключения:</span>
+                <span id="connection-status" class="text-gray-400">Подключение...</span>
+            </div>
+            <div class="control-item">
+                <span class="section-title">Выбор клиента:</span>
+                <select id="client-select" class="mb-2" onchange="selectClient()">
+                    <option value="">Нет активных клиентов</option>
+                </select>
+                <button onclick="requestGameState()">Обновить состояние выбранного клиента</button>
+            </div>
+        </div>
+
+        <div class="controls-group">
+            <div class="control-item">
+                <span class="section-title">Глобальные команды:</span>
+                <input type="text" id="admin-message-input" placeholder="Введите сообщение для игроков">
+                <button onclick="sendCustomMessage()">Отправить глобальное сообщение</button>
+            </div>
+            <div class="control-item">
+                <span class="section-title">Управление игрой:</span>
+                <button onclick="restartGame()">Начать игру заново для выбранного клиента</button>
+                <button onclick="fullResetGame()">Полный сброс игры (УДАЛИТ ВСЕ СОХРАНЕНИЯ)</button>
+            </div>
+        </div>
+
+        <div class="section-title">Текущее состояние выбранного игрока:</div>
+        <div id="player-state-display">
+            <p><strong>Текущая сцена:</strong> <span id="current-scene-display">N/A</span></p>
+            <p><strong>Характеристики:</strong></p>
+            <ul>
+                <li>Логика: <span id="display-logic">N/A</span></li>
+                <li>Эмпатия: <span id="display-empathy">N/A</span></li>
+                <li>Синхронизация: <span id="display-sync">N/A</span></li>
+            </ul>
+            <p><strong>Репутация:</strong></p>
+            <ul>
+                <li>Нова Лаб: <span id="display-nova-lab-rep">N/A</span></li>
+                <li>Призраки: <span id="display-ghosts-rep">N/A</span></li>
+                <li>Рафи: <span id="display-rafi-rep">N/A</span></li>
+            </ul>
+            <p><strong>Счетчик секретного пути:</strong> <span id="display-secret-path-counter">N/A</span></p>
+            <p><strong>Нова Лаб враждебна:</strong> <span id="display-nova-lab-hostile">N/A</span></p>
+        </div>
+
+        <div class="section-title">Записи журнала выбранного игрока:</div>
+        <div id="player-journal-display">
+            <p id="journal-empty-message">Выберите игрока, чтобы увидеть записи журнала.</p>
+            <div id="journal-entries-editor">
+                </div>
+            <button onclick="saveJournalChanges()">Сохранить изменения журнала</button>
+        </div>
+
+
+        <div class="controls-group">
+            <div class="control-item">
+                <span class="section-title">Модификация характеристик (для отладки):</span>
+                <select id="stat-select" class="mb-2">
+                    <option value="logic">Логика</option>
+                    <option value="empathy">Эмпатия</option>
+                    <option value="synchronization">Синхронизация</option>
+                    <option value="reputationNovaLab">Репутация Нова Лаб</option>
+                    <option value="reputationGhosts">Репутация Призраков</option>
+                    <option value="reputationRafi">Репутация Рафи</option>
+                    <option value="secretPathCounter">Счетчик Секретного Пути</option>
+                    <option value="novaLabIsHostile">Нова Лаб враждебна</option>
+                </select>
+                <input type="text" id="stat-value-input" placeholder="Введите значение (число или true/false)">
+                <button onclick="modifyStat()">Установить характеристику</button>
+            </div>
+            <div class="control-item">
+                <span class="section-title">Управление сценами:</span>
+                <input type="text" id="scene-id-input" placeholder="Введите ID сцены (e.g., prologue)">
+                <button onclick="setScene()">Перейти к сцене</button>
+            </div>
+        </div>
+
+        <div class="controls-group">
+            <div class="control-item">
+                <span class="section-title">Управление мини-играми:</span>
+                <select id="mini-game-type-select" class="mb-2">
+                    <option value="">Выберите мини-игру</option>
+                    <option value="memoryHack">Взлом Памяти</option>
+                    <option value="decryptor">Дешифратор</option>
+                    <option value="energyFlow">Поток Энергии</option>
+                    <option value="laserMaze">Лазерный Лабиринт</option>
+                </select>
+                <button onclick="forceStartMiniGame()">Принудительно начать мини-игру</button>
+                <div class="flex gap-2 mt-2">
+                    <button onclick="skipMiniGame(true)">Пропустить (Успех)</button>
+                    <button onclick="skipMiniGame(false)">Пропустить (Провал)</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title">Логи сервера:</div>
+        <div class="log-output" id="logs">
+            Подключение к серверу...
+        </div>
+    </div>
+
+    <script>
+        const socket = new WebSocket("ws://localhost:8080");
+        const logsDiv = document.getElementById('logs');
+        const connectionStatusSpan = document.getElementById('connection-status');
+        const adminMessageInput = document.getElementById('admin-message-input');
+        const statSelect = document.getElementById('stat-select');
+        const statValueInput = document.getElementById('stat-value-input');
+        const sceneIdInput = document.getElementById('scene-id-input');
+        const miniGameTypeSelect = document.getElementById('mini-game-type-select');
+        const clientSelect = document.getElementById('client-select');
+
+        // Элементы для отображения состояния игрока
+        const currentSceneDisplay = document.getElementById('current-scene-display');
+        const displayLogic = document.getElementById('display-logic');
+        const displayEmpathy = document.getElementById('display-empathy');
+        const displaySync = document.getElementById('display-sync');
+        const displayNovaLabRep = document.getElementById('display-nova-lab-rep');
+        const displayGhostsRep = document.getElementById('display-ghosts-rep');
+        const displayRafiRep = document.getElementById('display-rafi-rep');
+        const displaySecretPathCounter = document.getElementById('display-secret-path-counter');
+        const displayNovaLabHostile = document.getElementById('display-nova-lab-hostile');
+        const journalEntriesEditor = document.getElementById('journal-entries-editor');
+        const journalEmptyMessage = document.getElementById('journal-empty-message');
+
+        // Текущее состояние выбранного игрока, полученное от сервера
+        let selectedPlayerState = null;
+        // ID выбранного клиента
+        let selectedClientId = null;
+
+        // Вспомогательная функция для добавления записи в окно логов
+        function addLog(message, type = 'info') {
+            const logEntry = document.createElement('div');
+            logEntry.classList.add('log-entry', type);
+            logEntry.innerHTML = `[${new Date().toLocaleTimeString('ru-RU')}] ${message}`; // Время в русской локали
+            logsDiv.appendChild(logEntry);
+            logsDiv.scrollTop = logsDiv.scrollHeight;
+        }
+
+        // Вспомогательная функция для обновления UI состояния игрока
+        function updatePlayerStateUI(state) {
+            selectedPlayerState = state; // Сохраняем текущее состояние для редактирования журнала
+
+            currentSceneDisplay.textContent = state.currentScene;
+            displayLogic.textContent = state.logic;
+            displayEmpathy.textContent = state.empathy;
+            displaySync.textContent = state.synchronization;
+            displayNovaLabRep.textContent = state.reputationNovaLab;
+            displayGhostsRep.textContent = state.reputationGhosts;
+            displayRafiRep.textContent = state.reputationRafi;
+            displaySecretPathCounter.textContent = state.secretPathCounter;
+            displayNovaLabHostile.textContent = state.novaLabIsHostile ? 'Да' : 'Нет';
+
+            // Обновляем редактор журнала
+            journalEntriesEditor.innerHTML = '';
+            // Проверяем, существует ли state.journal и является ли он объектом
+            const allJournalEntries = state.journal ? Object.entries(state.journal) : [];
+
+
+            if (allJournalEntries.length > 0) {
+                journalEmptyMessage.classList.add('hidden');
+                allJournalEntries.forEach(([id, entry]) => {
+                    const entryDiv = document.createElement('div');
+                    entryDiv.classList.add('journal-entry-admin');
+                    entryDiv.innerHTML = `
+                        <input type="checkbox" id="journal-unlocked-${id}" data-id="${id}" class="journal-checkbox" ${entry.unlocked ? 'checked' : ''}>
+                        <label for="journal-unlocked-${id}">${entry.title}:</label>
+                        <input type="text" class="journal-content-input" data-id="${id}" value="${entry.content.replace(/"/g, '&quot;')}" placeholder="Содержимое записи">
+                    `;
+                    journalEntriesEditor.appendChild(entryDiv);
+                });
+            } else {
+                journalEmptyMessage.classList.remove('hidden');
+            }
+        }
+
+        socket.onopen = () => {
+            connectionStatusSpan.textContent = "Подключено 🟢";
+            addLog("Подключено к игровому серверу.", 'success');
+            // Уведомляем сервер, что это админка (без clientId в данном случае)
+            socket.send(JSON.stringify({ type: 'admin_connect' }));
+        };
+
+        socket.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+            addLog(`Получено: ${JSON.stringify(message)}`);
+
+            switch (message.type) {
+                case 'log_entry': // Новый тип для логов в реальном времени
+                    addLog(message.message, message.level.toLowerCase());
+                    break;
+                case 'player_state_data':
+                    updatePlayerStateUI(message.state);
+                    // Убеждаемся, что выбранный клиент соответствует полученным данным
+                    if (selectedClientId === message.state.clientId) {
+                        addLog(`Состояние клиента ${message.state.clientId} обновлено.`, 'info');
+                    }
+                    break;
+                case 'active_clients_list':
+                    updateClientList(message.clients);
+                    addLog(`Список активных клиентов обновлен: ${message.clients.join(', ')}`, 'info');
+                    break;
+                case 'admin_ack':
+                    addLog(`Подтверждение от сервера: ${message.message}`, 'success');
+                    // После успешного изменения, если это изменение текущего клиента, обновим его состояние
+                    if (selectedClientId) {
+                        requestGameState();
+                    }
+                    break;
+                case 'admin_error':
+                    addLog(`Ошибка админки: ${message.message}`, 'error');
+                    break;
+                case 'save_ack': // Эти сообщения могут приходить напрямую от сервера, если клиент тоже админка
+                case 'error':
+                case 'server_broadcast':
+                    // Эти сообщения могут прийти, если админка сама является клиентом игры
+                    // Или если сервер широковещательно отправляет их всем WS-соединениям
+                    break;
+                default:
+                    addLog(`Неизвестное/общее сообщение от сервера: ${JSON.stringify(message)}`, 'info');
+            }
+        };
+
+        socket.onclose = () => {
+            connectionStatusSpan.textContent = "Отключено 🔴";
+            addLog("Отключено от сервера.", 'error');
+        };
+
+        socket.onerror = (error) => {
+            connectionStatusSpan.textContent = "Ошибка ❌";
+            addLog(`Ошибка WebSocket: ${error.message}`, 'error');
+        };
+
+        // Функция для отправки команд администратора на сервер
+        function sendAdminCommand(commandType, payload = {}) {
+            // Добавляем selectedClientId к payload, если он выбран
+            if (selectedClientId) {
+                payload.targetClientId = selectedClientId;
+            }
+            if (socket.readyState === WebSocket.OPEN) {
+                const message = {
+                    type: 'admin_command',
+                    command: commandType,
+                    payload: payload
+                };
+                socket.send(JSON.stringify(message));
+                addLog(`Отправлено: ${JSON.stringify(message)}`, 'debug');
+            } else {
+                addLog("Сервер не подключен. Невозможно отправить команду.", 'warn');
+            }
+        }
+
+        // Обновление списка активных клиентов в выпадающем списке
+        function updateClientList(clients) {
+            clientSelect.innerHTML = '';
+            // Добавляем опцию "Нет активных клиентов" или "Выберите клиента"
+            const defaultOption = document.createElement('option');
+            defaultOption.value = "";
+            defaultOption.textContent = "--- Выберите клиента ---";
+            clientSelect.appendChild(defaultOption);
+
+            if (clients.length === 0) {
+                selectedClientId = null;
+                updatePlayerStateUI({ // Очищаем UI состояния игрока
+                    clientId: 'N/A', currentScene: 'N/A', logic: 'N/A', empathy: 'N/A', synchronization: 'N/A',
+                    reputationNovaLab: 'N/A', reputationGhosts: 'N/A', reputationRafi: 'N/A',
+                    secretPathCounter: 'N/A', novaLabIsHostile: 'N/A', journal: {}
+                });
+                journalEmptyMessage.classList.remove('hidden');
+                return;
+            }
+
+            clients.forEach(id => {
+                const option = document.createElement('option');
+                option.value = id;
+                option.textContent = id;
+                clientSelect.appendChild(option);
+            });
+
+            // Восстанавливаем выбранный клиент или выбираем первый
+            if (selectedClientId && clients.includes(selectedClientId)) {
+                clientSelect.value = selectedClientId;
+                // Не запрашиваем состояние, оно будет обновлено при получении списка
+                // от сервера, так как сервер пришлет состояние выбранного клиента.
+            } else if (clients.length > 0) {
+                selectedClientId = clients[0];
+                clientSelect.value = selectedClientId;
+                requestGameState(); // Запрашиваем состояние для нового выбранного клиента
+            }
+        }
+
+        // При выборе клиента из списка
+        function selectClient() {
+            selectedClientId = clientSelect.value;
+            if (selectedClientId) {
+                requestGameState(); // Запросить состояние для выбранного клиента
+            } else {
+                // Очистить UI состояния, если ничего не выбрано
+                updatePlayerStateUI({
+                    clientId: 'N/A', currentScene: 'N/A', logic: 'N/A', empathy: 'N/A', synchronization: 'N/A',
+                    reputationNovaLab: 'N/A', reputationGhosts: 'N/A', reputationRafi: 'N/A',
+                    secretPathCounter: 'N/A', novaLabIsHostile: 'N/A', journal: {}
+                });
+                journalEmptyMessage.classList.remove('hidden');
+            }
+        }
+
+
+        // Команды, которые админ может отправлять
+        function requestGameState() {
+            if (!selectedClientId) {
+                addLog("Выберите клиента для запроса состояния.", 'warn');
+                return;
+            }
+            sendAdminCommand('request_player_state');
+        }
+
+        function restartGame() {
+            if (!selectedClientId) {
+                addLog("Выберите клиента для перезапуска игры.", 'warn');
+                return;
+            }
+            if (confirm(`Вы уверены, что хотите перезапустить игру для клиента "${selectedClientId}"?`)) {
+                sendAdminCommand('restart_game');
+            }
+        }
+
+        function fullResetGame() {
+            if (confirm("ВНИМАНИЕ: Это действие удалит ВСЕ сохранения игры на сервере и сбросит текущую игру для ВСЕХ клиентов! Продолжить?")) {
+                sendAdminCommand('full_reset_game');
+            }
+        }
+
+        function sendCustomMessage() {
+            const message = adminMessageInput.value;
+            if (message) {
+                sendAdminCommand('broadcast_message', { message: message }); // Передаем объект с сообщением
+                adminMessageInput.value = '';
+            } else {
+                addLog("Введите сообщение для отправки.", 'warn');
+            }
+        }
+
+        function modifyStat() {
+            if (!selectedClientId) {
+                addLog("Выберите клиента для модификации статистики.", 'warn');
+                return;
+            }
+            const stat = statSelect.value;
+            let value = statValueInput.value;
+
+            if (!stat || value === "") {
+                addLog("Выберите характеристику и введите значение.", 'warn');
+                return;
+            }
+
+            if (stat === 'novaLabIsHostile') {
+                if (value.toLowerCase() === 'true') {
+                    value = true;
+                } else if (value.toLowerCase() === 'false') {
+                    value = false;
+                } else {
+                    addLog("Для 'Нова Лаб враждебна' введите 'true' или 'false'.", 'error');
+                    return;
+                }
+            } else {
+                value = parseFloat(value);
+                if (isNaN(value)) {
+                    addLog("Введите корректное числовое значение.", 'error');
+                    return;
+                }
+            }
+
+            sendAdminCommand('modify_stat', { stat: stat, value: value });
+            statValueInput.value = '';
+        }
+
+        function setScene() {
+            if (!selectedClientId) {
+                addLog("Выберите клиента для изменения сцены.", 'warn');
+                return;
+            }
+            const sceneId = sceneIdInput.value.trim();
+            if (sceneId) {
+                sendAdminCommand('set_scene', { sceneId: sceneId });
+                sceneIdInput.value = '';
+            } else {
+                addLog("Введите ID сцены.", 'warn');
+            }
+        }
+
+        // Сохранение изменений журнала
+        function saveJournalChanges() {
+            if (!selectedClientId || !selectedPlayerState) {
+                addLog("Выберите клиента и загрузите его состояние, чтобы сохранить изменения журнала.", 'warn');
+                return;
+            }
+
+            const changes = {};
+            journalEntriesEditor.querySelectorAll('.journal-entry-admin').forEach(entryDiv => {
+                const checkbox = entryDiv.querySelector('.journal-checkbox');
+                const input = entryDiv.querySelector('.journal-content-input');
+                const entryId = input.dataset.id;
+
+                const originalEntry = selectedPlayerState.journal[entryId];
+                const newContent = input.value;
+                const newUnlocked = checkbox.checked;
+
+                if (originalEntry.content !== newContent || originalEntry.unlocked !== newUnlocked) {
+                    changes[entryId] = {
+                        content: newContent,
+                        unlocked: newUnlocked
+                    };
+                }
+            });
+
+            if (Object.keys(changes).length > 0) {
+                sendAdminCommand('modify_journal_entries', { changes: changes });
+            } else {
+                addLog("Нет изменений для сохранения в журнале.", 'info');
+            }
+        }
+
+
+        // Принудительный старт мини-игры
+        function forceStartMiniGame() {
+            if (!selectedClientId) {
+                addLog("Выберите клиента для принудительного запуска мини-игры.", 'warn');
+                return;
+            }
+            const gameType = miniGameTypeSelect.value;
+            if (gameType) {
+                sendAdminCommand('start_mini_game', { gameType: gameType });
+            } else {
+                addLog("Выберите тип мини-игры для принудительного запуска.", 'warn');
+            }
+        }
+
+        // Пропуск мини-игры
+        function skipMiniGame(success) {
+            if (!selectedClientId) {
+                addLog("Выберите клиента для пропуска мини-игры.", 'warn');
+                return;
+            }
+            if (confirm(`Вы уверены, что хотите пропустить текущую мини-игру для клиента "${selectedClientId}" с результатом "${success ? 'Успех' : 'Провал'}"?`)) {
+                sendAdminCommand('skip_mini_game', { success: success });
+            }
+        }
+    </script>
+</body>
+</html>
