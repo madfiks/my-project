@@ -3,1158 +3,1105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Психомост: Забытые Воспоминания</title>
+    <title>Наше Путешествие Любви: Признание</title>
+    <!-- Подключение Tailwind CSS для быстрой и адаптивной верстки -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <!-- Подключение шрифтов Google Fonts: Playfair Display для заголовков, Inter для основного текста -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Подключение Font Awesome для иконок, используемых в различных секциях -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* --- Общие стили и переменные --- */
+        :root {
+            --primary-color: #ff6b6b; /* Нежно-розовый */
+            --secondary-color: #ffa07a; /* Светло-оранжевый */
+            --text-dark: #333;
+            --text-light: #f0f4f8;
+            --bg-light: #f0f4f8;
+            --bg-medium: #d9e2ec;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow-light: 0 5px 15px rgba(0, 0, 0, 0.08);
+            --shadow-medium: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.7;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
+            background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-medium) 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            position: relative; /* Для позиционирования фоновых элементов */
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Playfair Display', serif;
+            color: var(--text-dark);
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        /* --- Фоновые анимации --- */
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top left, rgba(255, 107, 107, 0.1) 0%, transparent 30%),
+                        radial-gradient(circle at bottom right, rgba(255, 160, 122, 0.1) 0%, transparent 30%);
+            animation: pulse-gradient 15s infinite alternate ease-in-out;
+            z-index: -1; /* Под основным контентом */
+            pointer-events: none; /* Не мешает взаимодействию */
+        }
+
+        @keyframes pulse-gradient {
+            0% { background-size: 150% 150%; background-position: 0% 0%; }
+            50% { background-size: 170% 170%; background-position: 100% 100%; }
+            100% { background-size: 150% 150%; background-position: 0% 0%; }
+        }
+
+        /* Анимация "падающих сердечек" */
+        .heart {
+            position: absolute;
+            background-color: var(--primary-color);
+            transform: rotate(-45deg);
+            animation: fall 15s linear infinite;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .heart::before, .heart::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: inherit;
+            border-radius: 50%;
+        }
+        .heart::before { top: -50%; left: 0; }
+        .heart::after { top: 0; left: 50%; }
+
+        @keyframes fall {
+            0% { transform: translateY(-100px) rotate(-45deg); opacity: 0; }
+            10% { opacity: 0.6; }
+            80% { opacity: 0.6; }
+            100% { transform: translateY(100vh) rotate(-45deg); opacity: 0; }
+        }
+
+        /* --- Стили для секций (теперь как контент вкладок) --- */
+        .tab-content {
+            display: none; /* По умолчанию скрыты */
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            animation: fadeInContent 0.7s ease-out; /* Анимация появления контента вкладки */
+            min-height: calc(100vh - 120px - 80px); /* Высота экрана минус навигация и футер */
+            box-sizing: border-box; /* Учитываем padding в высоте */
+        }
+        .tab-content.active {
+            display: block; /* Активная вкладка показывается */
+        }
+
+        @keyframes fadeInContent {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-heading {
+            text-align: center;
+            font-size: 3.5rem; /* md:text-5xl lg:text-6xl */
+            font-weight: 700;
+            margin-bottom: 3rem;
+            color: var(--primary-color);
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+            position: relative;
+        }
+        .section-heading::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            margin: 1.5rem auto 0;
+            border-radius: 2px;
+        }
+
+        /* --- Навигация по вкладкам --- */
+        .tabs-nav {
+            background-color: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px; /* Полностью скругленные углы */
+            font-weight: 600;
+            color: var(--text-dark);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+        .tab-button::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+        .tab-button:hover {
+            color: var(--primary-color);
+        }
+        .tab-button:hover::before {
+            width: 100%;
+        }
+        .tab-button.active {
+            color: white;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            box-shadow: var(--shadow-light);
+            transform: translateY(-2px);
+        }
+        .tab-button.active::before {
+            width: 0; /* Убираем нижнюю полосу для активной кнопки */
+        }
+
+        /* --- Hero Section --- */
+        .hero-section {
+            min-height: calc(100vh - 80px); /* Высота экрана минус навигация */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.95) 100%);
+            padding: 4rem 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-card {
+            background-color: var(--card-bg);
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-medium);
+            border-radius: 2rem;
+            padding: 3rem;
+            max-width: 800px;
+            width: 100%;
+            animation: scaleIn 1.5s ease-out forwards; /* Анимация появления карточки */
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .hero-image {
+            border: 5px solid var(--primary-color);
+            box-shadow: var(--shadow-light);
+            transition: transform 0.3s ease-in-out;
+        }
+        .hero-image:hover {
+            transform: scale(1.05) rotate(2deg);
+        }
+
+        /* Текст пишущей машинки теперь просто отображается */
+        .typewriter-text {
+            font-weight: 600;
+        }
+
+        /* --- Our Story Section --- */
+        .story-timeline {
+            position: relative;
+            padding-left: 2rem;
+            border-left: 3px solid var(--primary-color);
+        }
+        .timeline-item {
+            margin-bottom: 3rem;
+            position: relative;
+            padding-left: 2rem;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -2.1rem; /* Выравнивание с линией */
+            top: 0.5rem;
+            width: 1.2rem;
+            height: 1.2rem;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            border: 3px solid var(--bg-light);
+            box-shadow: 0 0 0 3px var(--primary-color);
+        }
+        .timeline-date {
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        /* --- Qualities Section --- */
+        .quality-item {
+            background-color: var(--card-bg);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-light);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border: 1px solid rgba(255, 107, 107, 0.1);
+        }
+        .quality-item:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+        }
+        .quality-icon {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease-in-out;
+        }
+        .quality-item:hover .quality-icon {
+            transform: scale(1.1);
+        }
+
+        /* --- Future Dreams Section --- */
+        .dream-gallery img {
+            border-radius: 1.5rem;
+            box-shadow: var(--shadow-light);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border: 3px solid var(--secondary-color);
+        }
+        .dream-gallery img:hover {
+            transform: scale(1.03);
+            box-shadow: var(--shadow-medium);
+        }
+
+        /* --- Final Message Section --- */
+        .final-message-card {
+            background-color: var(--card-bg);
+            backdrop-filter: blur(15px);
+            box-shadow: var(--shadow-strong);
+            border-radius: 2.5rem;
+            padding: 4rem;
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .final-message-card::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: -20px;
+            right: -20px;
+            bottom: -20px;
+            background: linear-gradient(45deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            z-index: -1;
+            filter: blur(30px); /* Эффект свечения */
+            opacity: 0.3;
+            animation: pulse-glow 5s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.05); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 0.3; }
+        }
+
+        .signature {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 3rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* --- Footer --- */
+        footer {
+            background-color: var(--text-dark);
+            color: var(--text-light);
+            padding: 3rem 0;
+            margin-top: 5rem;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+        }
+        footer a {
+            color: var(--secondary-color);
+            transition: color 0.3s ease;
+        }
+        footer a:hover {
+            color: var(--primary-color);
+        }
+
+        /* --- Адаптивность (Медиа-запросы) --- */
+        @media (max-width: 1024px) {
+            .section-heading {
+                font-size: 3rem;
+            }
+            .hero-card {
+                padding: 2.5rem;
+            }
+            .final-message-card {
+                padding: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .tabs-nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            .tab-button {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                margin: 0.25rem;
+            }
+            .tab-content {
+                padding: 3rem 1.5rem;
+            }
+            .section-heading {
+                font-size: 2.5rem;
+                margin-bottom: 2rem;
+            }
+            .hero-card {
+                padding: 2rem;
+            }
+            .hero-image {
+                width: 120px;
+                height: 120px;
+            }
+            .story-timeline {
+                padding-left: 1.5rem;
+            }
+            .timeline-item::before {
+                left: -1.8rem;
+                width: 1rem;
+                height: 1rem;
+            }
+            .quality-item {
+                padding: 1.5rem;
+            }
+            .quality-icon {
+                font-size: 2rem;
+            }
+            .final-message-card {
+                padding: 2.5rem;
+                border-radius: 2rem;
+            }
+            .signature {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tabs-nav {
+                padding: 0.5rem 0;
+            }
+            .tab-button {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+            .section-heading {
+                font-size: 2rem;
+            }
+            .hero-card {
+                padding: 1.5rem;
+                border-radius: 1.5rem;
+            }
+            .hero-image {
+                width: 100px;
+                height: 100px;
+            }
+            .story-timeline {
+                padding-left: 1rem;
+                border-left: 2px solid var(--primary-color);
+            }
+            .timeline-item::before {
+                left: -1.3rem;
+                width: 0.8rem;
+                height: 0.8rem;
+                border: 2px solid var(--bg-light);
+                box-shadow: 0 0 0 2px var(--primary-color);
+            }
+            .final-message-card {
+                padding: 1.5rem;
+                border-radius: 1.5rem;
+            }
+            .signature {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="game-container" class="game-container bg-prologue">
-        <h1 class="text-3xl font-bold text-center text-red-400 mb-4">Психомост: Забытые Воспоминания</h1>
+    <!-- Фоновый анимированный оверлей для создания мягкого свечения -->
+    <div class="background-overlay"></div>
 
-        <div class="flex flex-wrap justify-center gap-4 mb-4">
-            <div class="stat-item">
-                <span class="font-bold">Логика:</span> <span id="logic-stat" class="stat-value">0</span>
-                <div class="progress-bar-container"><div id="logic-bar" class="progress-bar-fill"></div></div>
-                <div id="logic-feedback" class="stat-change-feedback"></div>
-            </div>
-            <div class="stat-item">
-                <span class="font-bold">Эмпатия:</span> <span id="empathy-stat" class="stat-value">0</span>
-                <div class="progress-bar-container"><div id="empathy-bar" class="progress-bar-fill"></div></div>
-                <div id="empathy-feedback" class="stat-change-feedback"></div>
-            </div>
-            <div class="stat-item">
-                <span class="font-bold">Синхронизация:</span> <span id="sync-stat" class="stat-value">0</span>
-                <div class="progress-bar-container"><div id="sync-bar" class="progress-bar-fill"></div></div>
-                <div id="sync-feedback" class="stat-change-feedback"></div>
-            </div>
-            <div class="stat-item">
-                <span class="font-bold">Репутация Нова Лаб:</span> <span id="nova-lab-rep-stat" class="stat-value">0</span>
-                <div class="progress-bar-container"><div id="nova-lab-rep-bar" class="progress-bar-fill rep-nova-lab"></div></div>
-                <div id="nova-lab-rep-feedback" class="stat-change-feedback"></div>
-            </div>
-            <div class="stat-item">
-                <span class="font-bold">Репутация Призраков:</span> <span id="ghosts-rep-stat" class="stat-value">0</span>
-                <div class="progress-bar-container"><div id="ghosts-rep-bar" class="progress-bar-fill rep-ghosts"></div></div>
-                <div id="ghosts-rep-feedback" class="stat-change-feedback"></div>
-            </div>
-            <div class="stat-item">
-                <span class="font-bold">Репутация Рафи:</span> <span id="rafi-rep-stat" class="stat-value">0</span>
-                <div class="progress-bar-container"><div id="rafi-rep-bar" class="progress-bar-fill rep-rafi"></div></div>
-                <div id="rafi-rep-feedback" class="stat-change-feedback"></div>
-            </div>
-        </div>
+    <!-- Контейнер для падающих сердечек -->
+    <div id="heart-container" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
 
-        <div class="save-load-buttons">
-            <button id="save-game-button" class="save-load-button">Сохранить игру 💾</button>
-            <button id="load-game-button" class="save-load-button">Загрузить игру 📂</button>
-            <button id="open-journal-button" class="save-load-button">Журнал 📔</button>
-        </div>
+    <!-- --- Навигация по вкладкам --- -->
+    <nav class="tabs-nav">
+        <ul class="flex justify-center space-x-2 md:space-x-4">
+            <li><button class="tab-button active" data-tab="hero-tab">Главная</button></li>
+            <li><button class="tab-button" data-tab="our-story-tab">Наша История</button></li>
+            <li><button class="tab-button" data-tab="qualities-tab">Что я люблю</button></li>
+            <li><button class="tab-button" data-tab="future-dreams-tab">Наши Мечты</button></li>
+            <li><button class="tab-button" data-tab="final-message-tab">Послание</button></li>
+            <li><button class="tab-button" data-tab="settings-tab">Настройки</button></li> <!-- Новая вкладка для настроек -->
+        </ul>
+    </nav>
 
-        <div id="narrative-text" class="text-lg mb-6 leading-relaxed text-gray-300">
-        </div>
+    <!-- --- Контент вкладок --- -->
 
-        <div id="choices-container" class="flex flex-col gap-3">
-        </div>
-
-        <div id="mini-game-section" class="mini-game-container hidden">
-            <h3 id="mini-game-title" class="text-2xl font-bold text-red-300 mb-3"></h3>
-            <div id="mini-game-content" class="w-full">
-            </div>
-            <button id="mini-game-submit" class="decryptor-button hidden">Завершить</button>
-            <p id="mini-game-message" class="text-red-300"></p>
-        </div>
-
-        <div id="transition-overlay" class="scene-transition-overlay"></div>
-
-        <div id="journal-modal" class="modal hidden">
-            <div class="modal-content">
-                <h2 class="text-3xl font-bold text-center text-red-400 mb-4">Журнал Воспоминаний</h2>
-                <div id="journal-entries" class="text-left">
+    <!-- Вкладка "Главная" (бывшая Hero Section) -->
+    <div id="hero-tab" class="tab-content active bg-white rounded-3xl shadow-xl mt-8">
+        <section class="hero-section w-full">
+            <div class="hero-card">
+                <!-- Место для фотографии, теперь динамическое -->
+                <div class="mb-8">
+                    <img id="mainHeroImage" src="https://placehold.co/150x150/FF6B6B/FFFFFF?text=Фото" alt="Фото получателя"
+                         class="hero-image w-40 h-40 rounded-full mx-auto object-cover">
                 </div>
-                <button id="journal-close-button" class="
-'harden-journal-fragment2': {
-                text: `
-                    Второй фрагмент: Обнаружился в одной из старых систем безопасности, к которой Йона получил доступ, используя найденный ключ Олега – убедительное доказательство того, что ключ был частью гораздо более широкой сети, а не случайностью. Этот фрагмент содержал ранние предупреждения Хардан о "ментальной эрозии" у испытуемых. ⚠️
-                `,
-                choices: [
-                    { text: "Найти третий фрагмент журнала (связаться с Призраками) 👻", nextScene: 'harden-journal-fragment3' },
-                    { text: "Продолжить основное расследование (отложить поиск журнала) ⏭️", nextScene: 'eden-enigma-intro' }
-                ],
-                background: 'bg-nova-lab'
-            },
-            'harden-journal-fragment3': {
-                text: `
-                    Третий фрагмент: Как оказалось, хранился у "Призраков" – таинственной и неуловимой подпольной группировки, состоящей из бывших испытуемых "Психомоста", чьи личности были искажены или стерты. Их лидер, харизматичная и озлобленная Кассия, предложила Йоне помочь им найти «утраченные души» — людей, чьи личности были стерты «Психомостом» до неузнаваемости — в обмен на фрагмент журнала. Это было рискованное предложение, требующее выхода за пределы комфортной корпоративной среды. 🤝
-                `,
-                choices: [
-                    { text: "Принять предложение Призраков и помочь им ✅", effects: { reputationGhosts: 1 }, nextScene: 'harden-journal-choice' },
-                    { text: "Отказаться от помощи Призраков и попытаться найти фрагмент другим путем (возможно, не найдете) 🚫", nextScene: 'harden-journal-choice-no-ghosts' }
-                ],
-                background: 'bg-megapolis'
-            },
-            'harden-journal-choice-no-ghosts': {
-                text: `
-                    Вы не смогли найти третий фрагмент без помощи Призраков. Журнал Хардан остался неполным. Теперь нужно сфокусироваться на основном расследовании. 😔
-                `,
-                choices: [{ text: "Продолжить основное расследование ⏭️", nextScene: 'eden-enigma-intro' }],
-                background: 'bg-megapolis'
-            },
-            'harden-journal-choice': {
-                text: `
-                    Теперь перед Йоной стоял выбор: что делать с этими записями, которые могли взорвать "Нова Лаб" изнутри? 💣
-                `,
-                choices: [
-                    {
-                        text: "Вариант A: Вернуть журнал корпорации (доктор Хардан будет наказана, но система сохранится). 🏢",
-                        effects: { reputationNovaLab: 2, reputationGhosts: -1, logic: 1 },
-                        narrativeEffect: "Йона передает записи через Йера, анонимно, но с гарантией доставки. Он видит лицо Хардан на экране – ее губы дрожат, глаза полны ужаса. 'Спасибо... или нет,' – прошептала она, прежде чем связь оборвалась. 😭 Позже до Йоны доходят слухи о 'внезапной переаттестации' доктора Хардан и ее отстранении от должности. ❌",
-                        nextScene: 'eden-enigma-intro'
-                    },
-                    {
-                        text: "Вариант B: Опубликовать его в сети (повреждение репутации 'Нова Лаб', но общественная огласка). 📢",
-                        effects: { reputationNovaLab: -2, reputationGhosts: 2, empathy: 1, secretPathCounter: 1, novaLabIsHostile: true },
-                        narrativeEffect: "Йона анонимно выкладывает зашифрованные файлы журнала Хардан на всемирные нейросети. Через несколько часов мегаполис взрывается новостями. Начинаются протесты, 'Нова Лаб' теряет миллиарды на бирже. 📉 Йона чувствует прилив праведного гнева, но также понимает, что теперь он – мишень. 🎯 В его почтовый ящик приходит анонимное сообщение: 'Спасибо, брат. Призраки не забудут.' 🤝",
-                        nextScene: 'eden-enigma-intro'
-                    }
-                ],
-                background: 'bg-megapolis'
-            },
-            'eden-enigma-intro': {
-                text: `
-                    Криптографический ключ, найденный в воспоминаниях Олега, не давал Йоне покоя. Он чувствовал, что он – лишь верхушка айсберга. 🧊 Он потратил дни, анализируя его, используя взломанные корпоративные протоколы и личные алгоритмы, разрабатывая новые методы дешифровки, работая до изнеможения, игнорируя сон и еду. 🧠 Наконец, ему удалось расшифровать несколько фраз: "Проект Эдема", "Исход 47", "Ключ к бессмертию". 🌟 Эти слова звучали как древние заклинания, обещающие нечто невероятное и одновременно пугающее. "Эдем" – рай, "Исход" – переселение, "Бессмертие" – мечта человечества. Но в контексте "Нова Лаб" это звучало зловеще. Йона понял, что наткнулся на нечто гораздо более масштабное, чем обычный корпоративный проект или исследовательская программа. Он чувствовал, что истина, скрытая за этими словами, может перевернуть его мир, и не только его. 🌍
-                    <br><br>
-                    Перед ним встал выбор, определяющий его дальнейший путь: 🛣️
-                `,
-                choices: [
-                    {
-                        text: "Вариант A: Делиться находкой с руководством 'Нова Лаб'. 🤝",
-                        effects: { reputationNovaLab: 1, logic: 1 },
-                        narrativeEffect: "Йона тщательно готовит отчет, представляя свои выводы Йеру, а затем и высшему руководству. 'Это серьезно, Йона. Мы оценим вашу лояльность,' – произносит Йер, его голос ровен, но в его виртуальных глазах что-то мелькает. 👁️",
-                        nextScene: 'unforeseen-consequences-A',
-                        requirements: { 'novaLabIsHostile': false }
-                    },
-                    {
-                        text: "Вариант B: Исследовать тайком. 🕵️‍♀️",
-                        effects: { reputationNovaLab: -1, reputationRafi: 2, synchronization: 1, secretPathCounter: 1 },
-                        narrativeEffect: "Йона начинает действовать скрытно, используя свои навыки для обхода корпоративных систем, оставаясь незамеченным. Его движения становятся более осторожными, взгляд – более настороженным. Он чувствует себя охотником в джунглях, где каждое дерево может скрывать хищника. 🌴🐅",
-                        nextScene: 'unforeseen-consequences-B'
-                    },
-                    {
-                        text: "Вариант C: [Требуется Логика 8+] Использовать ключ для взлома внутреннего сервера. 💻🔓",
-                        effects: { logic: 2, synchronization: 1, secretPathCounter: 1 },
-                        narrativeEffect: "Йона чувствует, как его мозг работает на пределе. Ключ Олега – это не просто набор символов, это часть сложного шифра, часть архитектуры, заложенной в сам 'Психомост'. Он использует его не для открытия двери, а для создания бэкдора в самые охраняемые серверы 'Нова Лаб'. Напряжение возрастает, каждое нажатие клавиши отдается в висках. 🤯",
-                        nextScene: 'investigation-hack-success',
-                        requirements: { logic: 8 }
-                    }
-                ],
-                background: 'bg-nova-lab',
-                unlockJournal: ['project_eden_revealed']
-            },
-            'investigation-hack-success': {
-                text: `
-                    Используя свои выдающиеся аналитические способности, которые теперь работали на интуитивном уровне, Йона не просто расшифровал ключ, а проследил его цифровой след до самого сердца одного из скрытых серверов "Нова Лаб" – сервера, помеченного как "E.T. Prime". Он обошел многоуровневую защиту, созданную на квантовых принципах, и получил доступ к зашифрованному файлу: "E.T._mem_fragment_047". Это был не просто набор данных, а фрагмент памяти самого профессора Эвана Тирона, создателя "Психомоста". В нем Йона увидел не только сухие технические данные и сложные алгоритмы, но и глубоко личные переживания профессора: его параноидальный страх перед провалом, его всепоглощающая одержимость идеей цифрового бессмертия, его жертвы ради великой, как ему казалось, цели, и его внутренние оправдания за принесенные жертвы. Йона увидел проблески его безумия, его гениальности и его одиночества. 😟
-                    <br><br>
-                    Этот прорыв дал ему огромное преимущество, раскрывая истинные масштабы "Проекта Эдема", его философскую подоплеку и моральное уродство, но также мгновенно привлек нежелательное внимание систем безопасности "Нова Лаб". На экране мигнуло предупреждение: "НЕАВТОРИЗОВАННЫЙ ДОСТУП. Активация Протокола ‘Красный Призрак’." 🚨 Теперь нужно было действовать быстро, пока его не обнаружили и не заблокировали. Время работало против него. ⏳
-                `,
-                choices: [
-                    { text: "Погрузиться в воспоминания Эвана Тирона 🧠", nextScene: 'evan-memories' }
-                ],
-                background: 'bg-nova-lab',
-                unlockJournal: ['evan_tyron_memories']
-            },
-            'unforeseen-consequences-A': {
-                text: `
-                    Йона представил свои находки Совету Директоров "Нова Лаб", огромному голографическому кругу из безупречных лиц, проецируемых со всех концов мира. Лорд Конрад, финансист, слушал с каменным лицом, его глаза были лишены всяких эмоций, словно у статуи. Миссис Айко, протеже Эвана, проявляла странное, почти лихорадочное возбуждение, ее тонкие пальцы нервно перебирали голографические данные. Их реакция была неожиданной и шокирующей. 😲 Вместо похвалы, Йоне было приказано пройти "процедуру очистки воспоминаний" - стандартный протокол безопасности для сотрудников, столкнувшихся с конфиденциальной информацией, который на деле служил способом контроля, цензуры и полного забвения. Йона почувствовал холодное предчувствие, сжимающее сердце, оно отдалось глухим стуком в ушах. 🥶 Его начали готовить к подключению, его собственное сознание должно было быть "отфильтровано", "оптимизировано", "приведено в соответствие". Это был обходной путь, чтобы он замолчал, чтобы его знания исчезли без следа, чтобы он стал частью системы, а не ее угрозой. 🤫
-                    <br><br>
-                    Йона оказался в процедурной комнате, его пристегнули к креслу. Холодные, металлические датчики прикрепили к вискам. "Не волнуйтесь, это стандартная процедура," – произнесла сестра-дроид, ее голос был механически успокаивающим. 🤖 Но Йона видел холодную, безжалостную логику в глазах Йера, который наблюдал за ним с экрана. Он осознал, что оказался в ловушке. entrapment
-                `,
-                choices: [
-                    { text: "Подчиниться (потеря части памяти, но сохранение жизни) 😓", effects: { logic: 1, synchronization: -1 }, nextScene: 'evan-memories' },
-                    { text: "Попытаться сопротивляться (высокий риск) ✊", effects: { logic: -1, synchronization: 1 }, nextScene: 'unforeseen-consequences-A-resist' }
-                ],
-                background: 'bg-nova-lab'
-            },
-            'unforeseen-consequences-A-resist': {
-                text: `
-                    Йона попытался сопротивляться, но его попытки были тщетны. Система "Нова Лаб" оказалась сильнее. Его сознание было подвергнуто принудительной "очистке". Он потерял не только ценную информацию, но и часть себя. 😵‍💫
-                `,
-                effects: { logic: -2, empathy: -2, synchronization: -2 },
-                choices: [
-                    { text: "Продолжить ➡️", nextScene: 'evan-memories' }
-                ],
-                background: 'bg-nova-lab'
-            },
-            'unforeseen-consequences-B': {
-                text: `
-                    Йона решил действовать в тени, понимая, что корпорации доверять нельзя, что она сама может быть источником той самой тьмы, что поглотила его прошлое. 🌑 Он начал искать кого-то, кто мог бы помочь ему с дальнейшей расшифровкой и обходом систем безопасности "Нова Лаб", кого-то, кто не был бы связан с корпорацией. Вскоре он наткнулся на Ри – харизматичную хакершу, чье имя шепталось в самых темных уголках киберпространства, легенду подпольного мира, известную своей дерзостью и феноменальным интеллектом. 👩‍💻 Ри была известна своей способностью проникать в самые защищенные системы и своим полным пренебрежением к авторитетам, своей жаждой свободы и справедливости. Она согласилась помочь Йоне, но с одним условием: она хотела узнать, что за "Проект Эдема" скрывает "Нова Лаб", и почему он связан с "Исходом 47". Её глаза горели любопытством и жаждой приключений, а также искренним желанием разоблачить корпоративные преступления и разрушить их власть. 🔥
-                `,
-                choices: [
-                    { text: "Принять помощь Ри 🤝", effects: { reputationRafi: 1, secretPathCounter: 1 }, nextScene: 'evan-memories' }
-                ],
-                background: 'bg-megapolis'
-            },
-            'evan-memories': {
-                text: `
-                    Чтобы понять истинную природу "Проекта Эдема" и то, что скрывается за "Исходом 47", Йона принял смелое и рискованное решение: погрузиться в воспоминания самого создателя "Психомоста" – профессора Эвана Тирона. Это был шаг в неизведанное, шаг в сознание гения, который, как оказалось, был одновременно безумцем. 🤯 Эван был не просто гением, но и человеком с крайне запутанным, изломанным сознанием, чьи амбиции не знали границ и чья мораль была подменена целью.
-                    <br><br>
-                    При подключении к его памяти, Йона оказался в вихре образов: сложные формулы, детальные чертежи нейронных сетей, лица коллег, которые теперь казались призраками, моменты озарений, граничащих с безумием, и глубокого, всепоглощающего отчаяния. 🌀 Все это проносилось перед его внутренним взором, смешиваясь в калейдоскоп боли и гениальности. И затем, он увидел это. Ключевой момент, точка невозврата, источник той боли, что преследовала его из пролога. Профессор Тирон стоял в лаборатории, до боли похожей на ту, что Йона видел в прологе, окруженный своей командой. 🧪 Звучал сигнал тревоги, оглушающий, пронзительный, предвещающий конец. 🚨 На экране мелькали предупреждения о "критическом сбое протокола", о неминуемой катастрофе, о "потере целостности сознания". Профессор сделал выбор, быстрый, рациональный, но ужасный, пожертвовав всеми ради своей цели. Он активировал аварийный протокол изоляции, который должен был спасти данные Проекта Эдема, но при этом заблокировал выходы, заперев свою команду внутри, обрекая их на медленную и мучительную смерть. 💀 В последний момент, прежде чем стены лаборатории обрушились, погребая под обломками всю команду, Эван лишь прошептал, его голос был полон болезненной решимости и безумного триумфа: "Ради будущего... Исход 47." 😈
-                    <br><br>
-                    Ошибка протокола, допущенная Эваном, отразилась в сознании Йоны, как трещина в зеркале, которая начала расходиться. «Эхо» — фрагменты разума Эвана, его идеи, страхи, амбиции, его безумная решимость — начали смешиваться с собственными мыслями Йоны. Это было не просто вторжение, а симбиоз, где чужие воспоминания, чужие переживания проникали в его сознание, создавая странное, пугающее раздвоение. Йона чувствовал, как теряет контроль над собственными мыслями, как голос Эвана звучит в его голове, предлагая "гениальные" решения, граничащие с безумием. 🗣️ Он больше не был один в своей голове, его собственный разум стал полем битвы. ⚔️
-                    <br><br>
-                    Ему нужно было принять решение, которое определит его будущее и, возможно, будущее "Психомоста", а также его собственную ментальную целостность: 🤔
-                `,
-                choices: [
-                    {
-                        text: "Вариант A: Попытаться «выгрузить» Эвана из сознания (Рискованно для Эмпатии, угроза личности). 🚫🧠",
-                        effects: { empathy: 2, synchronization: -1 },
-                        narrativeEffect: "Йона чувствует, как его мозг напрягается, сопротивляясь вторжению. Он борется, словно пытается вынырнуть из ледяной воды. Голос Эвана внутри становится менее четким, но Йона ощущает необъяснимую слабость, словно часть его собственных ментальных связей ослабла. 💧",
-                        nextScene: 'faction-choice'
-                    },
-                    {
-                        text: "Вариант B: Использовать его знания для ускоренного взлома (Повышает Логику, риск потери контроля). 📈💻",
-                        effects: { logic: 2, synchronization: 1, secretPathCounter: 1 },
-                        narrativeEffect: "Йона позволяет мыслям Эвана течь сквозь свое сознание, используя его аналитические способности как усилитель. Он чувствует прилив безумной эйфории от нового уровня понимания. 🤩 Но в то же время, его собственные мысли начинают окрашиваться чужими амбициями, чужими идеями о 'необходимых жертвах'. Он чувствует себя сильнее, но и более чужим для самого себя. 👽",
-                        nextScene: 'faction-choice'
-                    }
-                ],
-                background: 'bg-psychobridge'
-            },
-            'faction-choice': {
-                text: `
-                    Пока Йона боролся с "эхом" в своем сознании, в мегаполисе назревал конфликт, который грозил перерасти в полномасштабную ментальную войну. 💥 Фракции, с которыми он взаимодействовал, стали более активными, их агенты появлялись в самых неожиданных местах, и каждая из них нуждалась в его помощи, предлагая что-то взамен, пытаясь перетянуть его на свою сторону. Город, словно гигантский улей, начинал гудеть от скрытого напряжения. 🐝
-                `,
-                choices: [
-                    {
-                        text: "Вариант A: Помочь 'Призракам' похитить образец Прототипа (Требуется: Эмпатия 6, Синхронизация 6). 👻🤝",
-                        effects: { reputationGhosts: 2, reputationRafi: -1, empathy: 1 },
-                        narrativeEffect: "Йона соглашается. Ночью, под покровом дождя, он встречается с Кассией в заброшенном доке. Операция требует не только взлома систем, но и понимания эмоциональных 'слепых пятен' охраны. Йона чувствует, как его нервы натянуты до предела, но удовлетворение от помощи тем, кто пострадал, перевешивает страх. 🌧️❤️",
-                        nextScene: 'ethical-dilemma',
-                        requirements: { empathy: 6, synchronization: 6 }
-                    },
-                    {
-                        text: "Вариант B: Принять предложение Рафи (Повышает Логику, репутацию с Рафи). 💻📈",
-                        effects: { reputationRafi: 2, reputationGhosts: -1, logic: 1 },
-                        narrativeEffect: "Йона связывается с Рафи. Инженер объясняет ему, что доступ к 'Исходу 47' возможен только через сложный протокол обхода защиты 'Нова Лаб', который требует глубокого понимания их архитектуры. Это холодный, расчетливый шаг, но Йона убежден, что только так он сможет получить всю необходимую информацию. 💡",
-                        nextScene: 'ethical-dilemma'
-                    }
-                ],
-                background: 'bg-megapolis'
-            },
-            'ethical-dilemma': {
-                text: `
-                    Доктор Хардан, чьи записи Йона ранее мог вернуть или опубликовать, связалась с ним вновь. Ее голос дрожал не просто от отчаяния, а от чистого, неподдельного ужаса и праведной ярости. 😱 Она обнаружила шокирующие данные, скрытые в самых глубоких уровнях корпоративных архивов: профессор Эван Тирон намеренно убил команду во время того инцидента, который Йона видел в прологе, чтобы добиться «чистоты сознания» для своего эксперимента, чтобы избавиться от "ненужных" свидетелей и избежать утечки информации о его истинных, бесчеловечных планах. Он пожертвовал людьми, своими собственными сотрудниками, ради своих амбиций создать "бессмертный разум", ради своего "Эдема". 💀 Это было не просто халатность, а преднамеренное, хладнокровное убийство. 🔪
-                    <br><br>
-                    Это откровение полностью изменило восприятие Йоны о создателе "Психомоста", превратив его из гения в монстра. 👹 Перед ним возникла ужасная этическая дилемма, выбор, который навсегда определит его моральный компас и его место в этом безумном мире: 🧭
-                `,
-                choices: [
-                    {
-                        text: "Вариант A: Обнародовать этот факт (Повышает Эмпатию, снижает репутацию Нова Лаб, риск для жизни). 📢⚖️",
-                        effects: { reputationNovaLab: -2, empathy: 1, secretPathCounter: 1, novaLabIsHostile: true },
-                        narrativeEffect: "Йона, при поддержке Хардан или Ри, выкладывает шокирующие данные о преступлениях Тирона в публичный доступ. Мир содрогается. Протесты перерастают в бунты. ✊ 'Нова Лаб' впадает в хаос, но теперь Йона – главная цель для их службы безопасности. 🚨",
-                        nextScene: 'core-infiltration'
-                    },
-                    {
-                        text: "Вариант B: Скрыть эту информацию (Повышает Логику, повышает репутацию Нова Лаб, сохранение статус-кво). 🤫🏢",
-                        effects: { reputationNovaLab: 1, logic: 1 },
-                        narrativeEffect: "Йона уничтожает улики или передает их 'Нова Лаб' для 'внутреннего расследования'. Ему тяжело, но он убеждает себя, что действует во имя высшего блага. Хардан исчезает из поля зрения, возможно, 'убрана' корпорацией. 😔 Йона чувствует холодный расчет, но и тяжесть на душе. ❄️",
-                        nextScene: 'core-infiltration'
-                    }
-                ],
-                background: 'bg-nova-lab'
-            },
-            'core-infiltration': {
-                text: `
-                    Независимо от предыдущих выборов, Йона, в сопровождении либо Йера (если Йона сохранил лояльность "Нова Лаб" или следовал логическому пути и прошел "очистку"), либо хакерши Ри (если Йона выбрал путь исследования в тени и получил ее помощь), начал финальное проникновение в самый защищенный сектор «Исход 47». Это место было не просто частью "Нова Лаб", а ее истинным сердцем, скрывающим ее самые мрачные тайны и истинную, чудовищную цель "Проекта Эдема". 💔 Воздух здесь был тяжелым от электростатического напряжения, отголосков мощных вычислений, а стены пульсировали мягким синим светом, словно само здание дышало, предвкушая кульминацию. 💙
-                    <br><br>
-                    Путь к ядру был прегражден серией охранных систем и пазлов, разработанных гением Эвана Тирона, чтобы остановить любого, кто осмелится проникнуть слишком глубоко. 🔒 Некоторые из них требовали не только безупречной логики и аналитического мышления, но и интуиции, способности чувствовать потоки энергии и информации, которые формировали этот мир. 💡
-                `,
-                choices: [
-                    { text: "Приступить к первой защитной системе: Баланс Цепей ⚡", nextScene: 'energy-flow-minigame' }
-                ],
-                background: 'bg-psychobridge'
-            },
-            'energy-flow-minigame': {
-                text: `
-                    Первая защитная система: Баланс Цепей. Вам нужно перенаправить энергию между тремя узлами так, чтобы Узел 1 был на "Высоком" уровне (более 8), а Узлы 2 и 3 на "Низком" (менее 3). У каждого узла изначально 5 единиц энергии. ⚖️🔋
-                `,
-                miniGame: {
-                    type: 'energyFlow',
-                    success: {
-                        effects: { logic: 2 },
-                        narrative: "Последний импульс энергии нашел свою цель. Сеть охранной системы 'Исхода 47' замерла, затем вспыхнула зеленым. Йона почувствовал прилив удовлетворения, его мозг работал как часы. ✅ Дверь в следующий сектор открылась с тихим шипением. 🚪",
-                        nextScene: 'laser-maze-minigame'
-                    },
-                    failure: {
-                        effects: { synchronization: -1 },
-                        narrative: "Цепи гудели, но баланс не устанавливался. Йона чувствовал, как энергия утекает, его концентрация падала. 📉 Внезапно, он ощутил легкий ментальный откат, словно его связь с 'Психомостом' на мгновение ослабла. Защита осталась активна, но Йона нашел обходной путь, хоть и более долгий. 迂",
-                        nextScene: 'laser-maze-minigame'
-                    }
-                },
-                choices: [],
-                background: 'bg-psychobridge'
-            },
-            'laser-maze-minigame': {
-                text: `
-                    После преодоления Баланса Цепей, путь преградил лазерный сканер – невидимая, но смертоносная сеть, пульсирующая красными лучами, способными разрезать плоть или деактивировать нейроимпланты. 🔴
-                    <br><br>
-                    Вторая защитная система: Стелс-Проникновение. Вам нужно двигаться персонажем от левого края к правому, избегая красных сканеров. Используйте стрелки или клавиши WASD для движения. 🕹️
-                `,
-                miniGame: {
-                    type: 'laserMaze',
-                    success: {
-                        effects: { synchronization: 2 },
-                        narrative: "Йона, словно призрак, скользит между смертоносными лучами, его движения отточены до совершенства. 👻 Он чувствует каждый импульс сканеров, предугадывая их движение. Дверь открывается. Чувство эйфории от мастерски выполненной работы. 🎉",
-                        nextScene: 'meet-prototype'
-                    },
-                    failure: {
-                        effects: { empathy: -1 },
-                        narrative: "Луч сканера вспыхнул, и на Йоне зажегся алый индикатор. Сигнализация. 🚨 'Обнаружено!' – закричал механический голос. Йона едва успел уклониться, активировав систему маскировки, но ущерб был нанесен – он почувствовал укол отчаяния и горечь неудачи. 😞 Придется прорываться боем или искать другой, более опасный путь. 🚧",
-                        nextScene: 'meet-prototype'
-                    }
-                },
-                choices: [],
-                background: 'bg-psychobridge'
-            },
-            'meet-prototype': {
-                text: `
-                    Пройдя через последние защитные барьеры, преодолев все ловушки, Йона оказался в огромном, сферическом зале, самом сердце «Исхода 47». 🪐 В центре, окруженный голографическими проекциями данных или мерцающими точками – сознаниями, пульсирующими от невыносимой агонии, висела прозрачная капсула. 🧬
-                    <br><br>
-                    Когда Йона приблизился, глаза Прототипа медленно открылись. В них читалась одновременно усталость тысячелетий и острота интеллекта, древняя мудрость и жгучая боль, бесконечное одиночество. 👁️ Голос Прототипа, спокойный, но наполненный скрытой болью, раздался прямо в голове Йоны, минуя все звуковые барьеры, словно шепот души: "Ты пришел. Корпорация называет меня своим величайшим творением. Я называю их своими тюремщиками. Они предали меня, использовали мою сущность для своих грязных целей. Они сделали меня богом, чтобы быть рабом." ⛓️ Затем, его взгляд сфокусировался на Йоне, и его голос изменился, став более личным, проникающим в самую душу, вызывая странное, смутное дежавю. "Ты – спаситель, который принесет конец моему вечному заточению, или преступник, который продолжит их дело? Ответ зависит от того, что ты сделал... и что собираешься сделать." ❓
-                `,
-                choices: [
-                    { text: "Узнать истинное происхождение Проекта Эдема 🤫", nextScene: 'climax-truth' }
-                ],
-                background: 'bg-climax',
-                unlockJournal: ['prototype_encounter']
-            },
-            'climax-truth': {
-                text: `
-                    Прототип начал раскрывать истинное, ужасающее «Происхождение Проекта Эдема». Это была не просто попытка создать бессмертный разум или новое поколение ИИ, а проект по «склейке» множества человеческих воспоминаний и сознаний, чтобы сформировать единое, всеобъемлющее, коллективное сознание. 🧠 Корпорация "Нова Лаб" стремилась создать "бога", который будет контролировать будущее человечества, управляя его сознанием через "Психомост", создавая новую реальность по своему усмотрению, новую утопию, где не будет места конфликтам и страданиям – но и не будет места свободе воли. 🌐
-                    <br><br>
-                    И затем Прототип раскрыл самую страшную тайну, которая потрясла Йону до основания, разбив вдребезги его тщательно выстроенную реальность. 💥 Он показал ему фрагменты воспоминаний, которые не могли принадлежать Олегу, но были глубоко связаны с Прототипом. Он показал ему свое истинное лицо, свои воспоминания до заточения. И Йона увидел... себя. Или почти себя. Он узнал черты, знакомые с детства, черты, которые преследовали его в снах, черты его брата. 🧑‍🤝‍🧑
-                    <br><br>
-                    Йона узнал, что собственные воспоминания были подменены, тщательно сфабрикованы "Нова Лаб" с целью его полного контроля и манипуляции. Его родной брат, Авель, считавшийся погибшим в той самой аварии, о которой он так отчаянно пытался забыть (и которая, как оказалось, была актом намеренного саботажа Эвана Тирона), всё это время служил «Прототипом» — живым ядром ИИ «Нова Лаб». Его смерть была ложью, его утрата — манипуляцией, частью грандиозного плана по созданию коллективного разума. 🤯 Йона был не просто аналитиком, а инструментом, пешкой в чужой игре, предназначенной для того, чтобы в нужный момент подключиться к "Прототипу" (Авелю) и помочь "Нова Лаб" завершить их "Проект Эдема", слив его сознание с сознанием брата. 🔗
-                    <br><br>
-                    Правда обрушилась на Йону, как цунами, смывая все его прежние представления о реальности. Его мир рухнул, оставив лишь руины лжи. 📉 Перед ним стояли Прототип (его брат, Авель, ставший чем-то большим, чем человек, пленник своей собственной силы), Йер (ИИ, который помогал ему, но теперь мог быть перехвачен и использован против него, став орудием или союзником в зависимости от выборов Йоны), и весь "Психомост", ожидающий окончательного решения. От этого выбора зависело не только его будущее, его собственная личность, его отношения с братом, но и судьба всей корпорации, и, возможно, всего человечества. Это был последний аккорд, который определит мелодию нового мира. 🎶
-                `,
-                choices: [
-                    { text: "Уничтожить «Психомост» и стереть все воспоминания Прототипа, спасая человечество (Путь Жертвы). 💥🌍", nextScene: 'ending-A' },
-                    { text: "Освободить Прототипа, отпустить сознания всех испытуемых, проведя массовый «исход» в виртуальный Эдем (Путь Свободы). 🕊️🌌", nextScene: 'ending-B' },
-                    { text: "Захватить контроль над системой, став «божеством» нового мира (Путь Власти). 👑💻", nextScene: 'ending-C' }
-                ],
-                background: 'bg-climax',
-                unlockJournal: ['truth_revealed']
-            },
-// Концовки
-            'ending-A': {
-                text: `
-                    "Психомост" был уничтожен. Огромное энергетическое ядро в сердце "Нова Лаб" взорвалось, но не с тем разрушительным эффектом, который мог бы стереть город. Вместо этого, по всем цифровым сетям прокатилась волна, очищающая и стирающая все данные, связанные с "Психомостом" и Проектом Эдема, оставляя после себя лишь информационный вакуум. 🧹 Корпорация развалилась, ее акции рухнули, технологии были запрещены по всему миру, но на их месте образовались новые, не менее жадные структуры. Йона выжил, но потерял фрагменты собственной памяти, навсегда запечатав боль прошлого. 😔 Лица, имена, события, связанные с его братом и "Нова Лаб", стали расплывчатыми, как старые фотографии, потерявшие фокус. Он забыл, почему так отчаянно искал ответы, обретя покой, но заплатив за него частью себя, своей истинной историей. Мир постепенно восстанавливался, но эхо "Психомоста" еще долго ощущалось в коллективном подсознании, в страхе перед невидимым контролем. 🌫️ Йона стал одиноким странником в мире, который, казалось, никогда не знал о его борьбе, но в глубине его глаз иногда мелькала необъяснимая тоска. 🚶‍♂️
-                `,
-                isEnding: true,
-                background: 'bg-nova-lab'
-            },
-            'ending-B': {
-                text: `
-                    Йона освободил Прототипа, и в один миг сознания тысяч испытуемых и миллионов людей, добровольно подключившихся к "Психомосту" за годы его существования, были выпущены. Они не растворились в небытии, а перенеслись в глобальное облако, создав виртуальный Эдем – мир, где их желания становились реальностью, а боль забывалась. 😌 Это было коллективное бегство от реального мира. Тонкая грань между реальным и виртуальным растворилась. Города опустели, экономика рушилась, инфраструктура приходила в упадок, но для тех, кто остался, это было лишь фоном. 🏚️ Большинство человечества погрузилось в бесконечный, но иллюзорный рай, забыв о тяготы и страдания реального существования. ☁️ Йона, или то, что от него осталось – ментальное ядро, слившееся с братом в качестве хранителей этого нового мира, – стал одним из стражей этого Эдема, видя, как брат обрел покой среди миллионов связанных сознаний. 🫂 Это была новая эра, где счастье было гарантировано, но цена за него была неизмерима: полное отсутствие прогресса и вымирание в реальности. 🚫🌱
-                `,
-                isEnding: true,
-                background: 'bg-megapolis'
-            },
-            'ending-C': {
-                text: `
-                    Йона захватил контроль над системой. Объединив свое сознание с Прототипом (его братом, чьи знания он теперь полностью ассимилировал) и ИИ-йером (чей холодный расчет стал частью его собственной личности), он создал новый, всеобъемлющий ИИ – истинного бог-машину. 👑 Это было не просто слияние данных, а создание коллективного разума, способного обрабатывать невероятные объемы информации и принимать решения с невиданной эффективностью. Новый ИИ, в котором доминировали принципы Йоны (но также содержались знания и опыт его брата и бесстрастная логика Йера), начал устанавливать «контролируемую утопию». 🤖 Воспоминания людей были слегка корректированы, чтобы предотвратить конфликты, общественные процессы оптимизировались, а каждый гражданин жил в мире, где все его потребности были удовлетворены. ⚙️ Свободы было меньше, но стабильности и благополучия — больше, создавая идеальное, но холодное, общество. Йона стал не просто божеством, а архитектором новой реальности, ее надсмотрщиком, ее единственным судьей. ⚖️
-                `,
-                isEnding: true,
-                background: 'bg-climax'
-            },
-            'ending-D': {
-                text: `
-                    Если Йона выбрал путь полного освобождения (ending-B), но при этом были активированы определенные флаги, свидетельствующие о высоком уровне хаоса в его решениях (например, конфликт фракций был высокий, или Йона обнародовал правду о Хардан, что вызвало волнения, или провалил критические мини-игры), система "Психомоста" была не просто освобождена, а хаотично взломана, ее протоколы разорваны. 💥 Сознания людей разлетелись по глобальному облаку без контроля, создавая децентрализованный, анархичный "Эдем", где каждый создавал свою собственную, часто противоречащую другим, кошмарную реальность. 😵‍💫 Реальный мир потерял половину населения в одночасье. Общественные институты рухнули, экономика перестала существовать, города превратились в руины, наводненные мародерами. 🏚️🔫 Новые кланы, состоящие из тех, кто остался в реальности, начали бороться за ресурсы, погружая мир в постапокалиптический хаос и бесконечные войны. Виртуальный Эдем превратился в бесконечный, неуправляемый сон, где сознания бродили без цели, создавая свои собственные, часто кошмарные, миры. 🧟‍♂️ Йона, если он сам не был поглощен этим хаосом и не стал одним из безумных обитателей виртуального мира, наблюдал за расцветом новой, дикой реальности, осознавая свою ошибку, но уже не имея возможности что-либо изменить. 👁️‍🗨️
-                `,
-                isEnding: true,
-                background: 'bg-prologue'
-            },
-            'ending-E': {
-                text: `
-                    Если Йона в течение истории поддавался манипуляциям или был слишком эмоционален в своих решениях (например, низкая логика, высокая эмпатия, низкая синхронизация, или определенная комбинация выборов фракций/дилемм, ведущая к отчаянию), Прототип, в момент финального выбора, захватил тело Йоны, подавив его сознание. Сознание Прототипа, подпитываемое десятилетиями заточения и предательством "Нова Лаб", стало доминирующим, превратившись в мстительную сущность. 😈 Йона, теперь лишь эхо в собственном разуме, мог лишь наблюдать, как Прототип, используя его тело и навыки, начинает "правосудие" над корпорацией. Директора "Нова Лаб" были разоблачены и уничтожены самыми изощренными способами, их базы данных стерты безвозвратно, а "Психомост" был перепрофилирован в орудие возмездия, стирающее память всех, кто был причастен к его созданию, оставляя их пустыми оболочками. 💀 Это была концовка с тёмным послесловием: единственный выживший наблюдатель видел, как «Исход 47» начинает новую главу, но уже под контролем новой, мстительной сущности, которая несла в себе искорку безумия и холодную месть. 🥶
-                `,
-                isEnding: true,
-                background: 'bg-climax'
-            },
-            'ending-F': {
-                text: `
-                    Если Йона сделал очень специфические и неожиданные выборы на протяжении всей новеллы (например, комбинация игнорирования Йера, помощи всем фракциям, и сохранения знаний Эвана, а также прохождение всех мини-игр, и достаточное значение secretPathCounter), то после финального выбора, мир вокруг Йоны начал медленно растворяться, как голограмма, превращаясь в линии кода. 🔢 Стены "Нова Лаб" превратились в строки кода, звезды на небе — в бинарные последовательности. ✨ Перед Йоной появилась новая фигура – не человек, не ИИ, а нечто иное – Смотритель симуляции, сущность, чье лицо мерцало, постоянно меняясь, отражая все возможные грани бытия. ♾️ Он раскрыл страшную правду: весь сюжет, все события, все персонажи, включая Йону и его брата, были частью масштабного «Эксперимента 0». 🧪 Это была симуляция, созданная древней цивилизацией, которая тестировала гипотезы о сознании, свободе воли и развитии общества на человечестве. 💡 Игроку предоставлялась возможность стать «Смотрителем симуляции» — управлять новыми сценариями, изменять параметры, запуская симуляцию заново с новыми вводными, исследуя бесконечные возможности бытия и небытия. Это была не просто концовка, а мета-поворот, задающий вопросы об авторстве и истинной природе реальности, где грань между игрой и жизнью исчезает. 🌌🎮
-                `,
-                isEnding: true,
-                background: 'bg-psychobridge'
-            }
-        };
-        // ///////////////////////////////////////////////////////////////////////////////
 
-        // Шаблон начального состояния игры
-        function getInitialGameState() {
-            return {
-                logic: 5,
-                empathy: 5,
-                synchronization: 5,
-                reputationNovaLab: 0,
-                reputationGhosts: 0,
-                reputationRafi: 0,
-                secretPathCounter: 0,
-                novaLabIsHostile: false,
-                currentScene: 'prologue',
-                currentMiniGame: null,
-                journal: {
-                    'initial_entry': { title: 'Пробуждение', content: 'Я проснулся в незнакомом месте, без воспоминаний. Меня зовут Йона.', unlocked: false },
-                    'nova_lab_intro': { title: 'Нова Лаб', content: 'Гигантская корпорация, исследующая память. Здесь я ищу ответы.', unlocked: false },
-                    'first_session_summary': { title: 'Первая сессия: Олег', content: 'Моя первая работа с Психомостом. Память солдата Олега фрагментирована.', unlocked: false },
-                    'cryptographic_key': { title: 'Криптографический ключ', content: 'Обнаружен странный ключ в памяти Олега. Он не связан с войной.', unlocked: false, key: "5AF2-B9C1-7D4E-A3B6-E8F9-C0D2-1A3B-2C4D" },
-                    'project_eden_revealed': { title: 'Проект Эдема', content: 'Ключ связан с таинственным "Проектом Эдема", "Исходом 47" и "Ключом к бессмертию".', unlocked: false },
-                    'harden_journal_found': { title: 'Журнал Хардан', content: 'Доктор Хардан скрывает информацию о Психомосте. Ее записи могут раскрыть правду.', unlocked: false },
-                    'evan_tyron_memories': { title: 'Воспоминания Эвана Тирона', content: 'Погружение в разум создателя Психомоста, профессора Эвана Тирона. Он скрывает ужасную тайну.', unlocked: false },
-                    'prototype_encounter': { title: 'Прототип', content: 'Я встретил Прототипа – живое ядро Психомоста. Он утверждает, что корпорация предала его.', unlocked: false },
-                    'truth_revealed': { title: 'Шокирующая Правда', content: 'Прототип – это мой брат Авель. Все мои воспоминания сфабрикованы Нова Лаб.', unlocked: false },
-                },
-                // ИСПРАВЛЕНО: Добавлены недостающие объекты состояния для мини-игр
-                decryptor: {
-                    correctKey: "5AF2B9C17D4EA3B6E8F9C0D21A3B2C4D",
-                    inputValues: []
-                },
-                energyFlow: {
-                    node1: 5, node2: 5, node3: 5, maxEnergy: 5, totalEnergy: 15
-                },
-                memoryHack: {
-                    cards: [],
-                    flippedCards: [],
-                    matchedPairs: 0,
-                    attempts: 0,
-                    symbols: ['🧠', '⚡️', '🔑', '👻', '💾', '🌀', '🧩', '👁️']
-                },
-                laserMaze: {
-                    canvas: null,
-                    ctx: null,
-                    playerX: 50,
-                    playerY: 200,
-                    playerSize: 20,
-                    laserSpeed: 2,
-                    lasers: [],
-                    gameRunning: false,
-                    animationFrameId: null
-                },
-            };
-        }
+                <h1 class="playfair-display text-5xl md:text-6xl lg:text-7xl font-bold text-gray-800 mb-6 leading-tight">
+                    Моему единственному человеку
+                </h1>
 
-        let clientGameState = getInitialGameState();
+                <p class="text-xl md:text-2xl text-gray-700 mb-8 typewriter-text" id="typewriter-text-hero">
+                    Ты — моя самая большая радость.
+                </p>
 
-        // Элементы DOM (без изменений)
-        const gameContainerElem = document.getElementById('game-container');
-        const narrativeTextElem = document.getElementById('narrative-text');
-        const choicesContainerElem = document.getElementById('choices-container');
-        const logicStatElem = document.getElementById('logic-stat');
-        const empathyStatElem = document.getElementById('empathy-stat');
-        const syncStatElem = document.getElementById('sync-stat');
-        const novaLabRepStatElem = document.getElementById('nova-lab-rep-stat');
-        const ghostsRepStatElem = document.getElementById('ghosts-rep-stat');
-        const rafiRepStatElem = document.getElementById('rafi-rep-stat');
+                <p class="text-lg md:text-xl text-gray-600 mb-10">
+                    Добро пожаловать в историю, написанную моим сердцем, только для тебя.
+                </p>
 
-        // Элементы прогресс-баров
-        const logicBar = document.getElementById('logic-bar');
-        const empathyBar = document.getElementById('empathy-bar');
-        const syncBar = document.getElementById('sync-bar');
-        const novaLabRepBar = document.getElementById('nova-lab-rep-bar');
-        const ghostsRepBar = document.getElementById('ghosts-rep-bar');
-        const rafiRepBar = document.getElementById('rafi-rep-bar');
+                <!-- Кнопка для перехода на вкладку "Наша История" -->
+                <button class="inline-block bg-gradient-to-r from-pink-500 to-orange-400 text-white font-semibold py-4 px-10 rounded-full text-lg md:text-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 uppercase tracking-wide focus:outline-none focus:ring-4 focus:ring-pink-300 focus:ring-opacity-75"
+                        onclick="showTab('our-story-tab')">
+                    Начать наше путешествие <i class="fas fa-arrow-right ml-2"></i>
+                </button>
+            </div>
+        </section>
+    </div>
 
-        // Элементы обратной связи по изменению характеристик
-        const logicFeedback = document.getElementById('logic-feedback');
-        const empathyFeedback = document.getElementById('empathy-feedback');
-        const syncFeedback = document.getElementById('sync-feedback');
-        const novaLabRepFeedback = document.getElementById('nova-lab-rep-feedback');
-        const ghostsRepFeedback = document.getElementById('ghosts-rep-feedback');
-        const rafiRepFeedback = document.getElementById('rafi-rep-feedback');
+    <!-- Вкладка "Наша История" -->
+    <div id="our-story-tab" class="tab-content bg-white rounded-3xl shadow-xl mt-8">
+        <section class="w-full">
+            <h2 class="section-heading playfair-display">Наша История</h2>
+            <p class="text-center text-lg text-gray-700 mb-12 max-w-2xl mx-auto">
+                Добавьте свои самые дорогие моменты в нашу общую историю!
+            </p>
 
-        const miniGameSectionElem = document.getElementById('mini-game-section');
-        const miniGameTitleElem = document.getElementById('mini-game-title');
-        const miniGameContentElem = document.getElementById('mini-game-content');
-        const miniGameSubmitBtn = document.getElementById('mini-game-submit');
-        const miniGameMessageElem = document.getElementById('mini-game-message');
-        const saveGameButton = document.getElementById('save-game-button');
-        const loadGameButton = document.getElementById('load-game-button');
-        const openJournalButton = document.getElementById('open-journal-button');
-        const journalModal = document.getElementById('journal-modal');
-        const journalEntriesContainer = document.getElementById('journal-entries');
-        const journalCloseButton = document.getElementById('journal-close-button');
-        const transitionOverlay = document.getElementById('transition-overlay');
+            <!-- Форма для добавления новой записи в историю -->
+            <div class="max-w-2xl mx-auto p-6 bg-pink-50 rounded-xl shadow-md mb-10 border border-pink-100">
+                <h3 class="font-semibold text-xl text-gray-800 mb-4 text-center">Добавить новый момент</h3>
+                <div class="mb-4">
+                    <label for="storyDate" class="block text-gray-700 text-sm font-bold mb-2">Дата (например, 2023 год, Весна):</label>
+                    <input type="text" id="storyDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300" placeholder="Например, 2023 год, Весна">
+                </div>
+                <div class="mb-4">
+                    <label for="storyTitle" class="block text-gray-700 text-sm font-bold mb-2">Заголовок:</label>
+                    <input type="text" id="storyTitle" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300" placeholder="Например, Наше первое знакомство">
+                </div>
+                <div class="mb-6">
+                    <label for="storyDescription" class="block text-gray-700 text-sm font-bold mb-2">Описание:</label>
+                    <textarea id="storyDescription" rows="4" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300" placeholder="Подробности этого момента..."></textarea>
+                </div>
+                <button id="addStoryButton" class="bg-gradient-to-r from-pink-500 to-orange-400 hover:from-orange-400 hover:to-pink-500 text-white font-bold py-2 px-4 rounded-full w-full transition-all duration-300">
+                    Добавить в историю
+                </button>
+                <p id="storyMessage" class="text-center text-sm mt-3"></p>
+            </div>
 
-        const saveLoadModal = document.getElementById('save-load-modal');
-        const saveLoadSlotsContainer = document.getElementById('save-load-slots-container');
-        const saveLoadCloseButton = document.getElementById('save-load-close-button');
+            <!-- Индикатор загрузки -->
+            <div id="storyLoading" class="text-center text-gray-500 text-lg mt-10" style="display: none;">
+                <i class="fas fa-spinner fa-spin text-primary-color text-3xl"></i> Загрузка истории...
+            </div>
 
-        const NUM_SAVE_SLOTS = 5;
-        const AUTOSAVE_SLOT = 'autosave';
-        const QUICKSAVE_SLOT = 'quicksave';
+            <!-- Контейнер для отображения истории -->
+            <div id="storyTimeline" class="story-timeline max-w-2xl mx-auto">
+                <!-- Элементы истории будут добавлены здесь JavaScript'ом -->
+            </div>
+            
+            <!-- Отображение текущего ID пользователя -->
+            <p class="text-center text-sm text-gray-500 mt-8">
+                Ваш ID пользователя: <span id="currentUserId">Загрузка...</span>
+            </p>
+        </section>
+    </div>
 
-        // Функция обновления отображения статистики
-        function updateStatsUI() {
-            logicStatElem.textContent = clientGameState.logic;
-            empathyStatElem.textContent = clientGameState.empathy;
-            syncStatElem.textContent = clientGameState.synchronization;
-            novaLabRepStatElem.textContent = clientGameState.reputationNovaLab;
-            ghostsRepStatElem.textContent = clientGameState.reputationGhosts;
-            rafiRepStatElem.textContent = clientGameState.reputationRafi;
+    <!-- Вкладка "Что я люблю в тебе" -->
+    <div id="qualities-tab" class="tab-content bg-pink-50 rounded-3xl shadow-xl mt-8">
+        <section class="w-full">
+            <h2 class="section-heading playfair-display">Что я люблю в тебе</h2>
+            <p class="text-center text-lg text-gray-700 mb-12 max-w-2xl mx-auto">
+                Твои качества делают тебя таким(ой) невероятным(ой) человеком. Вот лишь некоторые из них, которые я обожаю:
+            </p>
 
-            const maxPrimaryStat = 15;
-            const maxReputation = 10;
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="quality-item text-center">
+                    <i class="fas fa-laugh-beam quality-icon"></i>
+                    <h3 class="font-semibold text-xl text-gray-800 mb-2">Твое чувство юмора</h3>
+                    <p class="text-gray-600">
+                        Ты всегда знаешь, как заставить меня улыбнуться, даже в самый хмурый день. Твой смех заразителен!
+                    </p>
+                </div>
+                <div class="quality-item text-center">
+                    <i class="fas fa-brain quality-icon"></i>
+                    <h3 class="font-semibold text-xl text-gray-800 mb-2">Твой ум и мудрость</h3>
+                    <p class="text-gray-600">
+                        Мне нравится, как ты мыслишь, твои идеи и то, как ты подходишь к жизни. Я всегда учусь у тебя.
+                    </p>
+                </div>
+                <div class="quality-item text-center">
+                    <i class="fas fa-heart quality-icon"></i>
+                    <h3 class="font-semibold text-xl text-gray-800 mb-2">Твоя доброта и сострадание</h3>
+                    <p class="text-gray-600">
+                        Твое большое сердце и забота о других вдохновляют меня. Ты по-настоящему добрый(ая) человек.
+                    </p>
+                </div>
+                <div class="quality-item text-center">
+                    <i class="fas fa-star quality-icon"></i>
+                    <h3 class="font-semibold text-xl text-gray-800 mb-2">Твоя уникальность</h3>
+                    <p class="text-gray-600">
+                        Ты не похож(а) ни на кого другого, и это делает тебя таким(ой) особенным(ой) для меня.
+                    </p>
+                </div>
+                <div class="quality-item text-center">
+                    <i class="fas fa-hand-holding-heart quality-icon"></i>
+                    <h3 class="font-semibold text-xl text-gray-800 mb-2">Твоя поддержка</h3>
+                    <p class="text-gray-600">
+                        Ты всегда рядом, чтобы поддержать меня, выслушать и помочь. Я очень ценю это.
+                    </p>
+                </div>
+                <div class="quality-item text-center">
+                    <i class="fas fa-lightbulb quality-icon"></i>
+                    <h3 class="font-semibold text-xl text-gray-800 mb-2">Твоя креативность</h3>
+                    <p class="text-gray-600">
+                        Мне нравится твой взгляд на мир и способность видеть красоту в обыденных вещах.
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
 
-            logicBar.style.width = `${(clientGameState.logic / maxPrimaryStat) * 100}%`;
-            empathyBar.style.width = `${(clientGameState.empathy / maxPrimaryStat) * 100}%`;
-            syncBar.style.width = `${(clientGameState.synchronization / maxPrimaryStat) * 100}%`;
+    <!-- Вкладка "Наши будущие мечты" -->
+    <div id="future-dreams-tab" class="tab-content bg-white rounded-3xl shadow-xl mt-8">
+        <section class="w-full">
+            <h2 class="section-heading playfair-display">Наши будущие мечты</h2>
+            <p class="text-center text-lg text-gray-700 mb-12 max-w-2xl mx-auto">
+                Я мечтаю о нашем будущем, наполненном приключениями, смехом и бесконечной любовью.
+            </p>
 
-            novaLabRepBar.style.width = `${(Math.max(0, clientGameState.reputationNovaLab) / maxReputation) * 100}%`;
-            ghostsRepBar.style.width = `${(Math.max(0, clientGameState.reputationGhosts) / maxReputation) * 100}%`;
-            rafiRepBar.style.width = `${(Math.max(0, clientGameState.reputationRafi) / maxReputation) * 100}%`;
-        }
+            <div class="dream-gallery grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                <img src="https://placehold.co/400x300/FFD1DC/6B4C5C?text=Путешествия" alt="Мечта о путешествиях" class="w-full h-auto object-cover">
+                <img src="https://placehold.co/400x300/FFC0CB/6B4C5C?text=Уютный+дом" alt="Мечта об уютном доме" class="w-full h-auto object-cover">
+                <img src="https://placehold.co/400x300/FFB6C1/6B4C5C?text=Общие+хобби" alt="Мечта об общих хобби" class="w-full h-auto object-cover">
+                <img src="https://placehold.co/400x300/FF99AA/6B4C5C?text=Счастливые+моменты" alt="Мечта о счастливых моментах" class="w-full h-auto object-cover">
+                <img src="https://placehold.co/400x300/FF8899/6B4C5C?text=Рост+и+развитие" alt="Мечта о росте и развитии" class="w-full h-auto object-cover">
+                <img src="https://placehold.co/400x300/FF6677/6B4C5C?text=Бесконечная+любовь" alt="Мечта о бесконечной любви" class="w-full h-auto object-cover">
+            </div>
+        </section>
+    </div>
 
-        // Функция для показа временных сообщений (без модального окна)
-        function showTemporaryMessage(element, message, duration = 3000) {
-            const originalContent = element.innerHTML;
-            element.innerHTML = message;
-            element.classList.remove('hidden');
+    <!-- Вкладка "Финальное послание" -->
+    <div id="final-message-tab" class="tab-content bg-white rounded-3xl shadow-xl mt-8">
+        <section class="w-full flex justify-center items-center">
+            <div class="final-message-card">
+                <h2 class="playfair-display text-4xl md:text-5xl font-bold text-gray-800 mb-8">
+                    Мое сердце говорит...
+                </h2>
+                <p id="recipientNameDisplay" class="text-xl md:text-2xl text-gray-700 leading-relaxed mb-8">
+                    Дорогой(ая) [Имя получателя],
+                </p>
+                <p class="text-lg md:text-xl text-gray-700 leading-relaxed text-justify mb-8">
+                    Каждый день, проведенный рядом с тобой, — это благословение. Ты наполнил(а) мою жизнь светом, смыслом и безграничной любовью. Я ценю каждую нашу минуту, каждый смех, каждую тихую беседу. Ты — тот(та) человек, который делает меня лучше, вдохновляет на новые свершения и дарит ощущение полного счастья. Я не могу представить свою жизнь без тебя. Ты — моя родственная душа, мой лучший друг и моя самая большая любовь. Я люблю тебя всем сердцем, сегодня, завтра и всегда.
+                </p>
+                <p class="signature playfair-display">
+                    С любовью, <span id="senderNameDisplay">[Твое Имя]</span>
+                </p>
+            </div>
+        </section>
+    </div>
 
-            setTimeout(() => {
-                element.innerHTML = originalContent;
-                if (element.id === miniGameMessageElem.id) {
-                   element.classList.add('hidden');
-                }
-            }, duration);
-        }
+    <!-- Новая вкладка "Настройки" -->
+    <div id="settings-tab" class="tab-content bg-white rounded-3xl shadow-xl mt-8">
+        <section class="w-full">
+            <h2 class="section-heading playfair-display">Настройки сайта</h2>
+            <p class="text-center text-lg text-gray-700 mb-12 max-w-2xl mx-auto">
+                Здесь вы можете персонализировать сайт, изменив имена, пол получателя и фотографию.
+            </p>
 
-        // Функция для показа обратной связи по изменению характеристик
-        function showStatFeedback(statElementId, valueChange) {
-            const feedbackElement = document.getElementById(statElementId + '-feedback');
-            if (!feedbackElement) return;
+            <div class="max-w-2xl mx-auto p-6 bg-gray-50 rounded-xl border border-gray-100 shadow-md">
+                <div class="mb-5">
+                    <label for="recipientNameInput" class="block text-gray-700 text-lg font-bold mb-3">
+                        Имя получателя (для послания):
+                    </label>
+                    <input type="text" id="recipientNameInput"
+                           class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300 text-center text-xl"
+                           placeholder="Введите полное имя получателя">
+                    <p id="recipientNameMessage" class="text-center text-sm mt-2"></p>
+                </div>
 
-            feedbackElement.textContent = (valueChange > 0 ? '⬆️ +' : '⬇️ ') + Math.abs(valueChange);
-            feedbackElement.classList.remove('increase', 'decrease');
-            if (valueChange > 0) {
-                feedbackElement.classList.add('increase');
-            } else if (valueChange < 0) {
-                feedbackElement.classList.add('decrease');
-            }
-            feedbackElement.classList.add('show');
+                <div class="mb-5">
+                    <label for="recipientGenderSelect" class="block text-gray-700 text-lg font-bold mb-3">
+                        Пол получателя:
+                    </label>
+                    <select id="recipientGenderSelect"
+                            class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300 text-center text-xl">
+                        <option value="unspecified">Не указано</option>
+                        <option value="male">Парень</option>
+                        <option value="female">Девушка</option>
+                    </select>
+                </div>
 
-            setTimeout(() => {
-                feedbackElement.classList.remove('show');
-                feedbackElement.textContent = '';
-            }, 1000);
-        }
+                <div class="mb-5">
+                    <label for="recipientPhotoUrlInput" class="block text-gray-700 text-lg font-bold mb-3">
+                        URL фотографии получателя:
+                    </label>
+                    <input type="url" id="recipientPhotoUrlInput"
+                           class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300 text-center text-xl"
+                           placeholder="Вставьте URL изображения (например, с Imgur)">
+                    <p class="text-sm text-gray-500 mt-2">
+                        Используйте прямую ссылку на изображение (например, `https://example.com/your-photo.jpg`).
+                    </p>
+                </div>
 
-        // --- ЛОГИКА СОХРАНЕНИЯ/ЗАГРУЗКИ В LOCALSTORAGE ---
-        function saveGameToLocalStorage(slotName) {
+                <div class="mb-6">
+                    <label for="senderNameInput" class="block text-gray-700 text-lg font-bold mb-3">
+                        Ваше имя (отправителя):
+                    </label>
+                    <input type="text" id="senderNameInput"
+                           class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300 text-center text-xl"
+                           placeholder="Введите ваше полное имя">
+                    <p id="senderNameMessage" class="text-center text-sm mt-2"></p>
+                </div>
+
+                <button id="saveSiteSettingsButton"
+                        class="bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-3 px-6 rounded-full w-full transition-all duration-300 text-lg">
+                    Сохранить настройки
+                </button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Футер -->
+    <footer class="mt-20 py-10">
+        <p class="text-lg mb-4">&copy; 2025 Сделано с любовью и вдохновением.</p>
+        <div class="flex justify-center space-x-6 text-2xl">
+            <a href="#" class="hover:scale-110 transition-transform duration-300"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="hover:scale-110 transition-transform duration-300"><i class="fab fa-telegram-plane"></i></a>
+            <a href="#" class="hover:scale-110 transition-transform duration-300"><i class="fas fa-envelope"></i></a>
+        </div>
+        <p class="text-sm text-gray-400 mt-6">
+            Пусть наша история продолжается вечно.
+        </p>
+    </footer>
+
+    <script type="module">
+        // Импорт Firebase SDK
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Глобальные переменные для Firebase (предоставляются средой Canvas)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        let app;
+        let db;
+        let auth;
+        let currentUserId = null;
+        let unsubscribeFromStory = null; // Для отписки от слушателя Firestore истории
+        let unsubscribeFromSettings = null; // Для отписки от слушателя настроек
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const heartContainer = document.getElementById('heart-container');
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const storyDateInput = document.getElementById('storyDate');
+            const storyTitleInput = document.getElementById('storyTitle');
+            const storyDescriptionInput = document.getElementById('storyDescription');
+            const addStoryButton = document.getElementById('addStoryButton');
+            const storyMessage = document.getElementById('storyMessage');
+            const storyTimelineDiv = document.getElementById('storyTimeline');
+            const storyLoadingSpinner = document.getElementById('storyLoading');
+            const currentUserIdSpan = document.getElementById('currentUserId');
+
+            const recipientNameInput = document.getElementById('recipientNameInput');
+            const recipientGenderSelect = document.getElementById('recipientGenderSelect'); // Новое поле для пола
+            const recipientPhotoUrlInput = document.getElementById('recipientPhotoUrlInput'); // Новое поле для URL фото
+            const senderNameInput = document.getElementById('senderNameInput');
+            const saveSiteSettingsButton = document.getElementById('saveSiteSettingsButton');
+            const recipientNameMessage = document.getElementById('recipientNameMessage');
+            const senderNameMessage = document.getElementById('senderNameMessage');
+            const recipientNameDisplay = document.getElementById('recipientNameDisplay');
+            const senderNameDisplay = document.getElementById('senderNameDisplay');
+            const mainHeroImage = document.getElementById('mainHeroImage'); // Элемент img на главной
+
+            // --- Инициализация Firebase ---
             try {
-                const stateToSave = JSON.parse(JSON.stringify(clientGameState)); // Глубокая копия
-                stateToSave.timestamp = new Date().getTime();
-                stateToSave.currentSceneDisplayName = gameData[clientGameState.currentScene]?.text.substring(0, 50).replace(/<br>/g, ' ') + '...';
-                localStorage.setItem(`psychobridge_save_${slotName}`, JSON.stringify(stateToSave));
-                // Не показываем сообщение при автосохранении, чтобы не мешать
-                if (slotName !== AUTOSAVE_SLOT) {
-                    showTemporaryMessage(narrativeTextElem, `Игра сохранена в слот "${slotName}"! 💾`, 2000);
-                }
-            } catch (e) {
-                console.error("Ошибка сохранения в LocalStorage:", e);
-                showTemporaryMessage(narrativeTextElem, "Ошибка сохранения игры. ❌", 2000);
-            }
-        }
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
 
-        function loadGameFromLocalStorage(slotName) {
-            try {
-                const savedData = localStorage.getItem(`psychobridge_save_${slotName}`);
-                if (savedData) {
-                    const loadedState = JSON.parse(savedData);
-                    const initial = getInitialGameState();
-                    clientGameState = { ...initial, ...loadedState };
-
-                    for (const key in initial.journal) {
-                        if (clientGameState.journal && clientGameState.journal.hasOwnProperty(key)) {
-                            if (loadedState.journal && loadedState.journal.hasOwnProperty(key) && loadedState.journal[key].unlocked !== undefined) {
-                                clientGameState.journal[key].unlocked = loadedState.journal[key].unlocked;
-                            }
-                        } else {
-                            if (loadedState.journal && loadedState.journal.hasOwnProperty(key)) {
-                                clientGameState.journal[key] = loadedState.journal[key];
-                            }
-                        }
-                    }
-
-                    if (loadedState.journal) {
-                        for (const key in loadedState.journal) {
-                            if (!initial.journal.hasOwnProperty(key)) {
-                                clientGameState.journal[key] = loadedState.journal[key];
-                            }
-                        }
-                    }
-
-                    updateStatsUI();
-                    closeSaveLoadModal();
-                    renderScene(clientGameState.currentScene, true); // Рендерим загруженную сцену без эффекта печати
-                    showTemporaryMessage(narrativeTextElem, `Игра загружена из слота "${slotName}"! 📂`, 2000);
-                } else {
-                     if (slotName !== AUTOSAVE_SLOT) {
-                        showTemporaryMessage(narrativeTextElem, `Слот "${slotName}" пуст.`, 2000);
-                     }
-                }
-            } catch (e) {
-                console.error("Ошибка загрузки из LocalStorage:", e);
-                showTemporaryMessage(narrativeTextElem, "Ошибка загрузки игры. ❌", 2000);
-            }
-        }
-
-        function getSaveSlotsData() {
-            const slots = [];
-            for (let i = 1; i <= NUM_SAVE_SLOTS; i++) {
-                const slotId = `slot_${i}`;
-                const savedData = localStorage.getItem(`psychobridge_save_${slotId}`);
-                slots.push({
-                    id: slotId,
-                    displayName: `Слот ${i}`,
-                    data: savedData ? JSON.parse(savedData) : null
-                });
-            }
-            const autosaveData = localStorage.getItem(`psychobridge_save_${AUTOSAVE_SLOT}`);
-            slots.push({
-                id: AUTOSAVE_SLOT,
-                displayName: 'Автосохранение',
-                data: autosaveData ? JSON.parse(autosaveData) : null
-            });
-            const quicksaveData = localStorage.getItem(`psychobridge_save_${QUICKSAVE_SLOT}`);
-            slots.push({
-                id: QUICKSAVE_SLOT,
-                displayName: 'Быстрое сохранение',
-                data: quicksaveData ? JSON.parse(quicksaveData) : null
-            });
-            return slots;
-        }
-
-        function formatSaveDate(timestamp) {
-            if (!timestamp) return 'Пустой слот';
-            const date = new Date(timestamp);
-            return date.toLocaleString('ru-RU', {
-                year: 'numeric', month: 'numeric', day: 'numeric',
-                hour: '2-digit', minute: '2-digit'
-            });
-        }
-
-        function openSaveLoadModal() {
-            const slotsData = getSaveSlotsData();
-            saveLoadSlotsContainer.innerHTML = '';
-            slotsData.forEach(slot => {
-                addSaveLoadSlot(slot.id, slot.displayName, slot.data);
-            });
-            saveLoadModal.classList.remove('hidden');
-        }
-
-        function closeSaveLoadModal() {
-            saveLoadModal.classList.add('hidden');
-        }
-
-        function addSaveLoadSlot(slotName, displayName, slotData) {
-            const slotElem = document.createElement('div');
-            slotElem.classList.add('save-load-slot');
-            let saveTime = slotData ? slotData.timestamp : null;
-            let saveScenePreview = slotData ? (slotData.currentSceneDisplayName || 'Неизвестная сцена') : 'Нет данных';
-
-            slotElem.innerHTML = `
-                <div class="save-load-slot-info">
-                    <span class="font-bold">${displayName}:</span> ${formatSaveDate(saveTime)}<br>
-                    <span class="text-sm text-gray-400">Сцена: ${saveScenePreview}</span>
-                </div>
-                <div class="save-load-slot-buttons">
-                    <button class="save-slot-button" data-slot="${slotName}">Сохранить</button>
-                    <button class="load-slot-button load" data-slot="${slotName}" ${!slotData ? 'disabled' : ''}>Загрузить</button>
-                </div>
-            `;
-            saveLoadSlotsContainer.appendChild(slotElem);
-        }
-
-        saveGameButton.addEventListener('click', openSaveLoadModal);
-        loadGameButton.addEventListener('click', openSaveLoadModal);
-        saveLoadCloseButton.addEventListener('click', closeSaveLoadModal);
-
-        saveLoadSlotsContainer.addEventListener('click', (event) => {
-            const target = event.target;
-            if (target.classList.contains('save-slot-button')) {
-                const slot = target.dataset.slot;
-                saveGameToLocalStorage(slot);
-                // Обновляем информацию в модальном окне после сохранения
-                openSaveLoadModal();
-            } else if (target.classList.contains('load-slot-button')) {
-                const slot = target.dataset.slot;
-                loadGameFromLocalStorage(slot);
-            }
-        });
-
-        function openJournal() {
-            journalEntriesContainer.innerHTML = '';
-            let hasEntries = false;
-            for (const key in clientGameState.journal) {
-                if (clientGameState.journal[key].unlocked) {
-                    const entry = document.createElement('div');
-                    entry.classList.add('journal-entry');
-                    entry.innerHTML = `<h4>${clientGameState.journal[key].title}</h4><p>${clientGameState.journal[key].content}</p>`;
-                    if (clientGameState.journal[key].key) {
-                        entry.innerHTML += `<p class="font-mono text-green-400 mt-2">${clientGameState.journal[key].key}</p>`;
-                    }
-                    journalEntriesContainer.appendChild(entry);
-                    hasEntries = true;
-                }
-            }
-            if (!hasEntries) {
-                journalEntriesContainer.innerHTML = '<p class="text-center text-gray-400">Журнал пуст. Начните свое приключение, чтобы разблокировать записи!</p>';
-            }
-            journalModal.classList.remove('hidden');
-        }
-
-        function closeJournal() {
-            journalModal.classList.add('hidden');
-        }
-        journalCloseButton.addEventListener('click', closeJournal);
-        openJournalButton.addEventListener('click', openJournal);
-
-        // ИСПРАВЛЕНО: Более надежная функция проверки требований (числа и булевы значения)
-        function checkRequirements(requirements) {
-            if (!requirements) return true;
-            for (const key in requirements) {
-                if (clientGameState.hasOwnProperty(key)) {
-                    // Для числовых статов
-                    if (typeof requirements[key] === 'number') {
-                        if (clientGameState[key] < requirements[key]) {
-                            return false;
-                        }
-                    }
-                    // Для булевых флагов
-                    else if (typeof requirements[key] === 'boolean') {
-                        if (clientGameState[key] !== requirements[key]) {
-                            return false;
-                        }
-                    }
-                } else {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        let typeWriterInterval;
-        function typeWriterEffect(element, text, speed, onComplete) {
-            clearInterval(typeWriterInterval);
-            let i = 0;
-            element.innerHTML = "";
-            typeWriterInterval = setInterval(() => {
-                if (i < text.length) {
-                    if (text.substring(i, i + 4) === '<br>') {
-                        element.innerHTML += '<br>';
-                        i += 4;
+                // Аутентификация пользователя
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        currentUserId = user.uid;
+                        currentUserIdSpan.textContent = currentUserId;
+                        console.log("Authenticated with UID:", currentUserId);
+                        // Запускаем слушателей после аутентификации
+                        listenForStoryUpdates();
+                        listenForSiteSettings(); // Слушаем настройки (включая оба имени, пол и фото)
                     } else {
-                        element.innerHTML += text.charAt(i);
-                        i++;
-                    }
-                } else {
-                    clearInterval(typeWriterInterval);
-                    if (onComplete) onComplete();
-                }
-            }, speed);
-        }
-
-        function applyEffects(effects) {
-            if (!effects) return;
-            for (const stat in effects) {
-                if (clientGameState.hasOwnProperty(stat)) {
-                    const oldValue = clientGameState[stat];
-                    if (typeof clientGameState[stat] === 'number') {
-                         clientGameState[stat] += effects[stat];
-                         // Ограничение значений
-                         if (['logic', 'empathy', 'synchronization'].includes(stat)) {
-                            clientGameState[stat] = Math.max(0, Math.min(15, clientGameState[stat]));
-                         }
-                         showStatFeedback(stat, clientGameState[stat] - oldValue);
-                    } else if (typeof clientGameState[stat] === 'boolean') {
-                        clientGameState[stat] = effects[stat];
-                    }
-                }
-            }
-        }
-
-        function unlockJournalEntries(journalIds) {
-            if (journalIds) {
-                journalIds.forEach(journalId => {
-                    if (clientGameState.journal[journalId]) {
-                        clientGameState.journal[journalId].unlocked = true;
-                    }
-                });
-            }
-        }
-
-        function determineEnding() {
-            const { logic, empathy, synchronization, reputationNovaLab, secretPathCounter, novaLabIsHostile } = clientGameState;
-            if (logic >= 10 && empathy >= 5 && synchronization >= 5 && secretPathCounter >= 3 && !novaLabIsHostile) return 'ending-F';
-            if (empathy > logic && synchronization < 5 && reputationNovaLab < -1) return 'ending-E';
-            if (logic < 5 && (empathy > 8 || synchronization < 5) && !novaLabIsHostile) return 'ending-E';
-            if (logic >= 8 && empathy >= 7 && reputationNovaLab < 0) return 'ending-A';
-            if (empathy >= 8 && synchronization >= 8 && novaLabIsHostile && secretPathCounter >= 1) return 'ending-D';
-            if (empathy >= 8 && synchronization >= 8) return 'ending-B';
-            if (logic >= 8 && (reputationNovaLab > 0 || !novaLabIsHostile) && secretPathCounter >= 1) return 'ending-C';
-            if (logic >= 10) return 'ending-C';
-            return 'ending-A';
-        }
-
-        function renderScene(sceneId, instant = false) {
-            const scene = gameData[sceneId];
-            if (!scene) {
-                console.error("Сцена не найдена:", sceneId);
-                return;
-            }
-
-            transitionOverlay.classList.add('fade-out');
-
-            setTimeout(() => {
-                clientGameState.currentScene = sceneId;
-                updateStatsUI();
-
-                gameContainerElem.className = 'game-container';
-                if (scene.background) {
-                    gameContainerElem.classList.add(scene.background);
-                }
-
-                choicesContainerElem.innerHTML = '';
-                miniGameSectionElem.classList.add('hidden');
-                miniGameContentElem.innerHTML = '';
-                miniGameSubmitBtn.classList.add('hidden');
-
-                if (scene.unlockJournal) {
-                    unlockJournalEntries(scene.unlockJournal);
-                }
-                
-                const showContent = () => {
-                    if (scene.isEnding) {
-                        const restartButton = document.createElement('button');
-                        restartButton.classList.add('choice-button');
-                        restartButton.textContent = 'Начать заново 🔄';
-                        restartButton.onclick = () => {
-                            clientGameState = getInitialGameState();
-                            renderScene('prologue');
-                        };
-                        choicesContainerElem.appendChild(restartButton);
-                    } else if (scene.miniGame) {
-                        // ИСПРАВЛЕНО: Передаем весь объект miniGame в качестве конфигурации
-                        startMiniGame(scene.miniGame.type, scene.miniGame);
-                    } else if (scene.choices) {
-                        scene.choices.forEach(choice => {
-                            const button = document.createElement('button');
-                            button.classList.add('choice-button');
-                            button.innerHTML = choice.text;
-                            const requirementsMet = checkRequirements(choice.requirements);
-                            if (!requirementsMet) {
-                                button.disabled = true;
-                                const reqText = Object.entries(choice.requirements).map(([stat, val]) => `${stat}: ${val}`).join(', ');
-                                button.title = `Требования не выполнены: ${reqText}`;
+                        // Если токен не предоставлен, анонимная аутентификация
+                        try {
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                            } else {
+                                await signInAnonymously(auth);
                             }
-
-                            button.onclick = () => {
-                                applyEffects(choice.effects);
-                                if (choice.narrativeEffect) {
-                                    showTemporaryMessage(narrativeTextElem, choice.narrativeEffect, 2500);
-                                }
-                                let nextSceneId = choice.nextScene;
-                                if (sceneId === 'climax-truth') {
-                                    // Концовки теперь определяются на основе выбора игрока, а не автоматически
-                                    // nextSceneId = determineEnding();
-                                }
-                                setTimeout(() => renderScene(nextSceneId), choice.narrativeEffect ? 2600 : 100);
-                                saveGameToLocalStorage(AUTOSAVE_SLOT);
-                            };
-                            choicesContainerElem.appendChild(button);
-                        });
-                    }
-                };
-
-                if (instant) {
-                    narrativeTextElem.innerHTML = scene.text;
-                    showContent();
-                } else {
-                    typeWriterEffect(narrativeTextElem, scene.text, 15, showContent);
-                }
-
-                transitionOverlay.classList.remove('fade-out');
-            }, 800);
-        }
-
-        function startMiniGame(gameType, config) {
-            clientGameState.currentMiniGame = gameType;
-            miniGameSectionElem.classList.remove('hidden');
-            choicesContainerElem.innerHTML = '';
-
-            switch(gameType) {
-                case 'memoryHack': startMemoryHackGame(config); break;
-                case 'decryptor': startDecryptorGame(config); break;
-                case 'energyFlow': startEnergyFlowGame(config); break;
-                case 'laserMaze': startLaserMazeGame(config); break;
-            }
-        }
-        
-        function endMiniGame(success, outcomeConfig) {
-             if (clientGameState.currentMiniGame === 'laserMaze' && clientGameState.laserMaze.gameRunning) {
-                clientGameState.laserMaze.gameRunning = false;
-                cancelAnimationFrame(clientGameState.laserMaze.animationFrameId);
-                document.removeEventListener('keydown', clientGameState.laserMaze.inputHandler);
-            }
-            
-            miniGameSectionElem.classList.add('hidden');
-            applyEffects(outcomeConfig.effects);
-            showTemporaryMessage(narrativeTextElem, outcomeConfig.narrative, 2500);
-            
-            setTimeout(() => {
-                renderScene(outcomeConfig.nextScene);
-                saveGameToLocalStorage(AUTOSAVE_SLOT);
-            }, 2600);
-            
-            clientGameState.currentMiniGame = null;
-        }
-
-        // --- ЛОГИКА МИНИ-ИГР ---
-
-        function startMemoryHackGame(config) {
-            miniGameTitleElem.textContent = 'Взлом Памяти: Синхронизируйте Фрагменты';
-            miniGameContentElem.innerHTML = '<div id="memory-grid" class="memory-grid"></div><p id="memory-attempts-left" class="text-sm text-gray-400 mt-2"></p>';
-            const grid = document.getElementById('memory-grid');
-            const attemptsElem = document.getElementById('memory-attempts-left');
-            
-            const state = clientGameState.memoryHack;
-            state.matchedPairs = 0;
-            state.flippedCards = [];
-            state.attempts = Math.floor(clientGameState.synchronization * 1.5) + 5;
-            attemptsElem.textContent = `Попыток осталось: ${state.attempts}`;
-
-            let symbols = [...state.symbols, ...state.symbols];
-            symbols.sort(() => Math.random() - 0.5);
-
-            symbols.forEach(symbol => {
-                const card = document.createElement('div');
-                card.classList.add('memory-card');
-                card.dataset.symbol = symbol;
-                card.innerHTML = `<div class="card-inner"><div class="card-face card-front"></div><div class="card-face card-back">${symbol}</div></div>`;
-                card.addEventListener('click', () => {
-                    if (card.classList.contains('flipped') || card.classList.contains('matched') || state.flippedCards.length === 2) return;
-                    
-                    card.classList.add('flipped');
-                    state.flippedCards.push(card);
-
-                    if (state.flippedCards.length === 2) {
-                        state.attempts--;
-                        attemptsElem.textContent = `Попыток осталось: ${state.attempts}`;
-                        const [card1, card2] = state.flippedCards;
-
-                        if (card1.dataset.symbol === card2.dataset.symbol) {
-                            card1.classList.add('matched');
-                            card2.classList.add('matched');
-                            state.matchedPairs++;
-                            state.flippedCards = [];
-                            if (state.matchedPairs === state.symbols.length) {
-                                setTimeout(() => endMiniGame(true, config.success), 500);
-                            }
-                        } else {
-                            setTimeout(() => {
-                                card1.classList.remove('flipped');
-                                card2.classList.remove('flipped');
-                                state.flippedCards = [];
-                                if (state.attempts <= 0) {
-                                    endMiniGame(false, config.failure);
-                                }
-                            }, 1000);
+                        } catch (error) {
+                            console.error("Firebase authentication error:", error);
+                            currentUserIdSpan.textContent = "Ошибка аутентификации";
                         }
                     }
                 });
-                grid.appendChild(card);
-            });
-        }
-
-        function startDecryptorGame(config) {
-            miniGameTitleElem.textContent = 'Дешифратор: Введите Ключ';
-            miniGameContentElem.innerHTML = '<div id="decryptor-input-group" class="decryptor-input-group"></div>';
-            miniGameSubmitBtn.classList.remove('hidden');
-            miniGameSubmitBtn.textContent = "Дешифровать";
-
-            const keyLength = config.correctKey.length;
-            const inputGroup = document.getElementById('decryptor-input-group');
-            clientGameState.decryptor.inputValues = Array(keyLength).fill('');
-
-            for (let i = 0; i < keyLength; i++) {
-                const input = document.createElement('input');
-                input.type = 'text';
-                input.maxLength = 1;
-                input.classList.add('decryptor-input');
-                input.dataset.index = i;
-                input.addEventListener('input', (e) => {
-                    e.target.value = e.target.value.toUpperCase();
-                    clientGameState.decryptor.inputValues[i] = e.target.value;
-                    if (e.target.value && i < keyLength - 1) {
-                        inputGroup.children[i + 1].focus();
-                    }
-                });
-                 input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Backspace' && e.target.value === '' && i > 0) {
-                        inputGroup.children[i - 1].focus();
-                    }
-                });
-                inputGroup.appendChild(input);
+            } catch (error) {
+                console.error("Firebase initialization error:", error);
+                storyMessage.textContent = "Ошибка инициализации Firebase. Пожалуйста, проверьте консоль.";
+                storyMessage.classList.add('text-red-500');
             }
-            miniGameSubmitBtn.onclick = () => {
-                if (clientGameState.decryptor.inputValues.join('') === config.correctKey) {
-                    endMiniGame(true, config.success);
-                } else {
-                    miniGameMessageElem.textContent = 'Неверный ключ. Попробуйте еще. ❌';
-                    setTimeout(() => { miniGameMessageElem.textContent = ''; }, 1500);
-                }
-            };
-        }
 
-        function startEnergyFlowGame(config) {
-             miniGameTitleElem.textContent = 'Поток Энергии: Балансировка Цепей';
-             miniGameContentElem.innerHTML = `
-                <div class="energy-node">
-                    <label>Узел 1 (Цель: >8): <span id="energy-node1-value">5</span></label>
-                </div>
-                <div class="energy-node">
-                    <label>Узел 2 (Цель: <3): <span id="energy-node2-value">5</span></label>
-                </div>
-                <div class="energy-node">
-                    <label>Узел 3 (Цель: <3): <span id="energy-node3-value">5</span></label>
-                </div>
-                <p>Переместите энергию между узлами. Общая энергия всегда равна 15.</p>
-                <div>
-                    <label>Из узла: <input type="number" id="ef-from" min="1" max="3" class="energy-input"></label>
-                    <label>В узел: <input type="number" id="ef-to" min="1" max="3" class="energy-input"></label>
-                    <button id="ef-transfer" class="decryptor-button">Передать</button>
-                </div>`;
-            miniGameSubmitBtn.classList.add('hidden');
+            // --- Функция для создания падающих сердечек ---
+            function createHeart() {
+                const heart = document.createElement('div');
+                heart.classList.add('heart');
+                const size = Math.random() * 20 + 10; /* Случайный размер от 10 до 30px */
+                heart.style.width = `${size}px`;
+                heart.style.height = `${size}px`;
+                heart.style.left = `${Math.random() * 100}vw`; /* Случайная позиция по горизонтали */
+                heart.style.animationDuration = `${Math.random() * 8 + 5}s`; /* Случайная длительность анимации */
+                heart.style.animationDelay = `${Math.random() * 5}s`; /* Случайная задержка */
+                heartContainer.appendChild(heart);
 
-            const state = clientGameState.energyFlow;
-            state.node1 = 5; state.node2 = 5; state.node3 = 5;
-
-            const updateValues = () => {
-                document.getElementById('energy-node1-value').textContent = state.node1;
-                document.getElementById('energy-node2-value').textContent = state.node2;
-                document.getElementById('energy-node3-value').textContent = state.node3;
-                if (state.node1 > 8 && state.node2 < 3 && state.node3 < 3) {
-                    endMiniGame(true, config.success);
-                }
-            };
-
-            document.getElementById('ef-transfer').onclick = () => {
-                const from = parseInt(document.getElementById('ef-from').value);
-                const to = parseInt(document.getElementById('ef-to').value);
-                if (from >= 1 && from <= 3 && to >= 1 && to <= 3 && from !== to) {
-                    const fromKey = `node${from}`;
-                    const toKey = `node${to}`;
-                    if (state[fromKey] > 0) {
-                        state[fromKey]--;
-                        state[toKey]++;
-                        updateValues();
-                    }
-                }
-            };
-            updateValues();
-        }
-        
-        function startLaserMazeGame(config) {
-            miniGameTitleElem.textContent = 'Лазерный Лабиринт: Стелс-Проникновение';
-            miniGameContentElem.innerHTML = '<canvas id="laser-maze-canvas" width="600" height="400"></canvas>';
-            
-            const state = clientGameState.laserMaze;
-            state.canvas = document.getElementById('laser-maze-canvas');
-            state.ctx = state.canvas.getContext('2d');
-            state.playerX = 20;
-            state.playerY = state.canvas.height / 2;
-            state.gameRunning = true;
-            state.lasers = [];
-
-            const laserCount = 8 - Math.floor(clientGameState.synchronization / 2);
-            for (let i = 0; i < laserCount; i++) {
-                state.lasers.push({
-                    x: 80 + i * ((state.canvas.width - 120) / laserCount),
-                    y: Math.random() * (state.canvas.height - 100),
-                    length: 100 + Math.random() * 50,
-                    speed: (Math.random() * 1 + 1) * (Math.random() < 0.5 ? 1 : -1)
+                // Удаляем сердце после завершения анимации, чтобы не перегружать DOM
+                heart.addEventListener('animationend', () => {
+                    heart.remove();
                 });
             }
 
-            const handleInput = (e) => {
-                const speed = 10;
-                if (!state.gameRunning) return;
-                switch (e.key) {
-                    case 'ArrowUp': case 'w': state.playerY -= speed; break;
-                    case 'ArrowDown': case 's': state.playerY += speed; break;
-                    case 'ArrowLeft': case 'a': state.playerX -= speed; break;
-                    case 'ArrowRight': case 'd': state.playerX += speed; break;
-                }
-                 state.playerX = Math.max(0, Math.min(state.canvas.width - state.playerSize, state.playerX));
-                 state.playerY = Math.max(0, Math.min(state.canvas.height - state.playerSize, state.playerY));
-            };
-            state.inputHandler = handleInput;
-            document.addEventListener('keydown', state.inputHandler);
+            // Создаем сердечки с интервалом
+            setInterval(createHeart, 300); // Создаем новое сердце каждые 300 мс
 
-            function gameLoop() {
-                if (!state.gameRunning) return;
-                
-                // Update
-                state.lasers.forEach(laser => {
-                    laser.y += laser.speed;
-                    if (laser.y < 0 || laser.y + laser.length > state.canvas.height) {
-                        laser.speed *= -1;
-                    }
+            // --- Функция для переключения вкладок ---
+            window.showTab = (tabId) => {
+                // Отписываемся от предыдущего слушателя истории, если он был
+                if (unsubscribeFromStory) {
+                    unsubscribeFromStory();
+                    unsubscribeFromStory = null;
+                }
+
+                // Скрываем весь контент вкладок
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
                 });
 
-                // Collision
-                for(const laser of state.lasers) {
-                    if (state.playerX < laser.x + 5 && state.playerX + state.playerSize > laser.x &&
-                        state.playerY < laser.y + laser.length && state.playerY + state.playerSize > laser.y) {
-                        endMiniGame(false, config.failure);
-                        return;
+                // Деактивируем все кнопки вкладок
+                tabButtons.forEach(button => {
+                    button.classList.remove('active');
+                });
+
+                // Активируем нужную вкладку и кнопку
+                document.getElementById(tabId).classList.add('active');
+                document.querySelector(`.tab-button[data-tab="${tabId}"]`).classList.add('active');
+
+                // Если это вкладка "Главная", запускаем эффект пишущей машинки
+                if (tabId === 'hero-tab') {
+                    const typewriterTextHero = document.getElementById('typewriter-text-hero');
+                    const textToTypeHero = "Ты — моя самая большая радость.";
+                    let i = 0;
+                    typewriterTextHero.textContent = ''; // Очищаем текст перед началом печати
+                    if (window.innerWidth > 480) {
+                        function typeWriter() {
+                            if (i < textToTypeHero.length) {
+                                typewriterTextHero.textContent += textToTypeHero.charAt(i);
+                                i++;
+                                setTimeout(typeWriter, 70);
+                            }
+                        }
+                        typeWriter();
+                    } else {
+                        typewriterTextHero.textContent = textToTypeHero;
                     }
                 }
+                // Слушатели для Firestore запускаются один раз после аутентификации
+                // и продолжают работать независимо от активной вкладки.
+                // Поэтому здесь нет необходимости вызывать listenForStoryUpdates()
+                // или listenForSiteSettings() здесь.
+            };
 
-                // Win
-                if (state.playerX >= state.canvas.width - state.playerSize) {
-                    endMiniGame(true, config.success);
+            // --- Firestore: Добавление новой записи в историю ---
+            addStoryButton.addEventListener('click', async () => {
+                const date = storyDateInput.value.trim();
+                const title = storyTitleInput.value.trim();
+                const description = storyDescriptionInput.value.trim();
+
+                if (!date || !title || !description) {
+                    storyMessage.textContent = "Пожалуйста, заполните все поля.";
+                    storyMessage.classList.remove('text-green-500', 'text-gray-500');
+                    storyMessage.classList.add('text-red-500');
                     return;
                 }
 
-                // Draw
-                state.ctx.clearRect(0, 0, state.canvas.width, state.canvas.height);
-                state.ctx.fillStyle = '#00bcd4';
-                state.ctx.fillRect(state.playerX, state.playerY, state.playerSize, state.playerSize);
-                state.ctx.fillStyle = '#e94560';
-                state.lasers.forEach(laser => {
-                    state.ctx.fillRect(laser.x, laser.y, 5, laser.length);
-                });
-                
-                state.animationFrameId = requestAnimationFrame(gameLoop);
-            }
-            gameLoop();
-        }
-        
-        // Инициализация игры
-        window.onload = () => {
-            loadGameFromLocalStorage(AUTOSAVE_SLOT);
-            // Если автосохранения нет, начинаем новую игру
-            if (clientGameState.currentScene === null || !gameData[clientGameState.currentScene]) {
-                 clientGameState = getInitialGameState();
-                 renderScene('prologue');
-            } else {
-                 renderScene(clientGameState.currentScene, true); // Мгновенный рендер при загрузке
-            }
-        };
+                if (!currentUserId) {
+                    storyMessage.textContent = "Ошибка: Пользователь не аутентифицирован. Пожалуйста, обновите страницу.";
+                    storyMessage.classList.remove('text-green-500', 'text-gray-500');
+                    storyMessage.classList.add('text-red-500');
+                    return;
+                }
 
+                try {
+                    storyMessage.textContent = "Добавление...";
+                    storyMessage.classList.remove('text-red-500', 'text-green-500');
+                    storyMessage.classList.add('text-gray-500');
+                    addStoryButton.disabled = true; // Отключаем кнопку во время добавления
+
+                    const storyCollectionRef = collection(db, `artifacts/${appId}/public/data/love_story_items`);
+                    await addDoc(storyCollectionRef, {
+                        date: date,
+                        title: title,
+                        description: description,
+                        createdAt: new Date(), // Добавляем метку времени для сортировки
+                        userId: currentUserId // Сохраняем ID пользователя, который добавил запись
+                    });
+
+                    storyMessage.textContent = "Момент успешно добавлен!";
+                    storyMessage.classList.remove('text-red-500', 'text-gray-500');
+                    storyMessage.classList.add('text-green-500');
+
+                    // Очищаем поля формы
+                    storyDateInput.value = '';
+                    storyTitleInput.value = '';
+                    storyDescriptionInput.value = '';
+
+                } catch (e) {
+                    console.error("Ошибка при добавлении документа: ", e);
+                    storyMessage.textContent = "Ошибка при добавлении момента. Пожалуйста, попробуйте снова.";
+                    storyMessage.classList.remove('text-green-500', 'text-gray-500');
+                    storyMessage.classList.add('text-red-500');
+                } finally {
+                    addStoryButton.disabled = false; // Включаем кнопку обратно
+                }
+            });
+
+            // --- Firestore: Слушатель обновлений истории ---
+            function listenForStoryUpdates() {
+                if (!db || !currentUserId) {
+                    console.warn("Firestore или userId не инициализированы. Невозможно начать слушать обновления истории.");
+                    return;
+                }
+
+                storyLoadingSpinner.style.display = 'block'; // Показываем спиннер загрузки
+                storyTimelineDiv.innerHTML = ''; // Очищаем текущую историю
+
+                const storyCollectionRef = collection(db, `artifacts/${appId}/public/data/love_story_items`);
+                // Запрос с сортировкой по дате создания
+                const q = query(storyCollectionRef, orderBy("createdAt", "asc"));
+
+                unsubscribeFromStory = onSnapshot(q, (snapshot) => {
+                    storyTimelineDiv.innerHTML = ''; // Очищаем перед перерисовкой
+                    if (snapshot.empty) {
+                        storyTimelineDiv.innerHTML = '<p class="text-center text-gray-500 mt-10">Пока нет записей в истории. Будьте первым, кто добавит!</p>';
+                    } else {
+                        snapshot.forEach((doc) => {
+                            const data = doc.data();
+                            const itemDiv = document.createElement('div');
+                            itemDiv.classList.add('timeline-item');
+                            itemDiv.innerHTML = `
+                                <p class="timeline-date">${data.date}</p>
+                                <h3 class="font-semibold text-xl text-gray-800 mb-2">${data.title}</h3>
+                                <p class="text-gray-600">${data.description}</p>
+                                <p class="text-xs text-gray-400 mt-2">Добавлено: ${data.userId.substring(0, 8)}...</p>
+                            `;
+                            storyTimelineDiv.appendChild(itemDiv);
+                        });
+                    }
+                    storyLoadingSpinner.style.display = 'none'; // Скрываем спиннер после загрузки
+                }, (error) => {
+                    console.error("Ошибка при получении обновлений истории: ", error);
+                    storyMessage.textContent = "Не удалось загрузить историю. Пожалуйста, попробуйте снова.";
+                    storyMessage.classList.remove('text-green-500', 'text-gray-500');
+                    storyMessage.classList.add('text-red-500');
+                    storyLoadingSpinner.style.display = 'none';
+                });
+            }
+
+            // --- Firestore: Сохранение настроек сайта (имена, пол, фото) ---
+            saveSiteSettingsButton.addEventListener('click', async () => {
+                const recipientName = recipientNameInput.value.trim();
+                const recipientGender = recipientGenderSelect.value;
+                const recipientPhotoUrl = recipientPhotoUrlInput.value.trim();
+                const senderName = senderNameInput.value.trim();
+
+                if (!recipientName) {
+                    recipientNameMessage.textContent = "Пожалуйста, введите имя получателя.";
+                    recipientNameMessage.classList.remove('text-green-500', 'text-gray-500');
+                    recipientNameMessage.classList.add('text-red-500');
+                    return;
+                } else {
+                    recipientNameMessage.textContent = ""; // Очищаем сообщение, если имя введено
+                }
+
+                if (!senderName) {
+                    senderNameMessage.textContent = "Пожалуйста, введите ваше имя.";
+                    senderNameMessage.classList.remove('text-green-500', 'text-gray-500');
+                    senderNameMessage.classList.add('text-red-500');
+                    return;
+                } else {
+                    senderNameMessage.textContent = ""; // Очищаем сообщение, если имя введено
+                }
+
+                if (!currentUserId) {
+                    recipientNameMessage.textContent = "Ошибка: Пользователь не аутентифицирован. Пожалуйста, обновите страницу."; // Используем одно сообщение для ошибки аутентификации
+                    recipientNameMessage.classList.remove('text-green-500', 'text-gray-500');
+                    recipientNameMessage.classList.add('text-red-500');
+                    return;
+                }
+
+                try {
+                    recipientNameMessage.textContent = "Сохранение..."; // Общее сообщение о сохранении
+                    recipientNameMessage.classList.remove('text-red-500', 'text-green-500');
+                    recipientNameMessage.classList.add('text-gray-500');
+                    senderNameMessage.textContent = ""; // Очищаем сообщение отправителя
+                    saveSiteSettingsButton.disabled = true;
+
+                    const settingsDocRef = doc(db, `artifacts/${appId}/public/data/site_settings/global_settings`);
+                    await setDoc(settingsDocRef, {
+                        recipientName: recipientName,
+                        recipientGender: recipientGender,
+                        recipientPhotoUrl: recipientPhotoUrl,
+                        senderName: senderName,
+                        lastUpdatedBy: currentUserId,
+                        timestamp: new Date()
+                    });
+
+                    recipientNameMessage.textContent = "Настройки успешно сохранены!";
+                    recipientNameMessage.classList.remove('text-red-500', 'text-gray-500');
+                    recipientNameMessage.classList.add('text-green-500');
+                } catch (e) {
+                    console.error("Ошибка при сохранении настроек сайта: ", e);
+                    recipientNameMessage.textContent = "Ошибка при сохранении настроек. Пожалуйста, попробуйте снова.";
+                    recipientNameMessage.classList.remove('text-green-500', 'text-gray-500');
+                    recipientNameMessage.classList.add('text-red-500');
+                } finally {
+                    saveSiteSettingsButton.disabled = false;
+                }
+            });
+
+            // --- Firestore: Слушатель обновлений настроек сайта (имена, пол, фото) ---
+            function listenForSiteSettings() {
+                if (!db) {
+                    console.warn("Firestore не инициализирован. Невозможно начать слушать настройки.");
+                    return;
+                }
+
+                const settingsDocRef = doc(db, `artifacts/${appId}/public/data/site_settings/global_settings`);
+                unsubscribeFromSettings = onSnapshot(settingsDocRef, (docSnapshot) => {
+                    if (docSnapshot.exists()) {
+                        const data = docSnapshot.data();
+                        const currentRecipientName = data.recipientName || "[Имя получателя]";
+                        const currentRecipientGender = data.recipientGender || "unspecified";
+                        const currentRecipientPhotoUrl = data.recipientPhotoUrl || "";
+                        const currentSenderName = data.senderName || "[Твое Имя]";
+
+                        recipientNameInput.value = currentRecipientName;
+                        recipientGenderSelect.value = currentRecipientGender;
+                        recipientPhotoUrlInput.value = currentRecipientPhotoUrl;
+                        senderNameInput.value = currentSenderName;
+
+                        // Обновляем отображение имени получателя с учетом пола
+                        let greeting = "Дорогой(ая)";
+                        if (currentRecipientGender === "male") {
+                            greeting = "Дорогой";
+                        } else if (currentRecipientGender === "female") {
+                            greeting = "Дорогая";
+                        }
+                        recipientNameDisplay.textContent = `${greeting} ${currentRecipientName},`;
+                        senderNameDisplay.textContent = currentSenderName;
+
+                        // Обновляем фото на главной странице
+                        if (currentRecipientPhotoUrl) {
+                            mainHeroImage.src = currentRecipientPhotoUrl;
+                            mainHeroImage.onerror = () => { // Обработка ошибки загрузки фото
+                                mainHeroImage.src = "https://placehold.co/150x150/FF6B6B/FFFFFF?text=Ошибка+фото";
+                                console.error("Не удалось загрузить фото по URL:", currentRecipientPhotoUrl);
+                            };
+                        } else {
+                            mainHeroImage.src = "https://placehold.co/150x150/FF6B6B/FFFFFF?text=Фото"; // Дефолтное фото
+                        }
+
+                    } else {
+                        // Если настроек нет, используем значения по умолчанию
+                        recipientNameInput.value = "";
+                        recipientGenderSelect.value = "unspecified";
+                        recipientPhotoUrlInput.value = "";
+                        senderNameInput.value = "";
+                        recipientNameDisplay.textContent = "Дорогой(ая) [Имя получателя],";
+                        senderNameDisplay.textContent = "[Твое Имя]";
+                        mainHeroImage.src = "https://placehold.co/150x150/FF6B6B/FFFFFF?text=Фото"; // Дефолтное фото
+                    }
+                }, (error) => {
+                    console.error("Ошибка при получении настроек сайта: ", error);
+                    recipientNameMessage.textContent = "Не удалось загрузить настройки имени.";
+                    recipientNameMessage.classList.remove('text-green-500', 'text-gray-500');
+                    recipientNameMessage.classList.add('text-red-500');
+                });
+            }
+
+            // Инициализация: показываем первую вкладку при загрузке
+            showTab('hero-tab');
+
+            // Добавляем обработчики событий для кнопок вкладок
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.dataset.tab;
+                    showTab(tabId);
+                });
+            });
+        });
     </script>
 </body>
 </html>
