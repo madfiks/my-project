@@ -101,6 +101,17 @@
             100% { transform: translateY(100vh) rotate(-45deg); opacity: 0; }
         }
 
+        /* Стили для Canvas частиц */
+        #particles-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2; /* Под всеми остальными фонами */
+            pointer-events: none;
+        }
+
         /* --- Стили для секций (теперь как контент вкладок) --- */
         .tab-content {
             display: none; /* По умолчанию скрыты */
@@ -108,7 +119,8 @@
             max-width: 1200px;
             margin: 0 auto;
             padding: 4rem 2rem;
-            animation: fadeInContent 0.7s ease-out; /* Анимация появления контента вкладки */
+            /* Улучшенная анимация появления контента вкладки */
+            animation: fadeInScaleUp 0.8s ease-out forwards;
             min-height: calc(100vh - 120px - 80px); /* Высота экрана минус навигация и футер */
             box-sizing: border-box; /* Учитываем padding в высоте */
         }
@@ -116,9 +128,9 @@
             display: block; /* Активная вкладка показывается */
         }
 
-        @keyframes fadeInContent {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes fadeInScaleUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .section-heading {
@@ -246,18 +258,13 @@
             margin-bottom: 3rem;
             position: relative;
             padding-left: 2rem;
+            opacity: 0; /* Изначально скрыты для анимации */
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
         }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -2.1rem; /* Выравнивание с линией */
-            top: 0.5rem;
-            width: 1.2rem;
-            height: 1.2rem;
-            background-color: var(--primary-color);
-            border-radius: 50%;
-            border: 3px solid var(--bg-light);
-            box-shadow: 0 0 0 3px var(--primary-color);
+        .timeline-item.active {
+            opacity: 1;
+            transform: translateY(0);
         }
         .timeline-date {
             font-weight: 700;
@@ -267,6 +274,11 @@
         }
 
         /* --- Qualities Section --- */
+        .quality-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
         .quality-item {
             background-color: var(--card-bg);
             border-radius: 1.5rem;
@@ -274,6 +286,14 @@
             box-shadow: var(--shadow-light);
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             border: 1px solid rgba(255, 107, 107, 0.1);
+            opacity: 0; /* Изначально скрыты для анимации */
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            position: relative; /* Для кнопки удаления */
+        }
+        .quality-item.active {
+            opacity: 1;
+            transform: translateY(0);
         }
         .quality-item:hover {
             transform: translateY(-5px);
@@ -288,6 +308,27 @@
         .quality-item:hover .quality-icon {
             transform: scale(1.1);
         }
+        .quality-delete-btn {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            background-color: rgba(255, 0, 0, 0.1);
+            color: #ff0000;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            transition: opacity 0.2s ease-in-out, background-color 0.2s ease-in-out;
+        }
+        .quality-delete-btn:hover {
+            opacity: 1;
+            background-color: rgba(255, 0, 0, 0.2);
+        }
+
 
         /* --- Future Dreams Section --- */
         .dream-gallery img {
@@ -295,10 +336,64 @@
             box-shadow: var(--shadow-light);
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
             border: 3px solid var(--secondary-color);
+            opacity: 0; /* Изначально скрыты для анимации */
+            transform: scale(0.95);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .dream-gallery img.active {
+            opacity: 1;
+            transform: scale(1);
         }
         .dream-gallery img:hover {
             transform: scale(1.03);
             box-shadow: var(--shadow-medium);
+        }
+
+        /* --- Modal для изображений --- */
+        .image-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200; /* Выше всего */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
+        }
+        .image-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .image-modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 1rem;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+            transform: scale(0.8);
+            transition: transform 0.3s ease-out;
+        }
+        .image-modal-overlay.active .image-modal-content {
+            transform: scale(1);
+        }
+        .image-modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            font-size: 2.5rem;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
+        .image-modal-close:hover {
+            transform: rotate(90deg);
         }
 
         /* --- Final Message Section --- */
@@ -313,6 +408,13 @@
             text-align: center;
             position: relative;
             overflow: hidden;
+            opacity: 0; /* Изначально скрыты для анимации */
+            transform: translateY(30px);
+            animation: fadeInScaleUp 0.8s ease-out forwards; /* Используем ту же анимацию, что и для вкладок */
+        }
+        .final-message-card.active {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .final-message-card::before {
@@ -344,6 +446,60 @@
             text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
         }
 
+        /* --- Countdown Section --- */
+        .countdown-container {
+            text-align: center;
+            padding: 3rem;
+            background-color: var(--card-bg);
+            border-radius: 2rem;
+            box-shadow: var(--shadow-medium);
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInScaleUp 0.8s ease-out forwards;
+        }
+        .countdown-container.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .countdown-heading {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+
+        .countdown-timer {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .countdown-item {
+            background-color: var(--bg-light);
+            padding: 1.5rem 1rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-light);
+            min-width: 100px;
+        }
+
+        .countdown-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .countdown-label {
+            font-size: 1rem;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
         /* --- Footer --- */
         footer {
             background-color: var(--text-dark);
@@ -372,6 +528,9 @@
             }
             .final-message-card {
                 padding: 3rem;
+            }
+            .countdown-value {
+                font-size: 3rem;
             }
         }
 
@@ -420,6 +579,16 @@
             .signature {
                 font-size: 2rem;
             }
+            .countdown-value {
+                font-size: 2.5rem;
+            }
+            .countdown-item {
+                min-width: 80px;
+                padding: 1rem 0.5rem;
+            }
+            .countdown-label {
+                font-size: 0.8rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -459,6 +628,16 @@
             .signature {
                 font-size: 1.5rem;
             }
+            .countdown-value {
+                font-size: 2rem;
+            }
+            .countdown-item {
+                min-width: 70px;
+                padding: 0.75rem 0.25rem;
+            }
+            .countdown-label {
+                font-size: 0.7rem;
+            }
         }
     </style>
 </head>
@@ -469,6 +648,16 @@
     <!-- Контейнер для падающих сердечек -->
     <div id="heart-container" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
 
+    <!-- Canvas для фоновых частиц -->
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Аудио элемент для фоновой музыки -->
+    <audio id="backgroundMusic" loop autoplay style="display: none;">
+        <!-- Пример аудио: "SoundHelix-Song-1.mp3" от SoundHelix.com -->
+        <source src="" type="audio/mpeg">
+        Ваш браузер не поддерживает элемент аудио.
+    </audio>
+
     <!-- --- Навигация по вкладкам --- -->
     <nav class="tabs-nav">
         <ul class="flex justify-center space-x-2 md:space-x-4">
@@ -476,8 +665,9 @@
             <li><button class="tab-button" data-tab="our-story-tab">Наша История</button></li>
             <li><button class="tab-button" data-tab="qualities-tab">Что я люблю</button></li>
             <li><button class="tab-button" data-tab="future-dreams-tab">Наши Мечты</button></li>
+            <li><button class="tab-button" data-tab="countdown-tab">Обратный отсчет</button></li> <!-- Новая вкладка -->
             <li><button class="tab-button" data-tab="final-message-tab">Послание</button></li>
-            <li><button class="tab-button" data-tab="settings-tab">Настройки</button></li> <!-- Новая вкладка для настроек -->
+            <li><button class="tab-button" data-tab="settings-tab">Настройки</button></li>
         </ul>
     </nav>
 
@@ -501,7 +691,7 @@
                     Ты — моя самая большая радость.
                 </p>
 
-                <p class="text-lg md:text-xl text-gray-600 mb-10">
+                <p id="mainIntroText" class="text-lg md:text-xl text-gray-600 mb-10">
                     Добро пожаловать в историю, написанную моим сердцем, только для тебя.
                 </p>
 
@@ -510,6 +700,12 @@
                         onclick="showTab('our-story-tab')">
                     Начать наше путешествие <i class="fas fa-arrow-right ml-2"></i>
                 </button>
+
+                <!-- Кнопка "Поделиться" -->
+                <button id="shareButton" class="mt-4 inline-block bg-gray-200 text-gray-700 font-semibold py-3 px-8 rounded-full text-lg shadow-md hover:shadow-xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-300 focus:ring-opacity-75">
+                    <i class="fas fa-share-alt mr-2"></i> Поделиться
+                </button>
+                <p id="shareMessage" class="text-center text-sm mt-2"></p>
             </div>
         </section>
     </div>
@@ -568,50 +764,14 @@
                 Твои качества делают тебя таким(ой) невероятным(ой) человеком. Вот лишь некоторые из них, которые я обожаю:
             </p>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="quality-item text-center">
-                    <i class="fas fa-laugh-beam quality-icon"></i>
-                    <h3 class="font-semibold text-xl text-gray-800 mb-2">Твое чувство юмора</h3>
-                    <p class="text-gray-600">
-                        Ты всегда знаешь, как заставить меня улыбнуться, даже в самый хмурый день. Твой смех заразителен!
-                    </p>
-                </div>
-                <div class="quality-item text-center">
-                    <i class="fas fa-brain quality-icon"></i>
-                    <h3 class="font-semibold text-xl text-gray-800 mb-2">Твой ум и мудрость</h3>
-                    <p class="text-gray-600">
-                        Мне нравится, как ты мыслишь, твои идеи и то, как ты подходишь к жизни. Я всегда учусь у тебя.
-                    </p>
-                </div>
-                <div class="quality-item text-center">
-                    <i class="fas fa-heart quality-icon"></i>
-                    <h3 class="font-semibold text-xl text-gray-800 mb-2">Твоя доброта и сострадание</h3>
-                    <p class="text-gray-600">
-                        Твое большое сердце и забота о других вдохновляют меня. Ты по-настоящему добрый(ая) человек.
-                    </p>
-                </div>
-                <div class="quality-item text-center">
-                    <i class="fas fa-star quality-icon"></i>
-                    <h3 class="font-semibold text-xl text-gray-800 mb-2">Твоя уникальность</h3>
-                    <p class="text-gray-600">
-                        Ты не похож(а) ни на кого другого, и это делает тебя таким(ой) особенным(ой) для меня.
-                    </p>
-                </div>
-                <div class="quality-item text-center">
-                    <i class="fas fa-hand-holding-heart quality-icon"></i>
-                    <h3 class="font-semibold text-xl text-gray-800 mb-2">Твоя поддержка</h3>
-                    <p class="text-gray-600">
-                        Ты всегда рядом, чтобы поддержать меня, выслушать и помочь. Я очень ценю это.
-                    </p>
-                </div>
-                <div class="quality-item text-center">
-                    <i class="fas fa-lightbulb quality-icon"></i>
-                    <h3 class="font-semibold text-xl text-gray-800 mb-2">Твоя креативность</h3>
-                    <p class="text-gray-600">
-                        Мне нравится твой взгляд на мир и способность видеть красоту в обыденных вещах.
-                    </p>
-                </div>
+            <div id="qualitiesGrid" class="quality-grid">
+                <!-- Качества будут загружены здесь из Firestore -->
             </div>
+            
+            <!-- Сообщение об отсутствии качеств -->
+            <p id="noQualitiesMessage" class="text-center text-gray-500 mt-10" style="display: none;">
+                Пока нет добавленных качеств. Добавьте их на вкладке "Настройки"!
+            </p>
         </section>
     </div>
 
@@ -634,6 +794,40 @@
         </section>
     </div>
 
+    <!-- Новая вкладка "Обратный отсчет" -->
+    <div id="countdown-tab" class="tab-content bg-white rounded-3xl shadow-xl mt-8">
+        <section class="w-full">
+            <h2 class="section-heading playfair-display">Обратный отсчет до <span id="countdownEventName">[Событие]</span></h2>
+            <p class="text-center text-lg text-gray-700 mb-12 max-w-2xl mx-auto" id="countdownDescription">
+                До нашего особенного дня осталось...
+            </p>
+
+            <div class="countdown-container">
+                <div class="countdown-timer">
+                    <div class="countdown-item">
+                        <div id="countdownDays" class="countdown-value">00</div>
+                        <div class="countdown-label">Дней</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div id="countdownHours" class="countdown-value">00</div>
+                        <div class="countdown-label">Часов</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div id="countdownMinutes" class="countdown-value">00</div>
+                        <div class="countdown-label">Минут</div>
+                    </div>
+                    <div class="countdown-item">
+                        <div id="countdownSeconds" class="countdown-value">00</div>
+                        <div class="countdown-label">Секунд</div>
+                    </div>
+                </div>
+                <p id="countdownFinishedMessage" class="text-xl text-primary-color mt-8" style="display: none;">
+                    Поздравляем! Этот день настал!
+                </p>
+            </div>
+        </section>
+    </div>
+
     <!-- Вкладка "Финальное послание" -->
     <div id="final-message-tab" class="tab-content bg-white rounded-3xl shadow-xl mt-8">
         <section class="w-full flex justify-center items-center">
@@ -644,7 +838,7 @@
                 <p id="recipientNameDisplay" class="text-xl md:text-2xl text-gray-700 leading-relaxed mb-8">
                     Дорогой(ая) [Имя получателя],
                 </p>
-                <p class="text-lg md:text-xl text-gray-700 leading-relaxed text-justify mb-8">
+                <p id="finalMessageText" class="text-lg md:text-xl text-gray-700 leading-relaxed text-justify mb-8">
                     Каждый день, проведенный рядом с тобой, — это благословение. Ты наполнил(а) мою жизнь светом, смыслом и безграничной любовью. Я ценю каждую нашу минуту, каждый смех, каждую тихую беседу. Ты — тот(та) человек, который делает меня лучше, вдохновляет на новые свершения и дарит ощущение полного счастья. Я не могу представить свою жизнь без тебя. Ты — моя родственная душа, мой лучший друг и моя самая большая любовь. Я люблю тебя всем сердцем, сегодня, завтра и всегда.
                 </p>
                 <p class="signature playfair-display">
@@ -697,7 +891,7 @@
                     </p>
                 </div>
 
-                <div class="mb-6">
+                <div class="mb-5">
                     <label for="senderNameInput" class="block text-gray-700 text-lg font-bold mb-3">
                         Ваше имя (отправителя):
                     </label>
@@ -707,9 +901,82 @@
                     <p id="senderNameMessage" class="text-center text-sm mt-2"></p>
                 </div>
 
+                <div class="mb-5">
+                    <label for="backgroundMusicUrlInput" class="block text-gray-700 text-lg font-bold mb-3">
+                        URL фоновой музыки (.mp3):
+                    </label>
+                    <input type="url" id="backgroundMusicUrlInput"
+                           class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300 text-center text-xl"
+                           placeholder="Вставьте URL вашей любимой песни">
+                    <p class="text-sm text-gray-500 mt-2">
+                        Используйте прямую ссылку на MP3-файл (например, `https://example.com/song.mp3`).
+                    </p>
+                </div>
+
+                <div class="mb-5">
+                    <label for="mainIntroTextInput" class="block text-gray-700 text-lg font-bold mb-3">
+                        Текст на главной странице:
+                    </label>
+                    <textarea id="mainIntroTextInput" rows="3"
+                              class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300"
+                              placeholder="Добро пожаловать в историю, написанную моим сердцем, только для тебя."></textarea>
+                </div>
+
+                <div class="mb-6">
+                    <label for="finalMessageTextInput" class="block text-gray-700 text-lg font-bold mb-3">
+                        Текст финального послания:
+                    </label>
+                    <textarea id="finalMessageTextInput" rows="8"
+                              class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300"
+                              placeholder="Каждый день, проведенный рядом с тобой..."></textarea>
+                </div>
+
+                <hr class="my-8 border-gray-300">
+
+                <h3 class="font-semibold text-2xl text-gray-800 mb-5 text-center playfair-display">Настройка качеств</h3>
+                <p class="text-center text-gray-700 mb-6">Добавьте качества, которые вы цените в своем особенном человеке.</p>
+                <div class="mb-4">
+                    <label for="newQualityText" class="block text-gray-700 text-sm font-bold mb-2">Новое качество:</label>
+                    <input type="text" id="newQualityText" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300" placeholder="Например, Твоя доброта">
+                </div>
+                <div class="mb-6">
+                    <label for="newQualityDescription" class="block text-gray-700 text-sm font-bold mb-2">Описание качества:</label>
+                    <textarea id="newQualityDescription" rows="2" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300" placeholder="Например, Твое большое сердце и забота о других вдохновляют меня."></textarea>
+                </div>
+                <button id="addQualityButton" class="bg-gradient-to-r from-purple-500 to-indigo-400 hover:from-indigo-400 hover:to-purple-500 text-white font-bold py-2 px-4 rounded-full w-full transition-all duration-300">
+                    Добавить качество
+                </button>
+                <p id="qualityMessage" class="text-center text-sm mt-3"></p>
+
+                <h4 class="font-semibold text-xl text-gray-800 mt-8 mb-4 text-center">Существующие качества:</h4>
+                <div id="existingQualitiesList" class="space-y-3 text-left">
+                    <!-- Существующие качества будут загружены здесь -->
+                </div>
+
+                <hr class="my-8 border-gray-300">
+
+                <h3 class="font-semibold text-2xl text-gray-800 mb-5 text-center playfair-display">Настройка обратного отсчета</h3>
+                <p class="text-center text-gray-700 mb-6">Укажите дату и название важного события.</p>
+                <div class="mb-4">
+                    <label for="countdownEventNameInput" class="block text-gray-700 text-lg font-bold mb-3">
+                        Название события:
+                    </label>
+                    <input type="text" id="countdownEventNameInput"
+                           class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300 text-center text-xl"
+                           placeholder="Например, Наша годовщина">
+                </div>
+                <div class="mb-6">
+                    <label for="countdownDateInput" class="block text-gray-700 text-lg font-bold mb-3">
+                        Дата события:
+                    </label>
+                    <input type="date" id="countdownDateInput"
+                           class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300 text-center text-xl">
+                </div>
+                <p id="countdownSettingsMessage" class="text-center text-sm mt-3"></p>
+
                 <button id="saveSiteSettingsButton"
-                        class="bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-3 px-6 rounded-full w-full transition-all duration-300 text-lg">
-                    Сохранить настройки
+                        class="bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-3 px-6 rounded-full w-full transition-all duration-300 text-lg mt-8">
+                    Сохранить все настройки
                 </button>
             </div>
         </section>
@@ -728,15 +995,20 @@
         </p>
     </footer>
 
+    <!-- Модальное окно для изображений -->
+    <div id="imageModal" class="image-modal-overlay hidden">
+        <button class="image-modal-close" id="closeImageModal">&times;</button>
+        <img src="" alt="Увеличенное изображение" class="image-modal-content" id="modalImage">
+    </div>
+
     <script type="module">
         // Импорт Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Глобальные переменные для Firebase (предоставляются средой Canvas)
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        // ИСПРАВЛЕНИЕ: Предоставляем projectId для инициализации Firebase, если он не передан извне.
         const firebaseConfig = typeof __firebase_config !== 'undefined' && Object.keys(JSON.parse(__firebase_config)).length > 0
             ? JSON.parse(__firebase_config)
             : { projectId: 'love-journey-default-id' }; // Используем фиктивный ID для локального запуска
@@ -747,7 +1019,9 @@
         let auth;
         let currentUserId = null;
         let unsubscribeFromStory = null; // Для отписки от слушателя Firestore истории
+        let unsubscribeFromQualities = null; // Для отписки от слушателя Firestore качеств
         let unsubscribeFromSettings = null; // Для отписки от слушателя настроек
+        let countdownInterval = null; // Для интервала обратного отсчета
 
         document.addEventListener('DOMContentLoaded', async () => {
             const heartContainer = document.getElementById('heart-container');
@@ -763,15 +1037,53 @@
             const currentUserIdSpan = document.getElementById('currentUserId');
 
             const recipientNameInput = document.getElementById('recipientNameInput');
-            const recipientGenderSelect = document.getElementById('recipientGenderSelect'); // Новое поле для пола
-            const recipientPhotoUrlInput = document.getElementById('recipientPhotoUrlInput'); // Новое поле для URL фото
+            const recipientGenderSelect = document.getElementById('recipientGenderSelect');
+            const recipientPhotoUrlInput = document.getElementById('recipientPhotoUrlInput');
             const senderNameInput = document.getElementById('senderNameInput');
+            const backgroundMusicUrlInput = document.getElementById('backgroundMusicUrlInput');
+            const mainIntroTextInput = document.getElementById('mainIntroTextInput');
+            const finalMessageTextInput = document.getElementById('finalMessageTextInput');
             const saveSiteSettingsButton = document.getElementById('saveSiteSettingsButton');
             const recipientNameMessage = document.getElementById('recipientNameMessage');
             const senderNameMessage = document.getElementById('senderNameMessage');
             const recipientNameDisplay = document.getElementById('recipientNameDisplay');
             const senderNameDisplay = document.getElementById('senderNameDisplay');
-            const mainHeroImage = document.getElementById('mainHeroImage'); // Элемент img на главной
+            const mainHeroImage = document.getElementById('mainHeroImage');
+            const particlesCanvas = document.getElementById('particles-canvas');
+            const ctx = particlesCanvas.getContext('2d');
+            const backgroundMusic = document.getElementById('backgroundMusic');
+            const mainIntroTextDisplay = document.getElementById('mainIntroText');
+            const finalMessageTextDisplay = document.getElementById('finalMessageText');
+
+            const shareButton = document.getElementById('shareButton');
+            const shareMessage = document.getElementById('shareMessage');
+
+            const imageModal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            const closeImageModalButton = document.getElementById('closeImageModal');
+            const dreamGalleryImages = document.querySelectorAll('#future-dreams-tab .dream-gallery img');
+
+            // Элементы для динамических качеств
+            const newQualityText = document.getElementById('newQualityText');
+            const newQualityDescription = document.getElementById('newQualityDescription');
+            const addQualityButton = document.getElementById('addQualityButton');
+            const qualityMessage = document.getElementById('qualityMessage');
+            const qualitiesGrid = document.getElementById('qualitiesGrid'); // Контейнер для отображения качеств
+            const existingQualitiesList = document.getElementById('existingQualitiesList'); // Список для редактирования качеств в настройках
+            const noQualitiesMessage = document.getElementById('noQualitiesMessage');
+
+            // Элементы для обратного отсчета
+            const countdownEventNameInput = document.getElementById('countdownEventNameInput');
+            const countdownDateInput = document.getElementById('countdownDateInput');
+            const countdownSettingsMessage = document.getElementById('countdownSettingsMessage');
+            const countdownEventNameDisplay = document.getElementById('countdownEventName');
+            const countdownDescriptionDisplay = document.getElementById('countdownDescription');
+            const countdownDays = document.getElementById('countdownDays');
+            const countdownHours = document.getElementById('countdownHours');
+            const countdownMinutes = document.getElementById('countdownMinutes');
+            const countdownSeconds = document.getElementById('countdownSeconds');
+            const countdownFinishedMessage = document.getElementById('countdownFinishedMessage');
+
 
             // --- Инициализация Firebase ---
             try {
@@ -787,7 +1099,8 @@
                         console.log("Authenticated with UID:", currentUserId);
                         // Запускаем слушателей после аутентификации
                         listenForStoryUpdates();
-                        listenForSiteSettings(); // Слушаем настройки (включая оба имени, пол и фото)
+                        listenForQualities(); // Запускаем слушатель качеств
+                        listenForSiteSettings(); // Слушаем настройки (включая оба имени, пол, фото, музыку, тексты и дату отсчета)
                     } else {
                         // Если токен не предоставлен, анонимная аутентификация
                         try {
@@ -829,17 +1142,116 @@
             // Создаем сердечки с интервалом
             setInterval(createHeart, 300); // Создаем новое сердце каждые 300 мс
 
+            // --- Анимация частиц на Canvas ---
+            let particles = [];
+            const numParticles = 100; // Количество частиц
+            const maxDistance = 100; // Максимальное расстояние для соединения линиями
+
+            // Класс для отдельной частицы
+            class Particle {
+                constructor(x, y) {
+                    this.x = x;
+                    this.y = y;
+                    this.size = Math.random() * 2 + 0.5; // Размер частицы
+                    this.speedX = Math.random() * 0.5 - 0.25; // Скорость по X (-0.25 до 0.25)
+                    this.speedY = Math.random() * 0.5 - 0.25; // Скорость по Y (-0.25 до 0.25)
+                    this.color = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.2})`; // Полупрозрачный белый
+                }
+
+                update() {
+                    this.x += this.speedX;
+                    this.y += this.speedY;
+
+                    // Отскок от краев Canvas
+                    if (this.x > particlesCanvas.width || this.x < 0) {
+                        this.speedX *= -1;
+                    }
+                    if (this.y > particlesCanvas.height || this.y < 0) {
+                        this.speedY *= -1;
+                    }
+                }
+
+                draw() {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Инициализация частиц
+            function initParticles() {
+                particles = [];
+                for (let i = 0; i < numParticles; i++) {
+                    const x = Math.random() * particlesCanvas.width;
+                    const y = Math.random() * particlesCanvas.height;
+                    particles.push(new Particle(x, y));
+                }
+            }
+
+            // Анимационный цикл Canvas
+            function animateParticles() {
+                ctx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height); // Очистка Canvas
+
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+
+                    // Соединение частиц линиями
+                    for (let j = i; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < maxDistance) {
+                            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - (distance / maxDistance)})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.beginPath();
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(animateParticles); // Запрос следующего кадра
+            }
+
+            // Изменение размера Canvas при изменении размера окна
+            function resizeCanvas() {
+                particlesCanvas.width = window.innerWidth;
+                particlesCanvas.height = window.innerHeight;
+                initParticles(); // Переинициализация частиц при изменении размера
+            }
+
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas(); // Инициализация при загрузке
+            animateParticles(); // Запуск анимации
+
             // --- Функция для переключения вкладок ---
             window.showTab = (tabId) => {
-                // Отписываемся от предыдущего слушателя истории, если он был
+                // Отписываемся от предыдущих слушателей, если они были
                 if (unsubscribeFromStory) {
                     unsubscribeFromStory();
                     unsubscribeFromStory = null;
                 }
+                if (unsubscribeFromQualities) {
+                    unsubscribeFromQualities();
+                    unsubscribeFromQualities = null;
+                }
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
+
 
                 // Скрываем весь контент вкладок
                 tabContents.forEach(content => {
                     content.classList.remove('active');
+                    // Сбрасываем анимации для элементов внутри, чтобы они анимировались заново
+                    content.querySelectorAll('.timeline-item, .quality-item, .dream-gallery img, .final-message-card, .countdown-container').forEach(el => {
+                        el.classList.remove('active');
+                        el.style.transitionDelay = '0s'; // Сброс задержки
+                    });
                 });
 
                 // Деактивируем все кнопки вкладок
@@ -848,8 +1260,13 @@
                 });
 
                 // Активируем нужную вкладку и кнопку
-                document.getElementById(tabId).classList.add('active');
+                const activeTabContent = document.getElementById(tabId);
+                activeTabContent.classList.add('active');
                 document.querySelector(`.tab-button[data-tab="${tabId}"]`).classList.add('active');
+
+                // Плавная прокрутка к началу активной вкладки
+                activeTabContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
 
                 // Если это вкладка "Главная", запускаем эффект пишущей машинки
                 if (tabId === 'hero-tab') {
@@ -869,15 +1286,125 @@
                     } else {
                         typewriterTextHero.textContent = textToTypeHero;
                     }
+                } else if (tabId === 'our-story-tab') {
+                    // Анимируем элементы истории при переходе на вкладку
+                    // Используем setTimeout, чтобы анимация запускалась после того, как вкладка станет видимой
+                    setTimeout(() => {
+                        const timelineItems = storyTimelineDiv.querySelectorAll('.timeline-item');
+                        timelineItems.forEach((item, index) => {
+                            item.style.transitionDelay = `${index * 0.1}s`; // Задержка для последовательного появления
+                            item.classList.add('active');
+                        });
+                    }, 100); // Небольшая задержка после активации вкладки
+                } else if (tabId === 'qualities-tab') {
+                    // Запускаем слушатель качеств при переходе на вкладку
+                    if (currentUserId) {
+                        listenForQualities();
+                    } else {
+                        qualitiesGrid.innerHTML = '<p class="text-center text-gray-500 mt-10">Пожалуйста, подождите, идет аутентификация...</p>';
+                    }
+                    // Анимируем элементы качеств при переходе на вкладку
+                    setTimeout(() => {
+                        const qualityItems = document.querySelectorAll('#qualities-tab .quality-item');
+                        qualityItems.forEach((item, index) => {
+                            item.style.transitionDelay = `${index * 0.08}s`;
+                            item.classList.add('active');
+                        });
+                    }, 100);
+                } else if (tabId === 'future-dreams-tab') {
+                    // Анимируем изображения мечты при переходе на вкладку
+                    setTimeout(() => {
+                        const dreamImages = document.querySelectorAll('#future-dreams-tab .dream-gallery img');
+                        dreamImages.forEach((img, index) => {
+                            img.style.transitionDelay = `${index * 0.07}s`;
+                            img.classList.add('active');
+                        });
+                    }, 100);
+                } else if (tabId === 'countdown-tab') { // Новая логика для вкладки отсчета
+                    setTimeout(() => {
+                        const countdownContainer = document.querySelector('#countdown-tab .countdown-container');
+                        countdownContainer.classList.add('active');
+                        // Запускаем обратный отсчет только когда вкладка активна
+                        if (currentUserId) {
+                            listenForSiteSettings(); // Чтобы получить дату
+                        }
+                    }, 100);
                 }
-                // Слушатели для Firestore запускаются один раз после аутентификации
-                // и продолжают работать независимо от активной вкладки.
-                // Поэтому здесь нет необходимости вызывать listenForStoryUpdates()
-                // или listenForSiteSettings() здесь.
+                else if (tabId === 'final-message-tab') {
+                    // Анимируем финальное послание при переходе на вкладку
+                    setTimeout(() => {
+                        const finalMessageCard = document.querySelector('#final-message-tab .final-message-card');
+                        finalMessageCard.classList.add('active');
+                    }, 100);
+                }
             };
 
+            // --- Эффект конфетти/искр ---
+            function createConfetti(x, y, color) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'absolute';
+                confetti.style.left = `${x}px`;
+                confetti.style.top = `${y}px`;
+                confetti.style.width = '8px';
+                confetti.style.height = '8px';
+                confetti.style.backgroundColor = color;
+                confetti.style.borderRadius = '50%';
+                confetti.style.opacity = '1';
+                confetti.style.transform = `scale(${Math.random() * 0.5 + 0.5})`;
+                confetti.style.transition = 'transform 0.8s ease-out, opacity 0.8s ease-out';
+                confetti.style.zIndex = '9999';
+                document.body.appendChild(confetti);
+
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 50 + 30;
+                const finalX = x + Math.cos(angle) * distance;
+                const finalY = y + Math.sin(angle) * distance;
+
+                setTimeout(() => {
+                    confetti.style.transform = `translate(${finalX - x}px, ${finalY - y}px) scale(0)`;
+                    confetti.style.opacity = '0';
+                    confetti.style.transition = 'transform 0.8s ease-in, opacity 0.8s ease-in';
+                }, 10); // Небольшая задержка, чтобы анимация сработала
+
+                confetti.addEventListener('transitionend', () => {
+                    confetti.remove();
+                });
+            }
+
+            function triggerConfetti(event, count = 20) {
+                const colors = ['#ff6b6b', '#ffa07a', '#fca5a5', '#fef2f2', '#a78bfa', '#818cf8'];
+                const rect = event.target.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                for (let i = 0; i < count; i++) {
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    createConfetti(centerX, centerY, color);
+                }
+            }
+
+            // --- Обработчики модального окна изображений ---
+            dreamGalleryImages.forEach(img => {
+                img.addEventListener('click', () => {
+                    modalImage.src = img.src;
+                    imageModal.classList.add('active');
+                });
+            });
+
+            closeImageModalButton.addEventListener('click', () => {
+                imageModal.classList.remove('active');
+            });
+
+            imageModal.addEventListener('click', (event) => {
+                // Закрываем модальное окно, если клик был по оверлею, а не по изображению
+                if (event.target === imageModal) {
+                    imageModal.classList.remove('active');
+                }
+            });
+
+
             // --- Firestore: Добавление новой записи в историю ---
-            addStoryButton.addEventListener('click', async () => {
+            addStoryButton.addEventListener('click', async (event) => { // Передаем event
                 const date = storyDateInput.value.trim();
                 const title = storyTitleInput.value.trim();
                 const description = storyDescriptionInput.value.trim();
@@ -914,6 +1441,7 @@
                     storyMessage.textContent = "Момент успешно добавлен!";
                     storyMessage.classList.remove('text-red-500', 'text-gray-500');
                     storyMessage.classList.add('text-green-500');
+                    triggerConfetti(event); // Запускаем конфетти при успехе!
 
                     // Очищаем поля формы
                     storyDateInput.value = '';
@@ -972,12 +1500,165 @@
                 });
             }
 
-            // --- Firestore: Сохранение настроек сайта (имена, пол, фото) ---
-            saveSiteSettingsButton.addEventListener('click', async () => {
+            // --- Firestore: Добавление нового качества ---
+            addQualityButton.addEventListener('click', async () => {
+                const text = newQualityText.value.trim();
+                const description = newQualityDescription.value.trim();
+
+                if (!text || !description) {
+                    qualityMessage.textContent = "Пожалуйста, заполните оба поля качества.";
+                    qualityMessage.classList.remove('text-green-500', 'text-gray-500');
+                    qualityMessage.classList.add('text-red-500');
+                    return;
+                }
+
+                if (!currentUserId) {
+                    qualityMessage.textContent = "Ошибка: Пользователь не аутентифицирован. Пожалуйста, обновите страницу.";
+                    qualityMessage.classList.remove('text-green-500', 'text-gray-500');
+                    qualityMessage.classList.add('text-red-500');
+                    return;
+                }
+
+                try {
+                    qualityMessage.textContent = "Добавление...";
+                    qualityMessage.classList.remove('text-red-500', 'text-green-500');
+                    qualityMessage.classList.add('text-gray-500');
+                    addQualityButton.disabled = true;
+
+                    const qualitiesCollectionRef = collection(db, `artifacts/${appId}/public/data/qualities_items`);
+                    await addDoc(qualitiesCollectionRef, {
+                        text: text,
+                        description: description,
+                        createdAt: new Date(),
+                        userId: currentUserId
+                    });
+
+                    qualityMessage.textContent = "Качество успешно добавлено!";
+                    qualityMessage.classList.remove('text-red-500', 'text-gray-500');
+                    qualityMessage.classList.add('text-green-500');
+
+                    newQualityText.value = '';
+                    newQualityDescription.value = '';
+
+                } catch (e) {
+                    console.error("Ошибка при добавлении качества: ", e);
+                    qualityMessage.textContent = "Ошибка при добавлении качества. Пожалуйста, попробуйте снова.";
+                    qualityMessage.classList.remove('text-green-500', 'text-gray-500');
+                    qualityMessage.classList.add('text-red-500');
+                } finally {
+                    addQualityButton.disabled = false;
+                }
+            });
+
+            // --- Firestore: Удаление качества ---
+            existingQualitiesList.addEventListener('click', async (event) => {
+                if (event.target.classList.contains('quality-delete-btn')) {
+                    const qualityId = event.target.dataset.id;
+                    if (!qualityId) return;
+
+                    if (!currentUserId) {
+                        qualityMessage.textContent = "Ошибка: Пользователь не аутентифицирован для удаления.";
+                        qualityMessage.classList.remove('text-green-500', 'text-gray-500');
+                        qualityMessage.classList.add('text-red-500');
+                        return;
+                    }
+
+                    try {
+                        qualityMessage.textContent = "Удаление...";
+                        qualityMessage.classList.remove('text-green-500', 'text-red-500');
+                        qualityMessage.classList.add('text-gray-500');
+
+                        const qualityDocRef = doc(db, `artifacts/${appId}/public/data/qualities_items`, qualityId);
+                        await deleteDoc(qualityDocRef);
+
+                        qualityMessage.textContent = "Качество удалено!";
+                        qualityMessage.classList.remove('text-red-500', 'text-gray-500');
+                        qualityMessage.classList.add('text-green-500');
+                    } catch (e) {
+                        console.error("Ошибка при удалении качества: ", e);
+                        qualityMessage.textContent = "Ошибка при удалении качества. Пожалуйста, попробуйте снова.";
+                        qualityMessage.classList.remove('text-green-500', 'text-gray-500');
+                        qualityMessage.classList.add('text-red-500');
+                    }
+                }
+            });
+
+            // --- Firestore: Слушатель обновлений качеств ---
+            function listenForQualities() {
+                if (!db || !currentUserId) {
+                    console.warn("Firestore или userId не инициализированы. Невозможно начать слушать обновления качеств.");
+                    return;
+                }
+
+                qualitiesGrid.innerHTML = ''; // Очищаем сетку качеств
+                existingQualitiesList.innerHTML = ''; // Очищаем список в настройках
+                noQualitiesMessage.style.display = 'none';
+
+                const qualitiesCollectionRef = collection(db, `artifacts/${appId}/public/data/qualities_items`);
+                const q = query(qualitiesCollectionRef, orderBy("createdAt", "asc"));
+
+                unsubscribeFromQualities = onSnapshot(q, (snapshot) => {
+                    qualitiesGrid.innerHTML = '';
+                    existingQualitiesList.innerHTML = '';
+
+                    if (snapshot.empty) {
+                        noQualitiesMessage.style.display = 'block';
+                        qualitiesGrid.innerHTML = '<p class="text-center text-gray-500 mt-10">Пока нет добавленных качеств. Добавьте их на вкладке "Настройки"!</p>';
+                    } else {
+                        noQualitiesMessage.style.display = 'none';
+                        snapshot.forEach((doc) => {
+                            const data = doc.data();
+                            // Для отображения на вкладке "Что я люблю"
+                            const qualityItemDiv = document.createElement('div');
+                            qualityItemDiv.classList.add('quality-item', 'text-center');
+                            // Иконку можно выбрать динамически или оставить одну
+                            qualityItemDiv.innerHTML = `
+                                <i class="fas fa-heart quality-icon"></i>
+                                <h3 class="font-semibold text-xl text-gray-800 mb-2">${data.text}</h3>
+                                <p class="text-gray-600">${data.description}</p>
+                            `;
+                            qualitiesGrid.appendChild(qualityItemDiv);
+
+                            // Для списка в настройках
+                            const existingQualityLi = document.createElement('li');
+                            existingQualityLi.classList.add('flex', 'justify-between', 'items-center', 'bg-white', 'p-3', 'rounded-lg', 'shadow-sm', 'border', 'border-gray-200');
+                            existingQualityLi.innerHTML = `
+                                <span>${data.text}</span>
+                                <button class="quality-delete-btn" data-id="${doc.id}">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            `;
+                            existingQualitiesList.appendChild(existingQualityLi);
+                        });
+                        // Анимируем качества после их загрузки
+                        setTimeout(() => {
+                            const qualityItems = qualitiesGrid.querySelectorAll('.quality-item');
+                            qualityItems.forEach((item, index) => {
+                                item.style.transitionDelay = `${index * 0.08}s`;
+                                item.classList.add('active');
+                            });
+                        }, 100);
+                    }
+                }, (error) => {
+                    console.error("Ошибка при получении качеств: ", error);
+                    qualityMessage.textContent = "Не удалось загрузить качества. Пожалуйста, попробуйте снова.";
+                    qualityMessage.classList.remove('text-green-500', 'text-gray-500');
+                    qualityMessage.classList.add('text-red-500');
+                });
+            }
+
+            // --- Firestore: Сохранение настроек сайта (имена, пол, фото, музыка, тексты, дата отсчета) ---
+            saveSiteSettingsButton.addEventListener('click', async (event) => { // Передаем event
                 const recipientName = recipientNameInput.value.trim();
                 const recipientGender = recipientGenderSelect.value;
                 const recipientPhotoUrl = recipientPhotoUrlInput.value.trim();
                 const senderName = senderNameInput.value.trim();
+                const backgroundMusicUrl = backgroundMusicUrlInput.value.trim();
+                const mainIntroText = mainIntroTextInput.value.trim();
+                const finalMessageText = finalMessageTextInput.value.trim();
+                const countdownEventName = countdownEventNameInput.value.trim(); // Новое поле
+                const countdownDate = countdownDateInput.value; // Новое поле (YYYY-MM-DD)
+
 
                 if (!recipientName) {
                     recipientNameMessage.textContent = "Пожалуйста, введите имя получателя.";
@@ -985,7 +1666,7 @@
                     recipientNameMessage.classList.add('text-red-500');
                     return;
                 } else {
-                    recipientNameMessage.textContent = ""; // Очищаем сообщение, если имя введено
+                    recipientNameMessage.textContent = "";
                 }
 
                 if (!senderName) {
@@ -994,21 +1675,22 @@
                     senderNameMessage.classList.add('text-red-500');
                     return;
                 } else {
-                    senderNameMessage.textContent = ""; // Очищаем сообщение, если имя введено
+                    senderNameMessage.textContent = "";
                 }
 
                 if (!currentUserId) {
-                    recipientNameMessage.textContent = "Ошибка: Пользователь не аутентифицирован. Пожалуйста, обновите страницу."; // Используем одно сообщение для ошибки аутентификации
+                    recipientNameMessage.textContent = "Ошибка: Пользователь не аутентифицирован. Пожалуйста, обновите страницу.";
                     recipientNameMessage.classList.remove('text-green-500', 'text-gray-500');
                     recipientNameMessage.classList.add('text-red-500');
                     return;
                 }
 
                 try {
-                    recipientNameMessage.textContent = "Сохранение..."; // Общее сообщение о сохранении
+                    recipientNameMessage.textContent = "Сохранение...";
                     recipientNameMessage.classList.remove('text-red-500', 'text-green-500');
                     recipientNameMessage.classList.add('text-gray-500');
-                    senderNameMessage.textContent = ""; // Очищаем сообщение отправителя
+                    senderNameMessage.textContent = "";
+                    countdownSettingsMessage.textContent = ""; // Очищаем сообщение отсчета
                     saveSiteSettingsButton.disabled = true;
 
                     const settingsDocRef = doc(db, `artifacts/${appId}/public/data/site_settings/global_settings`);
@@ -1017,6 +1699,11 @@
                         recipientGender: recipientGender,
                         recipientPhotoUrl: recipientPhotoUrl,
                         senderName: senderName,
+                        backgroundMusicUrl: backgroundMusicUrl,
+                        mainIntroText: mainIntroText,
+                        finalMessageText: finalMessageText,
+                        countdownEventName: countdownEventName, // Сохраняем название события
+                        countdownDate: countdownDate, // Сохраняем дату события
                         lastUpdatedBy: currentUserId,
                         timestamp: new Date()
                     });
@@ -1024,6 +1711,8 @@
                     recipientNameMessage.textContent = "Настройки успешно сохранены!";
                     recipientNameMessage.classList.remove('text-red-500', 'text-gray-500');
                     recipientNameMessage.classList.add('text-green-500');
+                    triggerConfetti(event); // Запускаем конфетти при успехе!
+
                 } catch (e) {
                     console.error("Ошибка при сохранении настроек сайта: ", e);
                     recipientNameMessage.textContent = "Ошибка при сохранении настроек. Пожалуйста, попробуйте снова.";
@@ -1034,7 +1723,7 @@
                 }
             });
 
-            // --- Firestore: Слушатель обновлений настроек сайта (имена, пол, фото) ---
+            // --- Firestore: Слушатель обновлений настроек сайта (имена, пол, фото, музыка, тексты, дата отсчета) ---
             function listenForSiteSettings() {
                 if (!db) {
                     console.warn("Firestore не инициализирован. Невозможно начать слушать настройки.");
@@ -1049,11 +1738,22 @@
                         const currentRecipientGender = data.recipientGender || "unspecified";
                         const currentRecipientPhotoUrl = data.recipientPhotoUrl || "";
                         const currentSenderName = data.senderName || "[Твое Имя]";
+                        const currentBackgroundMusicUrl = data.backgroundMusicUrl || "";
+                        const currentMainIntroText = data.mainIntroText || "Добро пожаловать в историю, написанную моим сердцем, только для тебя.";
+                        const currentFinalMessageText = data.finalMessageText || "Каждый день, проведенный рядом с тобой, — это благословение. Ты наполнил(а) мою жизнь светом, смыслом и безграничной любовью. Я ценю каждую нашу минуту, каждый смех, каждую тихую беседу. Ты — тот(та) человек, который делает меня лучше, вдохновляет на новые свершения и дарит ощущение полного счастья. Я не могу представить свою жизнь без тебя. Ты — моя родственная душа, мой лучший друг и моя самая большая любовь. Я люблю тебя всем сердцем, сегодня, завтра и всегда.";
+                        const currentCountdownEventName = data.countdownEventName || "Особенный день";
+                        const currentCountdownDate = data.countdownDate || "";
+
 
                         recipientNameInput.value = currentRecipientName;
                         recipientGenderSelect.value = currentRecipientGender;
                         recipientPhotoUrlInput.value = currentRecipientPhotoUrl;
                         senderNameInput.value = currentSenderName;
+                        backgroundMusicUrlInput.value = currentBackgroundMusicUrl;
+                        mainIntroTextInput.value = currentMainIntroText;
+                        finalMessageTextInput.value = currentFinalMessageText;
+                        countdownEventNameInput.value = currentCountdownEventName;
+                        countdownDateInput.value = currentCountdownDate;
 
                         // Обновляем отображение имени получателя с учетом пола
                         let greeting = "Дорогой(ая)";
@@ -1064,7 +1764,10 @@
                         }
                         recipientNameDisplay.textContent = `${greeting} ${currentRecipientName},`;
                         senderNameDisplay.textContent = currentSenderName;
-
+                        mainIntroTextDisplay.textContent = currentMainIntroText;
+                        finalMessageTextDisplay.textContent = currentFinalMessageText;
+                        countdownEventNameDisplay.textContent = currentCountdownEventName;
+                        
                         // Обновляем фото на главной странице
                         if (currentRecipientPhotoUrl) {
                             mainHeroImage.src = currentRecipientPhotoUrl;
@@ -1076,15 +1779,61 @@
                             mainHeroImage.src = "https://placehold.co/150x150/FF6B6B/FFFFFF?text=Фото"; // Дефолтное фото
                         }
 
+                        // Обновляем и проигрываем фоновую музыку
+                        if (currentBackgroundMusicUrl && backgroundMusic.src !== currentBackgroundMusicUrl) {
+                            backgroundMusic.src = currentBackgroundMusicUrl;
+                            backgroundMusic.load(); // Перезагружаем аудио
+                            backgroundMusic.play().catch(error => {
+                                console.warn("Автоматическое воспроизведение музыки заблокировано браузером. Пользователю нужно будет нажать на страницу.", error);
+                                // Можно добавить кнопку "Включить музыку"
+                            });
+                        } else if (!currentBackgroundMusicUrl) {
+                            backgroundMusic.pause();
+                            backgroundMusic.src = "";
+                        }
+
+                        // Запускаем или обновляем обратный отсчет
+                        if (countdownInterval) {
+                            clearInterval(countdownInterval); // Очищаем предыдущий интервал
+                        }
+                        if (currentCountdownDate) {
+                            startCountdown(currentCountdownDate, currentCountdownEventName);
+                        } else {
+                            countdownDescriptionDisplay.textContent = "Укажите дату события в настройках.";
+                            countdownDays.textContent = "00";
+                            countdownHours.textContent = "00";
+                            countdownMinutes.textContent = "00";
+                            countdownSeconds.textContent = "00";
+                            countdownFinishedMessage.style.display = 'none';
+                        }
+
+
                     } else {
                         // Если настроек нет, используем значения по умолчанию
                         recipientNameInput.value = "";
                         recipientGenderSelect.value = "unspecified";
                         recipientPhotoUrlInput.value = "";
                         senderNameInput.value = "";
+                        backgroundMusicUrlInput.value = "";
+                        mainIntroTextInput.value = "Добро пожаловать в историю, написанную моим сердцем, только для тебя.";
+                        finalMessageTextInput.value = "Каждый день, проведенный рядом с тобой, — это благословение. Ты наполнил(а) мою жизнь светом, смыслом и безграничной любовью. Я ценю каждую нашу минуту, каждый смех, каждую тихую беседу. Ты — тот(та) человек, который делает меня лучше, вдохновляет на новые свершения и дарит ощущение полного счастья. Я не могу представить свою жизнь без тебя. Ты — моя родственная душа, мой лучший друг и моя самая большая любовь. Я люблю тебя всем сердцем, сегодня, завтра и всегда.";
+                        countdownEventNameInput.value = "";
+                        countdownDateInput.value = "";
+
                         recipientNameDisplay.textContent = "Дорогой(ая) [Имя получателя],";
                         senderNameDisplay.textContent = "[Твое Имя]";
                         mainHeroImage.src = "https://placehold.co/150x150/FF6B6B/FFFFFF?text=Фото"; // Дефолтное фото
+                        mainIntroTextDisplay.textContent = "Добро пожаловать в историю, написанную моим сердцем, только для тебя.";
+                        finalMessageTextDisplay.textContent = "Каждый день, проведенный рядом с тобой, — это благословение. Ты наполнил(а) мою жизнь светом, смыслом и безграничной любовью. Я ценю каждую нашу минуту, каждый смех, каждую тихую беседу. Ты — тот(та) человек, который делает меня лучше, вдохновляет на новые свершения и дарит ощущение полного счастья. Я не могу представить свою жизнь без тебя. Ты — моя родственная душа, мой лучший друг и моя самая большая любовь. Я люблю тебя всем сердцем, сегодня, завтра и всегда.";
+                        countdownEventNameDisplay.textContent = "[Событие]";
+                        countdownDescriptionDisplay.textContent = "Укажите дату события в настройках.";
+                        countdownDays.textContent = "00";
+                        countdownHours.textContent = "00";
+                        countdownMinutes.textContent = "00";
+                        countdownSeconds.textContent = "00";
+                        countdownFinishedMessage.style.display = 'none';
+                        backgroundMusic.pause();
+                        backgroundMusic.src = "";
                     }
                 }, (error) => {
                     console.error("Ошибка при получении настроек сайта: ", error);
@@ -1093,6 +1842,80 @@
                     recipientNameMessage.classList.add('text-red-500');
                 });
             }
+
+            // --- Функция обратного отсчета ---
+            function startCountdown(targetDateString, eventName) {
+                const targetDate = new Date(targetDateString).getTime();
+
+                countdownInterval = setInterval(() => {
+                    const now = new Date().getTime();
+                    const distance = targetDate - now;
+
+                    if (distance < 0) {
+                        clearInterval(countdownInterval);
+                        countdownDays.textContent = "00";
+                        countdownHours.textContent = "00";
+                        countdownMinutes.textContent = "00";
+                        countdownSeconds.textContent = "00";
+                        countdownFinishedMessage.style.display = 'block';
+                        countdownDescriptionDisplay.textContent = "";
+                        return;
+                    }
+
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    countdownDays.textContent = String(days).padStart(2, '0');
+                    countdownHours.textContent = String(hours).padStart(2, '0');
+                    countdownMinutes.textContent = String(minutes).padStart(2, '0');
+                    countdownSeconds.textContent = String(seconds).padStart(2, '0');
+                    countdownDescriptionDisplay.textContent = `До ${eventName} осталось...`;
+                    countdownFinishedMessage.style.display = 'none';
+
+                }, 1000);
+            }
+
+
+            // --- Кнопка "Поделиться" ---
+            shareButton.addEventListener('click', async () => {
+                try {
+                    // Используем navigator.clipboard.writeText для копирования URL
+                    // В некоторых средах (например, в iframe) это может быть ограничено,
+                    // тогда можно использовать document.execCommand('copy') как запасной вариант.
+                    await navigator.clipboard.writeText(window.location.href);
+                    shareMessage.textContent = "Ссылка скопирована в буфер обмена!";
+                    shareMessage.classList.remove('text-red-500');
+                    shareMessage.classList.add('text-green-500');
+                } catch (err) {
+                    console.error('Не удалось скопировать ссылку: ', err);
+                    // Запасной вариант для старых браузеров или ограниченных сред
+                    const textarea = document.createElement('textarea');
+                    textarea.value = window.location.href;
+                    textarea.style.position = 'fixed'; // Чтобы не влияло на макет
+                    document.body.appendChild(textarea);
+                    textarea.focus();
+                    textarea.select();
+                    try {
+                        document.execCommand('copy');
+                        shareMessage.textContent = "Ссылка скопирована (запасной метод)!";
+                        shareMessage.classList.remove('text-red-500');
+                        shareMessage.classList.add('text-green-500');
+                    } catch (errCopy) {
+                        console.error('Не удалось скопировать ссылку запасным методом: ', errCopy);
+                        shareMessage.textContent = "Не удалось скопировать ссылку. Пожалуйста, скопируйте ее вручную из адресной строки.";
+                        shareMessage.classList.remove('text-green-500');
+                        shareMessage.classList.add('text-red-500');
+                    }
+                    document.body.removeChild(textarea);
+                }
+                // Скрываем сообщение через несколько секунд
+                setTimeout(() => {
+                    shareMessage.textContent = "";
+                }, 3000);
+            });
+
 
             // Инициализация: показываем первую вкладку при загрузке
             showTab('hero-tab');
