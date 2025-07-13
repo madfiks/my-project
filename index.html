@@ -3,1931 +3,910 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Наше Путешествие Любви: Признание</title>
-    <!-- Подключение Tailwind CSS для быстрой и адаптивной верстки -->
+    <title id="dynamicChatTitle">Чат с Сосей</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Подключение шрифтов Google Fonts: Playfair Display для заголовков, Inter для основного текста -->
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Подключение Font Awesome для иконок, используемых в различных секциях -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* --- Общие стили и переменные --- */
-        :root {
-            --primary-color: #ff6b6b; /* Нежно-розовый */
-            --secondary-color: #ffa07a; /* Светло-оранжевый */
-            --text-dark: #333;
-            --text-light: #f0f4f8;
-            --bg-light: #f0f4f8;
-            --bg-medium: #d9e2ec;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --shadow-light: 0 5px 15px rgba(0, 0, 0, 0.08);
-            --shadow-medium: 0 10px 30px rgba(0, 0, 0, 0.15);
-            --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.25);
-        }
-
         body {
             font-family: 'Inter', sans-serif;
-            color: var(--text-dark);
-            line-height: 1.7;
-            margin: 0;
-            padding: 0;
-            overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
-            background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-medium) 100%);
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             min-height: 100vh;
+            margin: 0;
+        }
+        .chat-container {
+            background-color: #ffffff;
+            border-radius: 1rem; /* Rounded corners */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 640px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            position: relative; /* Для позиционирования фоновых элементов */
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Playfair Display', serif;
-            color: var(--text-dark);
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
-
-        p {
-            margin-bottom: 1rem;
-        }
-
-        /* --- Фоновые анимации --- */
-        .background-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at top left, rgba(255, 107, 107, 0.1) 0%, transparent 30%),
-                        radial-gradient(circle at bottom right, rgba(255, 160, 122, 0.1) 0%, transparent 30%);
-            animation: pulse-gradient 15s infinite alternate ease-in-out;
-            z-index: -1; /* Под основным контентом */
-            pointer-events: none; /* Не мешает взаимодействию */
-        }
-
-        @keyframes pulse-gradient {
-            0% { background-size: 150% 150%; background-position: 0% 0%; }
-            50% { background-size: 170% 170%; background-position: 100% 100%; }
-            100% { background-size: 150% 150%; background-position: 0% 0%; }
-        }
-
-        /* Анимация "падающих сердечек" */
-        .heart {
-            position: absolute;
-            background-color: var(--primary-color);
-            transform: rotate(-45deg);
-            animation: fall 15s linear infinite;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 0;
-        }
-        .heart::before, .heart::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background-color: inherit;
-            border-radius: 50%;
-        }
-        .heart::before { top: -50%; left: 0; }
-        .heart::after { top: 0; left: 50%; }
-
-        @keyframes fall {
-            0% { transform: translateY(-100px) rotate(-45deg); opacity: 0; }
-            10% { opacity: 0.6; }
-            80% { opacity: 0.6; }
-            100% { transform: translateY(100vh) rotate(-45deg); opacity: 0; }
-        }
-
-        /* Стили для Canvas частиц */
-        #particles-canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2; /* Под всеми остальными фонами */
-            pointer-events: none;
-        }
-
-        /* --- Стили для секций (теперь как контент вкладок) --- */
-        .tab-content {
-            display: none; /* По умолчанию скрыты */
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 4rem 2rem;
-            /* Улучшенная анимация появления контента вкладки */
-            animation: fadeInScaleUp 0.8s ease-out forwards;
-            min-height: calc(100vh - 120px - 80px); /* Высота экрана минус навигация и футер */
-            box-sizing: border-box; /* Учитываем padding в высоте */
-        }
-        .tab-content.active {
-            display: block; /* Активная вкладка показывается */
-        }
-
-        @keyframes fadeInScaleUp {
-            from { opacity: 0; transform: translateY(30px) scale(0.98); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        .section-heading {
-            text-align: center;
-            font-size: 3.5rem; /* md:text-5xl lg:text-6xl */
-            font-weight: 700;
-            margin-bottom: 3rem;
-            color: var(--primary-color);
-            text-shadow: 2px 2px 5px rgba(0,0,0,0.05);
-            position: relative;
-        }
-        .section-heading::after {
-            content: '';
-            display: block;
-            width: 80px;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            margin: 1.5rem auto 0;
-            border-radius: 2px;
-        }
-
-        /* --- Навигация по вкладкам --- */
-        .tabs-nav {
-            background-color: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(15px);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            width: 100%;
-            z-index: 100;
-            padding: 1rem 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        .tab-button {
-            padding: 0.75rem 1.5rem;
-            border-radius: 9999px; /* Полностью скругленные углы */
-            font-weight: 600;
-            color: var(--text-dark);
-            transition: all 0.3s ease;
-            position: relative;
             overflow: hidden;
-            background-color: transparent;
-            border: none;
-            cursor: pointer;
-            font-size: 1.1rem;
+            max-height: 90vh; /* Limit height for responsiveness */
         }
-        .tab-button::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            transition: width 0.3s ease;
-            border-radius: 2px;
-        }
-        .tab-button:hover {
-            color: var(--primary-color);
-        }
-        .tab-button:hover::before {
-            width: 100%;
-        }
-        .tab-button.active {
-            color: white;
-            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
-            box-shadow: var(--shadow-light);
-            transform: translateY(-2px);
-        }
-        .tab-button.active::before {
-            width: 0; /* Убираем нижнюю полосу для активной кнопки */
-        }
-
-        /* --- Hero Section --- */
-        .hero-section {
-            min-height: calc(100vh - 80px); /* Высота экрана минус навигация */
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .chat-header {
+            background-color: #3b82f6;
+            background-image: linear-gradient(to right, #3b82f6, #4f46e5);
+            color: #ffffff;
             text-align: center;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.95) 100%);
-            padding: 4rem 2rem;
-            position: relative;
-            z-index: 1;
+            padding: 1rem;
+            font-size: 2rem;
+            font-weight: bold;
+            border-top-left-radius: 1rem;
+            border-top-right-radius: 1rem;
         }
-
-        .hero-card {
-            background-color: var(--card-bg);
-            backdrop-filter: blur(20px);
-            box-shadow: var(--shadow-medium);
-            border-radius: 2rem;
-            padding: 3rem;
-            max-width: 800px;
-            width: 100%;
-            animation: scaleIn 1.5s ease-out forwards; /* Анимация появления карточки */
-        }
-
-        @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .hero-image {
-            border: 5px solid var(--primary-color);
-            box-shadow: var(--shadow-light);
-            transition: transform 0.3s ease-in-out;
-        }
-        .hero-image:hover {
-            transform: scale(1.05) rotate(2deg);
-        }
-
-        /* Текст пишущей машинки теперь просто отображается */
-        .typewriter-text {
-            font-weight: 600;
-        }
-
-        /* --- Our Story Section --- */
-        .story-timeline {
-            position: relative;
-            padding-left: 2rem;
-            border-left: 3px solid var(--primary-color);
-        }
-        .timeline-item {
-            margin-bottom: 3rem;
-            position: relative;
-            padding-left: 2rem;
-            opacity: 0; /* Изначально скрыты для анимации */
-            transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-        }
-        .timeline-item.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .timeline-date {
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-
-        /* --- Qualities Section --- */
-        .quality-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-        .quality-item {
-            background-color: var(--card-bg);
-            border-radius: 1.5rem;
-            padding: 2rem;
-            box-shadow: var(--shadow-light);
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            border: 1px solid rgba(255, 107, 107, 0.1);
-            opacity: 0; /* Изначально скрыты для анимации */
-            transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-            position: relative; /* Для кнопки удаления */
-        }
-        .quality-item.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .quality-item:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow-medium);
-        }
-        .quality-icon {
-            color: var(--primary-color);
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            transition: transform 0.3s ease-in-out;
-        }
-        .quality-item:hover .quality-icon {
-            transform: scale(1.1);
-        }
-        .quality-delete-btn {
-            position: absolute;
-            top: 0.75rem;
-            right: 0.75rem;
-            background-color: rgba(255, 0, 0, 0.1);
-            color: #ff0000;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
+        .messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 0.8rem;
-            opacity: 0.7;
-            transition: opacity 0.2s ease-in-out, background-color 0.2s ease-in-out;
+            flex-direction: column;
+            gap: 0.75rem;
         }
-        .quality-delete-btn:hover {
-            opacity: 1;
-            background-color: rgba(255, 0, 0, 0.2);
-        }
-
-
-        /* --- Future Dreams Section --- */
-        .dream-gallery img {
-            border-radius: 1.5rem;
-            box-shadow: var(--shadow-light);
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            border: 3px solid var(--secondary-color);
-            opacity: 0; /* Изначально скрыты для анимации */
-            transform: scale(0.95);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-        }
-        .dream-gallery img.active {
-            opacity: 1;
-            transform: scale(1);
-        }
-        .dream-gallery img:hover {
-            transform: scale(1.03);
-            box-shadow: var(--shadow-medium);
-        }
-
-        /* --- Modal для изображений --- */
-        .image-modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.85);
+        .message-input-area {
+            padding: 1.5rem;
+            border-top: 1px solid #e5e7eb;
+            background-color: #f9fafb;
             display: flex;
-            justify-content: center;
+            gap: 0.5rem;
+            align-items: center; /* Align items vertically */
+        }
+        .message-bubble {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            word-wrap: break-word;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* Subtle shadow for bubbles */
+            position: relative; /* For delete button positioning */
+        }
+        .message-bubble.mine {
+            background-color: #3b82f6;
+            color: #ffffff;
+            align-self: flex-end;
+            border-bottom-right-radius: 0.25rem;
+        }
+        .message-bubble.other {
+            background-color: #e5e7eb;
+            color: #1f2937;
+            align-self: flex-start;
+            border-bottom-left-radius: 0.25rem;
+        }
+        .user-info { /* Changed from user-id for more general styling */
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-bottom: 0.25rem;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
-            z-index: 200; /* Выше всего */
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease-out, visibility 0.3s ease-out;
         }
-        .image-modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
+        .message-time {
+            font-size: 0.65rem;
+            color: #9ca3af;
+            margin-left: 0.5rem;
         }
-        .image-modal-content {
-            max-width: 90%;
-            max-height: 90%;
-            object-fit: contain;
-            border-radius: 1rem;
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
-            transform: scale(0.8);
-            transition: transform 0.3s ease-out;
+        .nickname-setup {
+            padding: 1rem 1.5rem;
+            background-color: #e0f2fe; /* Light blue background */
+            border-top: 1px solid #bfdbfe;
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
         }
-        .image-modal-overlay.active .image-modal-content {
-            transform: scale(1);
+        .button-primary {
+            @apply px-5 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out;
         }
-        .image-modal-close {
+        .button-success {
+            @apply px-4 py-2 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150 ease-in-out;
+        }
+        .button-danger {
+            @apply px-3 py-1 bg-red-500 text-white rounded-md text-xs hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150 ease-in-out;
+        }
+        .input-field {
+            @apply flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500;
+        }
+        .input-field-small {
+            @apply flex-grow p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400;
+        }
+        .status-message {
+            @apply text-sm text-center py-2;
+        }
+        .attachment-indicator {
+            font-size: 0.7rem;
+            color: #4a5568;
+            margin-top: 0.25rem;
+            display: block;
+            font-style: italic;
+        }
+        .admin-panel-toggle, .settings-panel-toggle {
+            @apply px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-150 ease-in-out;
+        }
+        .admin-panel, .settings-panel {
+            background-color: #f3e8ff; /* Light purple */
+            padding: 1rem;
+            border-top: 1px solid #d8b4fe;
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+        .admin-panel.active, .settings-panel.active {
+            display: flex;
+        }
+        .delete-message-btn {
             position: absolute;
-            top: 1.5rem;
-            right: 1.5rem;
+            top: 5px;
+            right: 5px;
+            cursor: pointer;
             background: none;
             border: none;
-            font-size: 2.5rem;
-            color: white;
-            cursor: pointer;
-            transition: transform 0.2s ease-in-out;
-        }
-        .image-modal-close:hover {
-            transform: rotate(90deg);
-        }
-
-        /* --- Final Message Section --- */
-        .final-message-card {
-            background-color: var(--card-bg);
-            backdrop-filter: blur(15px);
-            box-shadow: var(--shadow-strong);
-            border-radius: 2.5rem;
-            padding: 4rem;
-            max-width: 900px;
-            width: 100%;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            opacity: 0; /* Изначально скрыты для анимации */
-            transform: translateY(30px);
-            animation: fadeInScaleUp 0.8s ease-out forwards; /* Используем ту же анимацию, что и для вкладок */
-        }
-        .final-message-card.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .final-message-card::before {
-            content: '';
-            position: absolute;
-            top: -20px;
-            left: -20px;
-            right: -20px;
-            bottom: -20px;
-            background: linear-gradient(45deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            z-index: -1;
-            filter: blur(30px); /* Эффект свечения */
-            opacity: 0.3;
-            animation: pulse-glow 5s infinite alternate;
-        }
-
-        @keyframes pulse-glow {
-            0% { transform: scale(1); opacity: 0.3; }
-            50% { transform: scale(1.05); opacity: 0.5; }
-            100% { transform: scale(1); opacity: 0.3; }
-        }
-
-        .signature {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-top: 3rem;
-            text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
-        }
-
-        /* --- Countdown Section --- */
-        .countdown-container {
-            text-align: center;
-            padding: 3rem;
-            background-color: var(--card-bg);
-            border-radius: 2rem;
-            box-shadow: var(--shadow-medium);
-            max-width: 700px;
-            margin: 0 auto;
-            opacity: 0;
-            transform: translateY(30px);
-            animation: fadeInScaleUp 0.8s ease-out forwards;
-        }
-        .countdown-container.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .countdown-heading {
-            font-size: 3rem;
-            color: var(--primary-color);
-            margin-bottom: 2rem;
-        }
-
-        .countdown-timer {
-            display: flex;
-            justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-
-        .countdown-item {
-            background-color: var(--bg-light);
-            padding: 1.5rem 1rem;
-            border-radius: 1rem;
-            box-shadow: var(--shadow-light);
-            min-width: 100px;
-        }
-
-        .countdown-value {
-            font-size: 3.5rem;
-            font-weight: 700;
-            color: var(--secondary-color);
+            color: #ef4444; /* Red color */
+            font-size: 0.8rem;
+            padding: 0;
             line-height: 1;
-            margin-bottom: 0.5rem;
+            opacity: 0.7;
+            transition: opacity 0.2s ease-in-out;
         }
-
-        .countdown-label {
-            font-size: 1rem;
-            color: var(--primary-color);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+        .delete-message-btn:hover {
+            opacity: 1;
         }
-
-        /* --- Footer --- */
-        footer {
-            background-color: var(--text-dark);
-            color: var(--text-light);
-            padding: 3rem 0;
-            margin-top: 5rem;
-            width: 100%;
-            text-align: center;
-            box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.1);
+        .message-bubble.mine .delete-message-btn {
+            color: #fca5a5; /* Lighter red for own messages */
         }
-        footer a {
-            color: var(--secondary-color);
-            transition: color 0.3s ease;
+        /* Styles for chat background */
+        .chat-background-default { background-color: #f0f2f5; }
+        .chat-background-light-blue { background-color: #e0f7fa; }
+        .chat-background-light-green { background-color: #e8f5e9; }
+        .chat-background-light-yellow { background-color: #fffde7; }
+        .user-id-display-area {
+            @apply p-4 text-center text-sm text-gray-600 border-t border-gray-200 rounded-b-xl flex items-center justify-center gap-2;
         }
-        footer a:hover {
-            color: var(--primary-color);
-        }
-
-        /* --- Адаптивность (Медиа-запросы) --- */
-        @media (max-width: 1024px) {
-            .section-heading {
-                font-size: 3rem;
-            }
-            .hero-card {
-                padding: 2.5rem;
-            }
-            .final-message-card {
-                padding: 3rem;
-            }
-            .countdown-value {
-                font-size: 3rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .tabs-nav ul {
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            .tab-button {
-                padding: 0.5rem 1rem;
-                font-size: 0.9rem;
-                margin: 0.25rem;
-            }
-            .tab-content {
-                padding: 3rem 1.5rem;
-            }
-            .section-heading {
-                font-size: 2.5rem;
-                margin-bottom: 2rem;
-            }
-            .hero-card {
-                padding: 2rem;
-            }
-            .hero-image {
-                width: 120px;
-                height: 120px;
-            }
-            .story-timeline {
-                padding-left: 1.5rem;
-            }
-            .timeline-item::before {
-                left: -1.8rem;
-                width: 1rem;
-                height: 1rem;
-            }
-            .quality-item {
-                padding: 1.5rem;
-            }
-            .quality-icon {
-                font-size: 2rem;
-            }
-            .final-message-card {
-                padding: 2.5rem;
-                border-radius: 2rem;
-            }
-            .signature {
-                font-size: 2rem;
-            }
-            .countdown-value {
-                font-size: 2.5rem;
-            }
-            .countdown-item {
-                min-width: 80px;
-                padding: 1rem 0.5rem;
-            }
-            .countdown-label {
-                font-size: 0.8rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .tabs-nav {
-                padding: 0.5rem 0;
-            }
-            .tab-button {
-                padding: 0.4rem 0.8rem;
-                font-size: 0.8rem;
-            }
-            .section-heading {
-                font-size: 2rem;
-            }
-            .hero-card {
-                padding: 1.5rem;
-                border-radius: 1.5rem;
-            }
-            .hero-image {
-                width: 100px;
-                height: 100px;
-            }
-            .story-timeline {
-                padding-left: 1rem;
-                border-left: 2px solid var(--primary-color);
-            }
-            .timeline-item::before {
-                left: -1.3rem;
-                width: 0.8rem;
-                height: 0.8rem;
-                border: 2px solid var(--bg-light);
-                box-shadow: 0 0 0 2px var(--primary-color);
-            }
-            .final-message-card {
-                padding: 1.5rem;
-                border-radius: 1.5rem;
-            }
-            .signature {
-                font-size: 1.5rem;
-            }
-            .countdown-value {
-                font-size: 2rem;
-            }
-            .countdown-item {
-                min-width: 70px;
-                padding: 0.75rem 0.25rem;
-            }
-            .countdown-label {
-                font-size: 0.7rem;
-            }
+        .copy-button {
+            @apply px-2 py-1 bg-gray-200 text-gray-700 rounded-md text-xs hover:bg-gray-300 transition duration-150 ease-in-out;
         }
     </style>
 </head>
 <body>
-    <!-- Фоновый анимированный оверлей для создания мягкого свечения -->
-    <div class="background-overlay"></div>
-
-    <!-- Контейнер для падающих сердечек -->
-    <div id="heart-container" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
-
-    <!-- Canvas для фоновых частиц -->
-    <canvas id="particles-canvas"></canvas>
-
-    <!-- Аудио элемент для фоновой музыки -->
-    <audio id="backgroundMusic" loop autoplay style="display: none;">
-        <!-- Пример аудио: "SoundHelix-Song-1.mp3" от SoundHelix.com -->
-        <source src="" type="audio/mpeg">
-        Ваш браузер не поддерживает элемент аудио.
-    </audio>
-
-    <!-- --- Навигация по вкладкам --- -->
-    <nav class="tabs-nav">
-        <ul class="flex justify-center space-x-2 md:space-x-4">
-            <li><button class="tab-button active" data-tab="hero-tab">Главная</button></li>
-            <li><button class="tab-button" data-tab="our-story-tab">Наша История</button></li>
-            <li><button class="tab-button" data-tab="qualities-tab">Что я люблю</button></li>
-            <li><button class="tab-button" data-tab="future-dreams-tab">Наши Мечты</button></li>
-            <li><button class="tab-button" data-tab="countdown-tab">Обратный отсчет</button></li> <!-- Новая вкладка -->
-            <li><button class="tab-button" data-tab="final-message-tab">Послание</button></li>
-            <li><button class="tab-button" data-tab="settings-tab">Настройки</button></li>
-        </ul>
-    </nav>
-
-    <!-- --- Контент вкладок --- -->
-
-    <!-- Вкладка "Главная" (бывшая Hero Section) -->
-    <div id="hero-tab" class="tab-content active bg-white rounded-3xl shadow-xl mt-8">
-        <section class="hero-section w-full">
-            <div class="hero-card">
-                <!-- Место для фотографии, теперь динамическое -->
-                <div class="mb-8">
-                    <img id="mainHeroImage" src="https://placehold.co/150x150/FF6B6B/FFFFFF?text=Фото" alt="Фото получателя"
-                         class="hero-image w-40 h-40 rounded-full mx-auto object-cover">
-                </div>
-
-                <h1 class="playfair-display text-5xl md:text-6xl lg:text-7xl font-bold text-gray-800 mb-6 leading-tight">
-                    Моему единственному человеку
-                </h1>
-
-                <p class="text-xl md:text-2xl text-gray-700 mb-8 typewriter-text" id="typewriter-text-hero">
-                    Ты — моя самая большая радость.
-                </p>
-
-                <p id="mainIntroText" class="text-lg md:text-xl text-gray-600 mb-10">
-                    Добро пожаловать в историю, написанную моим сердцем, только для тебя.
-                </p>
-
-                <!-- Кнопка для перехода на вкладку "Наша История" -->
-                <button class="inline-block bg-gradient-to-r from-pink-500 to-orange-400 text-white font-semibold py-4 px-10 rounded-full text-lg md:text-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 uppercase tracking-wide focus:outline-none focus:ring-4 focus:ring-pink-300 focus:ring-opacity-75"
-                        onclick="showTab('our-story-tab')">
-                    Начать наше путешествие <i class="fas fa-arrow-right ml-2"></i>
-                </button>
-
-                <!-- Кнопка "Поделиться" -->
-                <button id="shareButton" class="mt-4 inline-block bg-gray-200 text-gray-700 font-semibold py-3 px-8 rounded-full text-lg shadow-md hover:shadow-xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray-300 focus:ring-opacity-75">
-                    <i class="fas fa-share-alt mr-2"></i> Поделиться
-                </button>
-                <p id="shareMessage" class="text-center text-sm mt-2"></p>
-            </div>
-        </section>
-    </div>
-
-    <!-- Вкладка "Наша История" -->
-    <div id="our-story-tab" class="tab-content bg-white rounded-3xl shadow-xl mt-8">
-        <section class="w-full">
-            <h2 class="section-heading playfair-display">Наша История</h2>
-            <p class="text-center text-lg text-gray-700 mb-12 max-w-2xl mx-auto">
-                Добавьте свои самые дорогие моменты в нашу общую историю!
-            </p>
-
-            <!-- Форма для добавления новой записи в историю -->
-            <div class="max-w-2xl mx-auto p-6 bg-pink-50 rounded-xl shadow-md mb-10 border border-pink-100">
-                <h3 class="font-semibold text-xl text-gray-800 mb-4 text-center">Добавить новый момент</h3>
-                <div class="mb-4">
-                    <label for="storyDate" class="block text-gray-700 text-sm font-bold mb-2">Дата (например, 2023 год, Весна):</label>
-                    <input type="text" id="storyDate" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300" placeholder="Например, 2023 год, Весна">
-                </div>
-                <div class="mb-4">
-                    <label for="storyTitle" class="block text-gray-700 text-sm font-bold mb-2">Заголовок:</label>
-                    <input type="text" id="storyTitle" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300" placeholder="Например, Наше первое знакомство">
-                </div>
-                <div class="mb-6">
-                    <label for="storyDescription" class="block text-gray-700 text-sm font-bold mb-2">Описание:</label>
-                    <textarea id="storyDescription" rows="4" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300" placeholder="Подробности этого момента..."></textarea>
-                </div>
-                <button id="addStoryButton" class="bg-gradient-to-r from-pink-500 to-orange-400 hover:from-orange-400 hover:to-pink-500 text-white font-bold py-2 px-4 rounded-full w-full transition-all duration-300">
-                    Добавить в историю
-                </button>
-                <p id="storyMessage" class="text-center text-sm mt-3"></p>
-            </div>
-
-            <!-- Индикатор загрузки -->
-            <div id="storyLoading" class="text-center text-gray-500 text-lg mt-10" style="display: none;">
-                <i class="fas fa-spinner fa-spin text-primary-color text-3xl"></i> Загрузка истории...
-            </div>
-
-            <!-- Контейнер для отображения истории -->
-            <div id="storyTimeline" class="story-timeline max-w-2xl mx-auto">
-                <!-- Элементы истории будут добавлены здесь JavaScript'ом -->
-            </div>
-            
-            <!-- Отображение текущего ID пользователя -->
-            <p class="text-center text-sm text-gray-500 mt-8">
-                Ваш ID пользователя: <span id="currentUserId">Загрузка...</span>
-            </p>
-        </section>
-    </div>
-
-    <!-- Вкладка "Что я люблю в тебе" -->
-    <div id="qualities-tab" class="tab-content bg-pink-50 rounded-3xl shadow-xl mt-8">
-        <section class="w-full">
-            <h2 class="section-heading playfair-display">Что я люблю в тебе</h2>
-            <p class="text-center text-lg text-gray-700 mb-12 max-w-2xl mx-auto">
-                Твои качества делают тебя таким(ой) невероятным(ой) человеком. Вот лишь некоторые из них, которые я обожаю:
-            </p>
-
-            <div id="qualitiesGrid" class="quality-grid">
-                <!-- Качества будут загружены здесь из Firestore -->
-            </div>
-            
-            <!-- Сообщение об отсутствии качеств -->
-            <p id="noQualitiesMessage" class="text-center text-gray-500 mt-10" style="display: none;">
-                Пока нет добавленных качеств. Добавьте их на вкладке "Настройки"!
-            </p>
-        </section>
-    </div>
-
-    <!-- Вкладка "Наши будущие мечты" -->
-    <div id="future-dreams-tab" class="tab-content bg-white rounded-3xl shadow-xl mt-8">
-        <section class="w-full">
-            <h2 class="section-heading playfair-display">Наши будущие мечты</h2>
-            <p class="text-center text-lg text-gray-700 mb-12 max-w-2xl mx-auto">
-                Я мечтаю о нашем будущем, наполненном приключениями, смехом и бесконечной любовью.
-            </p>
-
-            <div class="dream-gallery grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <img src="https://placehold.co/400x300/FFD1DC/6B4C5C?text=Путешествия" alt="Мечта о путешествиях" class="w-full h-auto object-cover">
-                <img src="https://placehold.co/400x300/FFC0CB/6B4C5C?text=Уютный+дом" alt="Мечта об уютном доме" class="w-full h-auto object-cover">
-                <img src="https://placehold.co/400x300/FFB6C1/6B4C5C?text=Общие+хобби" alt="Мечта об общих хобби" class="w-full h-auto object-cover">
-                <img src="https://placehold.co/400x300/FF99AA/6B4C5C?text=Счастливые+моменты" alt="Мечта о счастливых моментах" class="w-full h-auto object-cover">
-                <img src="https://placehold.co/400x300/FF8899/6B4C5C?text=Рост+и+развитие" alt="Мечта о росте и развитии" class="w-full h-auto object-cover">
-                <img src="https://placehold.co/400x300/FF6677/6B4C5C?text=Бесконечная+любовь" alt="Мечта о бесконечной любви" class="w-full h-auto object-cover">
-            </div>
-        </section>
-    </div>
-
-    <!-- Новая вкладка "Обратный отсчет" -->
-    <div id="countdown-tab" class="tab-content bg-white rounded-3xl shadow-xl mt-8">
-        <section class="w-full">
-            <h2 class="section-heading playfair-display">Обратный отсчет до <span id="countdownEventName">[Событие]</span></h2>
-            <p class="text-center text-lg text-gray-700 mb-12 max-w-2xl mx-auto" id="countdownDescription">
-                До нашего особенного дня осталось...
-            </p>
-
-            <div class="countdown-container">
-                <div class="countdown-timer">
-                    <div class="countdown-item">
-                        <div id="countdownDays" class="countdown-value">00</div>
-                        <div class="countdown-label">Дней</div>
-                    </div>
-                    <div class="countdown-item">
-                        <div id="countdownHours" class="countdown-value">00</div>
-                        <div class="countdown-label">Часов</div>
-                    </div>
-                    <div class="countdown-item">
-                        <div id="countdownMinutes" class="countdown-value">00</div>
-                        <div class="countdown-label">Минут</div>
-                    </div>
-                    <div class="countdown-item">
-                        <div id="countdownSeconds" class="countdown-value">00</div>
-                        <div class="countdown-label">Секунд</div>
-                    </div>
-                </div>
-                <p id="countdownFinishedMessage" class="text-xl text-primary-color mt-8" style="display: none;">
-                    Поздравляем! Этот день настал!
-                </p>
-            </div>
-        </section>
-    </div>
-
-    <!-- Вкладка "Финальное послание" -->
-    <div id="final-message-tab" class="tab-content bg-white rounded-3xl shadow-xl mt-8">
-        <section class="w-full flex justify-center items-center">
-            <div class="final-message-card">
-                <h2 class="playfair-display text-4xl md:text-5xl font-bold text-gray-800 mb-8">
-                    Мое сердце говорит...
-                </h2>
-                <p id="recipientNameDisplay" class="text-xl md:text-2xl text-gray-700 leading-relaxed mb-8">
-                    Дорогой(ая) [Имя получателя],
-                </p>
-                <p id="finalMessageText" class="text-lg md:text-xl text-gray-700 leading-relaxed text-justify mb-8">
-                    Каждый день, проведенный рядом с тобой, — это благословение. Ты наполнил(а) мою жизнь светом, смыслом и безграничной любовью. Я ценю каждую нашу минуту, каждый смех, каждую тихую беседу. Ты — тот(та) человек, который делает меня лучше, вдохновляет на новые свершения и дарит ощущение полного счастья. Я не могу представить свою жизнь без тебя. Ты — моя родственная душа, мой лучший друг и моя самая большая любовь. Я люблю тебя всем сердцем, сегодня, завтра и всегда.
-                </p>
-                <p class="signature playfair-display">
-                    С любовью, <span id="senderNameDisplay">[Твое Имя]</span>
-                </p>
-            </div>
-        </section>
-    </div>
-
-    <!-- Новая вкладка "Настройки" -->
-    <div id="settings-tab" class="tab-content bg-white rounded-3xl shadow-xl mt-8">
-        <section class="w-full">
-            <h2 class="section-heading playfair-display">Настройки сайта</h2>
-            <p class="text-center text-lg text-gray-700 mb-12 max-w-2xl mx-auto">
-                Здесь вы можете персонализировать сайт, изменив имена, пол получателя и фотографию.
-            </p>
-
-            <div class="max-w-2xl mx-auto p-6 bg-gray-50 rounded-xl border border-gray-100 shadow-md">
-                <div class="mb-5">
-                    <label for="recipientNameInput" class="block text-gray-700 text-lg font-bold mb-3">
-                        Имя получателя (для послания):
-                    </label>
-                    <input type="text" id="recipientNameInput"
-                           class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300 text-center text-xl"
-                           placeholder="Введите полное имя получателя">
-                    <p id="recipientNameMessage" class="text-center text-sm mt-2"></p>
-                </div>
-
-                <div class="mb-5">
-                    <label for="recipientGenderSelect" class="block text-gray-700 text-lg font-bold mb-3">
-                        Пол получателя:
-                    </label>
-                    <select id="recipientGenderSelect"
-                            class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300 text-center text-xl">
-                        <option value="unspecified">Не указано</option>
-                        <option value="male">Парень</option>
-                        <option value="female">Девушка</option>
-                    </select>
-                </div>
-
-                <div class="mb-5">
-                    <label for="recipientPhotoUrlInput" class="block text-gray-700 text-lg font-bold mb-3">
-                        URL фотографии получателя:
-                    </label>
-                    <input type="url" id="recipientPhotoUrlInput"
-                           class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300 text-center text-xl"
-                           placeholder="Вставьте URL изображения (например, с Imgur)">
-                    <p class="text-sm text-gray-500 mt-2">
-                        Используйте прямую ссылку на изображение (например, `https://example.com/your-photo.jpg`).
-                    </p>
-                </div>
-
-                <div class="mb-5">
-                    <label for="senderNameInput" class="block text-gray-700 text-lg font-bold mb-3">
-                        Ваше имя (отправителя):
-                    </label>
-                    <input type="text" id="senderNameInput"
-                           class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300 text-center text-xl"
-                           placeholder="Введите ваше полное имя">
-                    <p id="senderNameMessage" class="text-center text-sm mt-2"></p>
-                </div>
-
-                <div class="mb-5">
-                    <label for="backgroundMusicUrlInput" class="block text-gray-700 text-lg font-bold mb-3">
-                        URL фоновой музыки (.mp3):
-                    </label>
-                    <input type="url" id="backgroundMusicUrlInput"
-                           class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300 text-center text-xl"
-                           placeholder="Вставьте URL вашей любимой песни">
-                    <p class="text-sm text-gray-500 mt-2">
-                        Используйте прямую ссылку на MP3-файл (например, `https://example.com/song.mp3`).
-                    </p>
-                </div>
-
-                <div class="mb-5">
-                    <label for="mainIntroTextInput" class="block text-gray-700 text-lg font-bold mb-3">
-                        Текст на главной странице:
-                    </label>
-                    <textarea id="mainIntroTextInput" rows="3"
-                              class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300"
-                              placeholder="Добро пожаловать в историю, написанную моим сердцем, только для тебя."></textarea>
-                </div>
-
-                <div class="mb-6">
-                    <label for="finalMessageTextInput" class="block text-gray-700 text-lg font-bold mb-3">
-                        Текст финального послания:
-                    </label>
-                    <textarea id="finalMessageTextInput" rows="8"
-                              class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300"
-                              placeholder="Каждый день, проведенный рядом с тобой..."></textarea>
-                </div>
-
-                <hr class="my-8 border-gray-300">
-
-                <h3 class="font-semibold text-2xl text-gray-800 mb-5 text-center playfair-display">Настройка качеств</h3>
-                <p class="text-center text-gray-700 mb-6">Добавьте качества, которые вы цените в своем особенном человеке.</p>
-                <div class="mb-4">
-                    <label for="newQualityText" class="block text-gray-700 text-sm font-bold mb-2">Новое качество:</label>
-                    <input type="text" id="newQualityText" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300" placeholder="Например, Твоя доброта">
-                </div>
-                <div class="mb-6">
-                    <label for="newQualityDescription" class="block text-gray-700 text-sm font-bold mb-2">Описание качества:</label>
-                    <textarea id="newQualityDescription" rows="2" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300" placeholder="Например, Твое большое сердце и забота о других вдохновляют меня."></textarea>
-                </div>
-                <button id="addQualityButton" class="bg-gradient-to-r from-purple-500 to-indigo-400 hover:from-indigo-400 hover:to-purple-500 text-white font-bold py-2 px-4 rounded-full w-full transition-all duration-300">
-                    Добавить качество
-                </button>
-                <p id="qualityMessage" class="text-center text-sm mt-3"></p>
-
-                <h4 class="font-semibold text-xl text-gray-800 mt-8 mb-4 text-center">Существующие качества:</h4>
-                <div id="existingQualitiesList" class="space-y-3 text-left">
-                    <!-- Существующие качества будут загружены здесь -->
-                </div>
-
-                <hr class="my-8 border-gray-300">
-
-                <h3 class="font-semibold text-2xl text-gray-800 mb-5 text-center playfair-display">Настройка обратного отсчета</h3>
-                <p class="text-center text-gray-700 mb-6">Укажите дату и название важного события.</p>
-                <div class="mb-4">
-                    <label for="countdownEventNameInput" class="block text-gray-700 text-lg font-bold mb-3">
-                        Название события:
-                    </label>
-                    <input type="text" id="countdownEventNameInput"
-                           class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300 text-center text-xl"
-                           placeholder="Например, Наша годовщина">
-                </div>
-                <div class="mb-6">
-                    <label for="countdownDateInput" class="block text-gray-700 text-lg font-bold mb-3">
-                        Дата события:
-                    </label>
-                    <input type="date" id="countdownDateInput"
-                           class="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline focus:border-pink-300 text-center text-xl">
-                </div>
-                <p id="countdownSettingsMessage" class="text-center text-sm mt-3"></p>
-
-                <button id="saveSiteSettingsButton"
-                        class="bg-gradient-to-r from-blue-500 to-cyan-400 hover:from-cyan-400 hover:to-blue-500 text-white font-bold py-3 px-6 rounded-full w-full transition-all duration-300 text-lg mt-8">
-                    Сохранить все настройки
-                </button>
-            </div>
-        </section>
-    </div>
-
-    <!-- Футер -->
-    <footer class="mt-20 py-10">
-        <p class="text-lg mb-4">&copy; 2025 Сделано с любовью и вдохновением.</p>
-        <div class="flex justify-center space-x-6 text-2xl">
-            <a href="#" class="hover:scale-110 transition-transform duration-300"><i class="fab fa-instagram"></i></a>
-            <a href="#" class="hover:scale-110 transition-transform duration-300"><i class="fab fa-telegram-plane"></i></a>
-            <a href="#" class="hover:scale-110 transition-transform duration-300"><i class="fas fa-envelope"></i></a>
+    <div class="chat-container">
+        <div class="chat-header" id="chatTitleDisplay">
+            Чат с Сосей
         </div>
-        <p class="text-sm text-gray-400 mt-6">
-            Пусть наша история продолжается вечно.
-        </p>
-    </footer>
+        <div class="messages" id="messages">
+            <!-- Сообщения будут загружены здесь -->
+            <div class="text-center text-gray-500 py-4">Загрузка сообщений...</div>
+        </div>
+        <div class="message-input-area">
+            <!-- Hidden file input -->
+            <input type="file" id="fileInput" accept="image/*" class="hidden">
+            <!-- Button to trigger file input -->
+            <button id="attachFileBtn" class="p-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition duration-150 ease-in-out">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13.5"/>
+                </svg>
+            </button>
+            <span id="fileNameDisplay" class="text-sm text-gray-500 ml-2 truncate max-w-[100px]"></span>
+            <input type="text" id="messageInput" placeholder="Введите ваше сообщение..." class="input-field">
+            <button id="sendMessageBtn" class="button-primary">
+                Отправить
+            </button>
+        </div>
+        <div class="nickname-setup">
+            <label for="nicknameInput" class="text-gray-700 font-medium">Ваш ник:</label>
+            <input type="text" id="nicknameInput" placeholder="Введите ваш ник" class="input-field-small">
+            <button id="saveNicknameBtn" class="button-success">
+                Сохранить ник
+            </button>
+        </div>
 
-    <!-- Модальное окно для изображений -->
-    <div id="imageModal" class="image-modal-overlay hidden">
-        <button class="image-modal-close" id="closeImageModal">&times;</button>
-        <img src="" alt="Увеличенное изображение" class="image-modal-content" id="modalImage">
+        <!-- Settings and Admin Panel Section -->
+        <div class="p-4 text-center border-t border-gray-200 flex justify-center items-center gap-4">
+            <button id="toggleSettingsPanelBtn" class="settings-panel-toggle">
+                Настройки чата
+            </button>
+            <button id="toggleAdminPanelBtn" class="admin-panel-toggle hidden">
+                Панель администратора
+            </button>
+        </div>
+
+        <!-- Settings Panel -->
+        <div id="settingsPanel" class="settings-panel">
+            <h3 class="text-lg font-semibold text-gray-800">Настройки чата</h3>
+            <div class="flex flex-col gap-2">
+                <label class="text-gray-700 font-medium">Фон чата:</label>
+                <select id="chatBackgroundSelect" class="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+                    <option value="default">По умолчанию</option>
+                    <option value="light-blue">Светло-голубой</option>
+                    <option value="light-green">Светло-зеленый</option>
+                    <option value="light-yellow">Светло-желтый</option>
+                </select>
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="toggleTimestamps" class="form-checkbox h-5 w-5 text-blue-600 rounded">
+                <label for="toggleTimestamps" class="text-gray-700">Показывать временные метки</label>
+            </div>
+            <button id="clearChatBtn" class="button-danger mt-2">
+                Очистить историю чата (локально)
+            </button>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="adminPanel" class="admin-panel">
+            <h3 class="text-lg font-semibold text-gray-800">Инструменты администратора</h3>
+            <p id="adminPanelMessage" class="text-sm text-yellow-700 bg-yellow-100 p-2 rounded hidden"></p>
+            
+            <div class="flex flex-col gap-2">
+                <label for="chatTitleInput" class="text-gray-700 font-medium">Название чата:</label>
+                <div class="flex gap-2">
+                    <input type="text" id="chatTitleInput" placeholder="Новое название чата" class="input-field-small">
+                    <button id="saveChatTitleBtn" class="button-success">Сохранить</button>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-2 mt-4">
+                <label class="text-gray-700 font-medium">Управление пользователями:</label>
+                <input type="text" id="banUserInput" placeholder="ID пользователя для бана/разбана" class="input-field-small">
+                <div class="flex gap-2">
+                    <button id="banUserBtn" class="button-danger">Забанить</button>
+                    <button id="unbanUserBtn" class="button-success">Разбанить</button>
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <h4 class="text-md font-semibold text-gray-800">Забаненные пользователи:</h4>
+                <ul id="bannedUsersList" class="list-disc list-inside text-sm text-gray-700">
+                    <!-- Забаненные пользователи будут здесь -->
+                </ul>
+            </div>
+        </div>
+
+        <div class="user-id-display-area">
+            Ваш ID пользователя: <span id="userIdDisplay" class="font-medium">Загрузка...</span>
+            <button id="copyUserIdBtn" class="copy-button">Копировать ID</button>
+        </div>
     </div>
 
+    <!-- Firebase SDKs -->
     <script type="module">
-        // Импорт Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Глобальные переменные для Firebase (предоставляются средой Canvas)
+        // Глобальные переменные, предоставляемые средой Canvas
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' && Object.keys(JSON.parse(__firebase_config)).length > 0
-            ? JSON.parse(__firebase_config)
-            : { projectId: 'love-journey-default-id' }; // Используем фиктивный ID для локального запуска
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+
+        // Вывод конфигурации для отладки
+        console.log("App ID:", appId);
+        console.log("Firebase Config:", firebaseConfig);
 
         let app;
         let db;
         let auth;
-        let currentUserId = null;
-        let unsubscribeFromStory = null; // Для отписки от слушателя Firestore истории
-        let unsubscribeFromQualities = null; // Для отписки от слушателя Firestore качеств
-        let unsubscribeFromSettings = null; // Для отписки от слушателя настроек
-        let countdownInterval = null; // Для интервала обратного отсчета
+        let userId = 'anon'; // ID анонимного пользователя по умолчанию
+        let userNickname = localStorage.getItem('userNickname') || 'Аноним'; // Ник из локального хранилища
+        let isAuthReady = false; // Флаг готовности аутентификации Firebase
+        let selectedFile = null; // Переменная для хранения выбранного файла изображения
+        let isRealAdmin = false; // Флаг для определения, является ли пользователь реальным администратором (из Firestore)
+        let canSeeAdminFeatures = false; // Контролирует видимость панели админа и кнопок удаления (включая "Оня")
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const heartContainer = document.getElementById('heart-container');
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('.tab-content');
-            const storyDateInput = document.getElementById('storyDate');
-            const storyTitleInput = document.getElementById('storyTitle');
-            const storyDescriptionInput = document.getElementById('storyDescription');
-            const addStoryButton = document.getElementById('addStoryButton');
-            const storyMessage = document.getElementById('storyMessage');
-            const storyTimelineDiv = document.getElementById('storyTimeline');
-            const storyLoadingSpinner = document.getElementById('storyLoading');
-            const currentUserIdSpan = document.getElementById('currentUserId');
+        // Настройки, хранящиеся локально (не синхронизируются)
+        let showTimestamps = JSON.parse(localStorage.getItem('showTimestamps')) !== false; // По умолчанию true
+        let chatBackground = localStorage.getItem('chatBackground') || 'default';
 
-            const recipientNameInput = document.getElementById('recipientNameInput');
-            const recipientGenderSelect = document.getElementById('recipientGenderSelect');
-            const recipientPhotoUrlInput = document.getElementById('recipientPhotoUrlInput');
-            const senderNameInput = document.getElementById('senderNameInput');
-            const backgroundMusicUrlInput = document.getElementById('backgroundMusicUrlInput');
-            const mainIntroTextInput = document.getElementById('mainIntroTextInput');
-            const finalMessageTextInput = document.getElementById('finalMessageTextInput');
-            const saveSiteSettingsButton = document.getElementById('saveSiteSettingsButton');
-            const recipientNameMessage = document.getElementById('recipientNameMessage');
-            const senderNameMessage = document.getElementById('senderNameMessage');
-            const recipientNameDisplay = document.getElementById('recipientNameDisplay');
-            const senderNameDisplay = document.getElementById('senderNameDisplay');
-            const mainHeroImage = document.getElementById('mainHeroImage');
-            const particlesCanvas = document.getElementById('particles-canvas');
-            const ctx = particlesCanvas.getContext('2d');
-            const backgroundMusic = document.getElementById('backgroundMusic');
-            const mainIntroTextDisplay = document.getElementById('mainIntroText');
-            const finalMessageTextDisplay = document.getElementById('finalMessageText');
+        const chatTitleDisplay = document.getElementById('chatTitleDisplay');
+        const dynamicChatTitle = document.getElementById('dynamicChatTitle'); // Для обновления тега <title>
+        const messagesDiv = document.getElementById('messages');
+        const messageInput = document.getElementById('messageInput');
+        const sendMessageBtn = document.getElementById('sendMessageBtn');
+        const userIdDisplay = document.getElementById('userIdDisplay');
+        const nicknameInput = document.getElementById('nicknameInput');
+        const saveNicknameBtn = document.getElementById('saveNicknameBtn');
+        const fileInput = document.getElementById('fileInput');
+        const attachFileBtn = document.getElementById('attachFileBtn');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const adminPanel = document.getElementById('adminPanel');
+        const toggleAdminPanelBtn = document.getElementById('toggleAdminPanelBtn');
+        const adminPanelMessage = document.getElementById('adminPanelMessage');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const toggleSettingsPanelBtn = document.getElementById('toggleSettingsPanelBtn');
+        const chatBackgroundSelect = document.getElementById('chatBackgroundSelect');
+        const toggleTimestampsCheckbox = document.getElementById('toggleTimestamps');
+        const clearChatBtn = document.getElementById('clearChatBtn');
+        const copyUserIdBtn = document.getElementById('copyUserIdBtn');
+        const chatTitleInput = document.getElementById('chatTitleInput');
+        const saveChatTitleBtn = document.getElementById('saveChatTitleBtn');
+        const banUserInput = document.getElementById('banUserInput');
+        const banUserBtn = document.getElementById('banUserBtn');
+        const unbanUserBtn = document.getElementById('unbanUserBtn');
+        const bannedUsersList = document.getElementById('bannedUsersList');
 
-            const shareButton = document.getElementById('shareButton');
-            const shareMessage = document.getElementById('shareMessage');
-
-            const imageModal = document.getElementById('imageModal');
-            const modalImage = document.getElementById('modalImage');
-            const closeImageModalButton = document.getElementById('closeImageModal');
-            const dreamGalleryImages = document.querySelectorAll('#future-dreams-tab .dream-gallery img');
-
-            // Элементы для динамических качеств
-            const newQualityText = document.getElementById('newQualityText');
-            const newQualityDescription = document.getElementById('newQualityDescription');
-            const addQualityButton = document.getElementById('addQualityButton');
-            const qualityMessage = document.getElementById('qualityMessage');
-            const qualitiesGrid = document.getElementById('qualitiesGrid'); // Контейнер для отображения качеств
-            const existingQualitiesList = document.getElementById('existingQualitiesList'); // Список для редактирования качеств в настройках
-            const noQualitiesMessage = document.getElementById('noQualitiesMessage');
-
-            // Элементы для обратного отсчета
-            const countdownEventNameInput = document.getElementById('countdownEventNameInput');
-            const countdownDateInput = document.getElementById('countdownDateInput');
-            const countdownSettingsMessage = document.getElementById('countdownSettingsMessage');
-            const countdownEventNameDisplay = document.getElementById('countdownEventName');
-            const countdownDescriptionDisplay = document.getElementById('countdownDescription');
-            const countdownDays = document.getElementById('countdownDays');
-            const countdownHours = document.getElementById('countdownHours');
-            const countdownMinutes = document.getElementById('countdownMinutes');
-            const countdownSeconds = document.getElementById('countdownSeconds');
-            const countdownFinishedMessage = document.getElementById('countdownFinishedMessage');
-
-
-            // --- Инициализация Firebase ---
+        // Инициализация Firebase
+        function initializeFirebase() {
             try {
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
 
-                // Аутентификация пользователя
+                // Слушатель изменений состояния аутентификации
                 onAuthStateChanged(auth, async (user) => {
                     if (user) {
-                        currentUserId = user.uid;
-                        currentUserIdSpan.textContent = currentUserId;
-                        console.log("Authenticated with UID:", currentUserId);
-                        // Запускаем слушателей после аутентификации
-                        listenForStoryUpdates();
-                        listenForQualities(); // Запускаем слушатель качеств
-                        listenForSiteSettings(); // Слушаем настройки (включая оба имени, пол, фото, музыку, тексты и дату отсчета)
+                        userId = user.uid;
+                        console.log("Пользователь вошел в систему:", userId);
+                        userIdDisplay.textContent = userId;
+                        await loadUserNickname(); // Загружаем ник пользователя из локального хранилища
+                        await checkRealAdminStatus(); // Проверяем статус реального администратора
                     } else {
-                        // Если токен не предоставлен, анонимная аутентификация
+                        console.log("Пользователь вышел из системы. Попытка анонимного входа...");
                         try {
-                            if (initialAuthToken) {
-                                await signInWithCustomToken(auth, initialAuthToken);
-                            } else {
-                                await signInAnonymously(auth);
-                            }
+                            await signInAnonymously(auth);
+                            userId = auth.currentUser.uid;
+                            userIdDisplay.textContent = userId;
+                            console.log("Анонимный пользователь вошел в систему:", userId);
+                            await loadUserNickname(); // Загружаем ник для анонимного пользователя
+                            await checkRealAdminStatus(); // Проверяем статус реального администратора
                         } catch (error) {
-                            console.error("Firebase authentication error:", error);
-                            currentUserIdSpan.textContent = "Ошибка аутентификации";
+                            console.error("Ошибка анонимного входа:", error);
+                            userIdDisplay.textContent = "Ошибка аутентификации";
                         }
                     }
+                    isAuthReady = true;
+                    // Запускаем слушатели Firestore только после аутентификации
+                    setupRealtimeChatTitle();
+                    setupRealtimeBannedUsers();
+                    setupRealtimeMessages();
+                    updateAdminFeaturesVisibility(); // Обновляем видимость функций админа
                 });
+
+                // Анонимный вход при старте
+                signInAnonymously(auth).catch(error => {
+                    console.error("Ошибка анонимного входа:", error);
+                });
+
             } catch (error) {
-                console.error("Firebase initialization error:", error);
-                storyMessage.textContent = "Ошибка инициализации Firebase. Пожалуйста, проверьте консоль.";
-                storyMessage.classList.add('text-red-500');
+                console.error("Ошибка инициализации Firebase:", error);
+                messagesDiv.innerHTML = '<div class="text-center text-red-500 py-4">Ошибка инициализации чата. Пожалуйста, проверьте консоль и Firebase Config.</div>';
             }
+        }
 
-            // --- Функция для создания падающих сердечек ---
-            function createHeart() {
-                const heart = document.createElement('div');
-                heart.classList.add('heart');
-                const size = Math.random() * 20 + 10; /* Случайный размер от 10 до 30px */
-                heart.style.width = `${size}px`;
-                heart.style.height = `${size}px`;
-                heart.style.left = `${Math.random() * 100}vw`; /* Случайная позиция по горизонтали */
-                heart.style.animationDuration = `${Math.random() * 8 + 5}s`; /* Случайная длительность анимации */
-                heart.style.animationDelay = `${Math.random() * 5}s`; /* Случайная задержка */
-                heartContainer.appendChild(heart);
+        // Загрузка ника пользователя из локального хранилища
+        async function loadUserNickname() {
+            // Ник теперь хранится только локально
+            userNickname = localStorage.getItem('userNickname') || 'Аноним';
+            nicknameInput.value = userNickname;
+            console.log("Ник пользователя загружен:", userNickname);
+        }
 
-                // Удаляем сердце после завершения анимации, чтобы не перегружать DOM
-                heart.addEventListener('animationend', () => {
-                    heart.remove();
-                });
+        // Проверка статуса реального администратора из Firestore
+        async function checkRealAdminStatus() {
+            if (!db || !userId) {
+                isRealAdmin = false;
+                return;
             }
-
-            // Создаем сердечки с интервалом
-            setInterval(createHeart, 300); // Создаем новое сердце каждые 300 мс
-
-            // --- Анимация частиц на Canvas ---
-            let particles = [];
-            const numParticles = 100; // Количество частиц
-            const maxDistance = 100; // Максимальное расстояние для соединения линиями
-
-            // Класс для отдельной частицы
-            class Particle {
-                constructor(x, y) {
-                    this.x = x;
-                    this.y = y;
-                    this.size = Math.random() * 2 + 0.5; // Размер частицы
-                    this.speedX = Math.random() * 0.5 - 0.25; // Скорость по X (-0.25 до 0.25)
-                    this.speedY = Math.random() * 0.5 - 0.25; // Скорость по Y (-0.25 до 0.25)
-                    this.color = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.2})`; // Полупрозрачный белый
-                }
-
-                update() {
-                    this.x += this.speedX;
-                    this.y += this.speedY;
-
-                    // Отскок от краев Canvas
-                    if (this.x > particlesCanvas.width || this.x < 0) {
-                        this.speedX *= -1;
-                    }
-                    if (this.y > particlesCanvas.height || this.y < 0) {
-                        this.speedY *= -1;
-                    }
-                }
-
-                draw() {
-                    ctx.fillStyle = this.color;
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                    ctx.fill();
-                }
+            const adminDocRef = doc(db, `artifacts/${appId}/public/data/admin_users`, userId);
+            try {
+                const adminDocSnap = await getDoc(adminDocRef);
+                isRealAdmin = adminDocSnap.exists();
+                console.log("Статус реального администратора (из Firestore):", isRealAdmin);
+                updateAdminFeaturesVisibility(); // Обновляем видимость функций админа
+            } catch (error) {
+                console.error("Ошибка проверки статуса реального администратора:", error);
+                isRealAdmin = false;
             }
+        }
 
-            // Инициализация частиц
-            function initParticles() {
-                particles = [];
-                for (let i = 0; i < numParticles; i++) {
-                    const x = Math.random() * particlesCanvas.width;
-                    const y = Math.random() * particlesCanvas.height;
-                    particles.push(new Particle(x, y));
-                }
-            }
+        // Обновление видимости кнопки панели администратора и сообщения
+        function updateAdminFeaturesVisibility() {
+            // Если ник "Оня", то пользователь видит админ-функции (локально)
+            const isNicknameOnya = (userNickname.toLowerCase() === 'оня');
+            canSeeAdminFeatures = isRealAdmin || isNicknameOnya;
 
-            // Анимационный цикл Canvas
-            function animateParticles() {
-                ctx.clearRect(0, 0, particlesCanvas.width, particlesCanvas.height); // Очистка Canvas
-
-                for (let i = 0; i < particles.length; i++) {
-                    particles[i].update();
-                    particles[i].draw();
-
-                    // Соединение частиц линиями
-                    for (let j = i; j < particles.length; j++) {
-                        const dx = particles[i].x - particles[j].x;
-                        const dy = particles[i].y - particles[j].y;
-                        const distance = Math.sqrt(dx * dx + dy * dy);
-
-                        if (distance < maxDistance) {
-                            ctx.strokeStyle = `rgba(255, 255, 255, ${1 - (distance / maxDistance)})`;
-                            ctx.lineWidth = 0.5;
-                            ctx.beginPath();
-                            ctx.moveTo(particles[i].x, particles[i].y);
-                            ctx.lineTo(particles[j].x, particles[j].y);
-                            ctx.stroke();
-                        }
-                    }
-                }
-                requestAnimationFrame(animateParticles); // Запрос следующего кадра
-            }
-
-            // Изменение размера Canvas при изменении размера окна
-            function resizeCanvas() {
-                particlesCanvas.width = window.innerWidth;
-                particlesCanvas.height = window.innerHeight;
-                initParticles(); // Переинициализация частиц при изменении размера
-            }
-
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas(); // Инициализация при загрузке
-            animateParticles(); // Запуск анимации
-
-            // --- Функция для переключения вкладок ---
-            window.showTab = (tabId) => {
-                // Отписываемся от предыдущих слушателей, если они были
-                if (unsubscribeFromStory) {
-                    unsubscribeFromStory();
-                    unsubscribeFromStory = null;
-                }
-                if (unsubscribeFromQualities) {
-                    unsubscribeFromQualities();
-                    unsubscribeFromQualities = null;
-                }
-                if (countdownInterval) {
-                    clearInterval(countdownInterval);
-                    countdownInterval = null;
-                }
-
-
-                // Скрываем весь контент вкладок
-                tabContents.forEach(content => {
-                    content.classList.remove('active');
-                    // Сбрасываем анимации для элементов внутри, чтобы они анимировались заново
-                    content.querySelectorAll('.timeline-item, .quality-item, .dream-gallery img, .final-message-card, .countdown-container').forEach(el => {
-                        el.classList.remove('active');
-                        el.style.transitionDelay = '0s'; // Сброс задержки
-                    });
-                });
-
-                // Деактивируем все кнопки вкладок
-                tabButtons.forEach(button => {
-                    button.classList.remove('active');
-                });
-
-                // Активируем нужную вкладку и кнопку
-                const activeTabContent = document.getElementById(tabId);
-                activeTabContent.classList.add('active');
-                document.querySelector(`.tab-button[data-tab="${tabId}"]`).classList.add('active');
-
-                // Плавная прокрутка к началу активной вкладки
-                activeTabContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-
-                // Если это вкладка "Главная", запускаем эффект пишущей машинки
-                if (tabId === 'hero-tab') {
-                    const typewriterTextHero = document.getElementById('typewriter-text-hero');
-                    const textToTypeHero = "Ты — моя самая большая радость.";
-                    let i = 0;
-                    typewriterTextHero.textContent = ''; // Очищаем текст перед началом печати
-                    if (window.innerWidth > 480) {
-                        function typeWriter() {
-                            if (i < textToTypeHero.length) {
-                                typewriterTextHero.textContent += textToTypeHero.charAt(i);
-                                i++;
-                                setTimeout(typeWriter, 70);
-                            }
-                        }
-                        typeWriter();
-                    } else {
-                        typewriterTextHero.textContent = textToTypeHero;
-                    }
-                } else if (tabId === 'our-story-tab') {
-                    // Анимируем элементы истории при переходе на вкладку
-                    // Используем setTimeout, чтобы анимация запускалась после того, как вкладка станет видимой
-                    setTimeout(() => {
-                        const timelineItems = storyTimelineDiv.querySelectorAll('.timeline-item');
-                        timelineItems.forEach((item, index) => {
-                            item.style.transitionDelay = `${index * 0.1}s`; // Задержка для последовательного появления
-                            item.classList.add('active');
-                        });
-                    }, 100); // Небольшая задержка после активации вкладки
-                } else if (tabId === 'qualities-tab') {
-                    // Запускаем слушатель качеств при переходе на вкладку
-                    if (currentUserId) {
-                        listenForQualities();
-                    } else {
-                        qualitiesGrid.innerHTML = '<p class="text-center text-gray-500 mt-10">Пожалуйста, подождите, идет аутентификация...</p>';
-                    }
-                    // Анимируем элементы качеств при переходе на вкладку
-                    setTimeout(() => {
-                        const qualityItems = document.querySelectorAll('#qualities-tab .quality-item');
-                        qualityItems.forEach((item, index) => {
-                            item.style.transitionDelay = `${index * 0.08}s`;
-                            item.classList.add('active');
-                        });
-                    }, 100);
-                } else if (tabId === 'future-dreams-tab') {
-                    // Анимируем изображения мечты при переходе на вкладку
-                    setTimeout(() => {
-                        const dreamImages = document.querySelectorAll('#future-dreams-tab .dream-gallery img');
-                        dreamImages.forEach((img, index) => {
-                            img.style.transitionDelay = `${index * 0.07}s`;
-                            img.classList.add('active');
-                        });
-                    }, 100);
-                } else if (tabId === 'countdown-tab') { // Новая логика для вкладки отсчета
-                    setTimeout(() => {
-                        const countdownContainer = document.querySelector('#countdown-tab .countdown-container');
-                        countdownContainer.classList.add('active');
-                        // Запускаем обратный отсчет только когда вкладка активна
-                        if (currentUserId) {
-                            listenForSiteSettings(); // Чтобы получить дату
-                        }
-                    }, 100);
-                }
-                else if (tabId === 'final-message-tab') {
-                    // Анимируем финальное послание при переходе на вкладку
-                    setTimeout(() => {
-                        const finalMessageCard = document.querySelector('#final-message-tab .final-message-card');
-                        finalMessageCard.classList.add('active');
-                    }, 100);
-                }
-            };
-
-            // --- Эффект конфетти/искр ---
-            function createConfetti(x, y, color) {
-                const confetti = document.createElement('div');
-                confetti.style.position = 'absolute';
-                confetti.style.left = `${x}px`;
-                confetti.style.top = `${y}px`;
-                confetti.style.width = '8px';
-                confetti.style.height = '8px';
-                confetti.style.backgroundColor = color;
-                confetti.style.borderRadius = '50%';
-                confetti.style.opacity = '1';
-                confetti.style.transform = `scale(${Math.random() * 0.5 + 0.5})`;
-                confetti.style.transition = 'transform 0.8s ease-out, opacity 0.8s ease-out';
-                confetti.style.zIndex = '9999';
-                document.body.appendChild(confetti);
-
-                const angle = Math.random() * Math.PI * 2;
-                const distance = Math.random() * 50 + 30;
-                const finalX = x + Math.cos(angle) * distance;
-                const finalY = y + Math.sin(angle) * distance;
-
-                setTimeout(() => {
-                    confetti.style.transform = `translate(${finalX - x}px, ${finalY - y}px) scale(0)`;
-                    confetti.style.opacity = '0';
-                    confetti.style.transition = 'transform 0.8s ease-in, opacity 0.8s ease-in';
-                }, 10); // Небольшая задержка, чтобы анимация сработала
-
-                confetti.addEventListener('transitionend', () => {
-                    confetti.remove();
-                });
-            }
-
-            function triggerConfetti(event, count = 20) {
-                const colors = ['#ff6b6b', '#ffa07a', '#fca5a5', '#fef2f2', '#a78bfa', '#818cf8'];
-                const rect = event.target.getBoundingClientRect();
-                const centerX = rect.left + rect.width / 2;
-                const centerY = rect.top + rect.height / 2;
-
-                for (let i = 0; i < count; i++) {
-                    const color = colors[Math.floor(Math.random() * colors.length)];
-                    createConfetti(centerX, centerY, color);
-                }
-            }
-
-            // --- Обработчики модального окна изображений ---
-            dreamGalleryImages.forEach(img => {
-                img.addEventListener('click', () => {
-                    modalImage.src = img.src;
-                    imageModal.classList.add('active');
-                });
-            });
-
-            closeImageModalButton.addEventListener('click', () => {
-                imageModal.classList.remove('active');
-            });
-
-            imageModal.addEventListener('click', (event) => {
-                // Закрываем модальное окно, если клик был по оверлею, а не по изображению
-                if (event.target === imageModal) {
-                    imageModal.classList.remove('active');
-                }
-            });
-
-
-            // --- Firestore: Добавление новой записи в историю ---
-            addStoryButton.addEventListener('click', async (event) => { // Передаем event
-                const date = storyDateInput.value.trim();
-                const title = storyTitleInput.value.trim();
-                const description = storyDescriptionInput.value.trim();
-
-                if (!date || !title || !description) {
-                    storyMessage.textContent = "Пожалуйста, заполните все поля.";
-                    storyMessage.classList.remove('text-green-500', 'text-gray-500');
-                    storyMessage.classList.add('text-red-500');
-                    return;
-                }
-
-                if (!currentUserId) {
-                    storyMessage.textContent = "Ошибка: Пользователь не аутентифицирован. Пожалуйста, обновите страницу.";
-                    storyMessage.classList.remove('text-green-500', 'text-gray-500');
-                    storyMessage.classList.add('text-red-500');
-                    return;
-                }
-
-                try {
-                    storyMessage.textContent = "Добавление...";
-                    storyMessage.classList.remove('text-red-500', 'text-green-500');
-                    storyMessage.classList.add('text-gray-500');
-                    addStoryButton.disabled = true; // Отключаем кнопку во время добавления
-
-                    const storyCollectionRef = collection(db, `artifacts/${appId}/public/data/love_story_items`);
-                    await addDoc(storyCollectionRef, {
-                        date: date,
-                        title: title,
-                        description: description,
-                        createdAt: new Date(), // Добавляем метку времени для сортировки
-                        userId: currentUserId // Сохраняем ID пользователя, который добавил запись
-                    });
-
-                    storyMessage.textContent = "Момент успешно добавлен!";
-                    storyMessage.classList.remove('text-red-500', 'text-gray-500');
-                    storyMessage.classList.add('text-green-500');
-                    triggerConfetti(event); // Запускаем конфетти при успехе!
-
-                    // Очищаем поля формы
-                    storyDateInput.value = '';
-                    storyTitleInput.value = '';
-                    storyDescriptionInput.value = '';
-
-                } catch (e) {
-                    console.error("Ошибка при добавлении документа: ", e);
-                    storyMessage.textContent = "Ошибка при добавлении момента. Пожалуйста, попробуйте снова.";
-                    storyMessage.classList.remove('text-green-500', 'text-gray-500');
-                    storyMessage.classList.add('text-red-500');
-                } finally {
-                    addStoryButton.disabled = false; // Включаем кнопку обратно
-                }
-            });
-
-            // --- Firestore: Слушатель обновлений истории ---
-            function listenForStoryUpdates() {
-                if (!db || !currentUserId) {
-                    console.warn("Firestore или userId не инициализированы. Невозможно начать слушать обновления истории.");
-                    return;
-                }
-
-                storyLoadingSpinner.style.display = 'block'; // Показываем спиннер загрузки
-                storyTimelineDiv.innerHTML = ''; // Очищаем текущую историю
-
-                const storyCollectionRef = collection(db, `artifacts/${appId}/public/data/love_story_items`);
-                // Запрос с сортировкой по дате создания
-                const q = query(storyCollectionRef, orderBy("createdAt", "asc"));
-
-                unsubscribeFromStory = onSnapshot(q, (snapshot) => {
-                    storyTimelineDiv.innerHTML = ''; // Очищаем перед перерисовкой
-                    if (snapshot.empty) {
-                        storyTimelineDiv.innerHTML = '<p class="text-center text-gray-500 mt-10">Пока нет записей в истории. Будьте первым, кто добавит!</p>';
-                    } else {
-                        snapshot.forEach((doc) => {
-                            const data = doc.data();
-                            const itemDiv = document.createElement('div');
-                            itemDiv.classList.add('timeline-item');
-                            itemDiv.innerHTML = `
-                                <p class="timeline-date">${data.date}</p>
-                                <h3 class="font-semibold text-xl text-gray-800 mb-2">${data.title}</h3>
-                                <p class="text-gray-600">${data.description}</p>
-                                <p class="text-xs text-gray-400 mt-2">Добавлено: ${data.userId.substring(0, 8)}...</p>
-                            `;
-                            storyTimelineDiv.appendChild(itemDiv);
-                        });
-                    }
-                    storyLoadingSpinner.style.display = 'none'; // Скрываем спиннер после загрузки
-                }, (error) => {
-                    console.error("Ошибка при получении обновлений истории: ", error);
-                    storyMessage.textContent = "Не удалось загрузить историю. Пожалуйста, попробуйте снова.";
-                    storyMessage.classList.remove('text-green-500', 'text-gray-500');
-                    storyMessage.classList.add('text-red-500');
-                    storyLoadingSpinner.style.display = 'none';
-                });
-            }
-
-            // --- Firestore: Добавление нового качества ---
-            addQualityButton.addEventListener('click', async () => {
-                const text = newQualityText.value.trim();
-                const description = newQualityDescription.value.trim();
-
-                if (!text || !description) {
-                    qualityMessage.textContent = "Пожалуйста, заполните оба поля качества.";
-                    qualityMessage.classList.remove('text-green-500', 'text-gray-500');
-                    qualityMessage.classList.add('text-red-500');
-                    return;
-                }
-
-                if (!currentUserId) {
-                    qualityMessage.textContent = "Ошибка: Пользователь не аутентифицирован. Пожалуйста, обновите страницу.";
-                    qualityMessage.classList.remove('text-green-500', 'text-gray-500');
-                    qualityMessage.classList.add('text-red-500');
-                    return;
-                }
-
-                try {
-                    qualityMessage.textContent = "Добавление...";
-                    qualityMessage.classList.remove('text-red-500', 'text-green-500');
-                    qualityMessage.classList.add('text-gray-500');
-                    addQualityButton.disabled = true;
-
-                    const qualitiesCollectionRef = collection(db, `artifacts/${appId}/public/data/qualities_items`);
-                    await addDoc(qualitiesCollectionRef, {
-                        text: text,
-                        description: description,
-                        createdAt: new Date(),
-                        userId: currentUserId
-                    });
-
-                    qualityMessage.textContent = "Качество успешно добавлено!";
-                    qualityMessage.classList.remove('text-red-500', 'text-gray-500');
-                    qualityMessage.classList.add('text-green-500');
-
-                    newQualityText.value = '';
-                    newQualityDescription.value = '';
-
-                } catch (e) {
-                    console.error("Ошибка при добавлении качества: ", e);
-                    qualityMessage.textContent = "Ошибка при добавлении качества. Пожалуйста, попробуйте снова.";
-                    qualityMessage.classList.remove('text-green-500', 'text-gray-500');
-                    qualityMessage.classList.add('text-red-500');
-                } finally {
-                    addQualityButton.disabled = false;
-                }
-            });
-
-            // --- Firestore: Удаление качества ---
-            existingQualitiesList.addEventListener('click', async (event) => {
-                if (event.target.classList.contains('quality-delete-btn')) {
-                    const qualityId = event.target.dataset.id;
-                    if (!qualityId) return;
-
-                    if (!currentUserId) {
-                        qualityMessage.textContent = "Ошибка: Пользователь не аутентифицирован для удаления.";
-                        qualityMessage.classList.remove('text-green-500', 'text-gray-500');
-                        qualityMessage.classList.add('text-red-500');
-                        return;
-                    }
-
-                    try {
-                        qualityMessage.textContent = "Удаление...";
-                        qualityMessage.classList.remove('text-green-500', 'text-red-500');
-                        qualityMessage.classList.add('text-gray-500');
-
-                        const qualityDocRef = doc(db, `artifacts/${appId}/public/data/qualities_items`, qualityId);
-                        await deleteDoc(qualityDocRef);
-
-                        qualityMessage.textContent = "Качество удалено!";
-                        qualityMessage.classList.remove('text-red-500', 'text-gray-500');
-                        qualityMessage.classList.add('text-green-500');
-                    } catch (e) {
-                        console.error("Ошибка при удалении качества: ", e);
-                        qualityMessage.textContent = "Ошибка при удалении качества. Пожалуйста, попробуйте снова.";
-                        qualityMessage.classList.remove('text-green-500', 'text-gray-500');
-                        qualityMessage.classList.add('text-red-500');
-                    }
-                }
-            });
-
-            // --- Firestore: Слушатель обновлений качеств ---
-            function listenForQualities() {
-                if (!db || !currentUserId) {
-                    console.warn("Firestore или userId не инициализированы. Невозможно начать слушать обновления качеств.");
-                    return;
-                }
-
-                qualitiesGrid.innerHTML = ''; // Очищаем сетку качеств
-                existingQualitiesList.innerHTML = ''; // Очищаем список в настройках
-                noQualitiesMessage.style.display = 'none';
-
-                const qualitiesCollectionRef = collection(db, `artifacts/${appId}/public/data/qualities_items`);
-                const q = query(qualitiesCollectionRef, orderBy("createdAt", "asc"));
-
-                unsubscribeFromQualities = onSnapshot(q, (snapshot) => {
-                    qualitiesGrid.innerHTML = '';
-                    existingQualitiesList.innerHTML = '';
-
-                    if (snapshot.empty) {
-                        noQualitiesMessage.style.display = 'block';
-                        qualitiesGrid.innerHTML = '<p class="text-center text-gray-500 mt-10">Пока нет добавленных качеств. Добавьте их на вкладке "Настройки"!</p>';
-                    } else {
-                        noQualitiesMessage.style.display = 'none';
-                        snapshot.forEach((doc) => {
-                            const data = doc.data();
-                            // Для отображения на вкладке "Что я люблю"
-                            const qualityItemDiv = document.createElement('div');
-                            qualityItemDiv.classList.add('quality-item', 'text-center');
-                            // Иконку можно выбрать динамически или оставить одну
-                            qualityItemDiv.innerHTML = `
-                                <i class="fas fa-heart quality-icon"></i>
-                                <h3 class="font-semibold text-xl text-gray-800 mb-2">${data.text}</h3>
-                                <p class="text-gray-600">${data.description}</p>
-                            `;
-                            qualitiesGrid.appendChild(qualityItemDiv);
-
-                            // Для списка в настройках
-                            const existingQualityLi = document.createElement('li');
-                            existingQualityLi.classList.add('flex', 'justify-between', 'items-center', 'bg-white', 'p-3', 'rounded-lg', 'shadow-sm', 'border', 'border-gray-200');
-                            existingQualityLi.innerHTML = `
-                                <span>${data.text}</span>
-                                <button class="quality-delete-btn" data-id="${doc.id}">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            `;
-                            existingQualitiesList.appendChild(existingQualityLi);
-                        });
-                        // Анимируем качества после их загрузки
-                        setTimeout(() => {
-                            const qualityItems = qualitiesGrid.querySelectorAll('.quality-item');
-                            qualityItems.forEach((item, index) => {
-                                item.style.transitionDelay = `${index * 0.08}s`;
-                                item.classList.add('active');
-                            });
-                        }, 100);
-                    }
-                }, (error) => {
-                    console.error("Ошибка при получении качеств: ", error);
-                    qualityMessage.textContent = "Не удалось загрузить качества. Пожалуйста, попробуйте снова.";
-                    qualityMessage.classList.remove('text-green-500', 'text-gray-500');
-                    qualityMessage.classList.add('text-red-500');
-                });
-            }
-
-            // --- Firestore: Сохранение настроек сайта (имена, пол, фото, музыка, тексты, дата отсчета) ---
-            saveSiteSettingsButton.addEventListener('click', async (event) => { // Передаем event
-                const recipientName = recipientNameInput.value.trim();
-                const recipientGender = recipientGenderSelect.value;
-                const recipientPhotoUrl = recipientPhotoUrlInput.value.trim();
-                const senderName = senderNameInput.value.trim();
-                const backgroundMusicUrl = backgroundMusicUrlInput.value.trim();
-                const mainIntroText = mainIntroTextInput.value.trim();
-                const finalMessageText = finalMessageTextInput.value.trim();
-                const countdownEventName = countdownEventNameInput.value.trim(); // Новое поле
-                const countdownDate = countdownDateInput.value; // Новое поле (YYYY-MM-DD)
-
-
-                if (!recipientName) {
-                    recipientNameMessage.textContent = "Пожалуйста, введите имя получателя.";
-                    recipientNameMessage.classList.remove('text-green-500', 'text-gray-500');
-                    recipientNameMessage.classList.add('text-red-500');
-                    return;
+            if (canSeeAdminFeatures) {
+                toggleAdminPanelBtn.classList.remove('hidden');
+                if (isNicknameOnya && !isRealAdmin) {
+                    adminPanelMessage.textContent = 'Вы вошли как администратор "Оня"! Для выполнения действий администратора (например, удаления сообщений) требуется полный доступ администратора (ваш UID должен быть добавлен в Firestore).';
+                    adminPanelMessage.classList.remove('hidden');
+                } else if (isRealAdmin) {
+                    adminPanelMessage.textContent = 'Вы являетесь реальным администратором и можете управлять чатом.';
+                    adminPanelMessage.classList.remove('hidden');
                 } else {
-                    recipientNameMessage.textContent = "";
+                    adminPanelMessage.classList.add('hidden');
                 }
+            } else {
+                toggleAdminPanelBtn.classList.add('hidden');
+                adminPanel.classList.remove('active'); // Скрываем панель, если пользователь не админ
+                adminPanelMessage.classList.add('hidden');
+            }
+            // Перерисовываем сообщения, чтобы обновить видимость кнопок удаления
+            loadMessages();
+        }
 
-                if (!senderName) {
-                    senderNameMessage.textContent = "Пожалуйста, введите ваше имя.";
-                    senderNameMessage.classList.remove('text-green-500', 'text-gray-500');
-                    senderNameMessage.classList.add('text-red-500');
-                    return;
-                } else {
-                    senderNameMessage.textContent = "";
-                }
-
-                if (!currentUserId) {
-                    recipientNameMessage.textContent = "Ошибка: Пользователь не аутентифицирован. Пожалуйста, обновите страницу.";
-                    recipientNameMessage.classList.remove('text-green-500', 'text-gray-500');
-                    recipientNameMessage.classList.add('text-red-500');
-                    return;
-                }
-
-                try {
-                    recipientNameMessage.textContent = "Сохранение...";
-                    recipientNameMessage.classList.remove('text-red-500', 'text-green-500');
-                    recipientNameMessage.classList.add('text-gray-500');
-                    senderNameMessage.textContent = "";
-                    countdownSettingsMessage.textContent = ""; // Очищаем сообщение отсчета
-                    saveSiteSettingsButton.disabled = true;
-
-                    const settingsDocRef = doc(db, `artifacts/${appId}/public/data/site_settings/global_settings`);
-                    await setDoc(settingsDocRef, {
-                        recipientName: recipientName,
-                        recipientGender: recipientGender,
-                        recipientPhotoUrl: recipientPhotoUrl,
-                        senderName: senderName,
-                        backgroundMusicUrl: backgroundMusicUrl,
-                        mainIntroText: mainIntroText,
-                        finalMessageText: finalMessageText,
-                        countdownEventName: countdownEventName, // Сохраняем название события
-                        countdownDate: countdownDate, // Сохраняем дату события
-                        lastUpdatedBy: currentUserId,
-                        timestamp: new Date()
-                    });
-
-                    recipientNameMessage.textContent = "Настройки успешно сохранены!";
-                    recipientNameMessage.classList.remove('text-red-500', 'text-gray-500');
-                    recipientNameMessage.classList.add('text-green-500');
-                    triggerConfetti(event); // Запускаем конфетти при успехе!
-
-                } catch (e) {
-                    console.error("Ошибка при сохранении настроек сайта: ", e);
-                    recipientNameMessage.textContent = "Ошибка при сохранении настроек. Пожалуйста, попробуйте снова.";
-                    recipientNameMessage.classList.remove('text-green-500', 'text-gray-500');
-                    recipientNameMessage.classList.add('text-red-500');
-                } finally {
-                    saveSiteSettingsButton.disabled = false;
-                }
-            });
-
-            // --- Firestore: Слушатель обновлений настроек сайта (имена, пол, фото, музыка, тексты, дата отсчета) ---
-            function listenForSiteSettings() {
-                if (!db) {
-                    console.warn("Firestore не инициализирован. Невозможно начать слушать настройки.");
-                    return;
-                }
-
-                const settingsDocRef = doc(db, `artifacts/${appId}/public/data/site_settings/global_settings`);
-                unsubscribeFromSettings = onSnapshot(settingsDocRef, (docSnapshot) => {
-                    if (docSnapshot.exists()) {
-                        const data = docSnapshot.data();
-                        const currentRecipientName = data.recipientName || "[Имя получателя]";
-                        const currentRecipientGender = data.recipientGender || "unspecified";
-                        const currentRecipientPhotoUrl = data.recipientPhotoUrl || "";
-                        const currentSenderName = data.senderName || "[Твое Имя]";
-                        const currentBackgroundMusicUrl = data.backgroundMusicUrl || "";
-                        const currentMainIntroText = data.mainIntroText || "Добро пожаловать в историю, написанную моим сердцем, только для тебя.";
-                        const currentFinalMessageText = data.finalMessageText || "Каждый день, проведенный рядом с тобой, — это благословение. Ты наполнил(а) мою жизнь светом, смыслом и безграничной любовью. Я ценю каждую нашу минуту, каждый смех, каждую тихую беседу. Ты — тот(та) человек, который делает меня лучше, вдохновляет на новые свершения и дарит ощущение полного счастья. Я не могу представить свою жизнь без тебя. Ты — моя родственная душа, мой лучший друг и моя самая большая любовь. Я люблю тебя всем сердцем, сегодня, завтра и всегда.";
-                        const currentCountdownEventName = data.countdownEventName || "Особенный день";
-                        const currentCountdownDate = data.countdownDate || "";
-
-
-                        recipientNameInput.value = currentRecipientName;
-                        recipientGenderSelect.value = currentRecipientGender;
-                        recipientPhotoUrlInput.value = currentRecipientPhotoUrl;
-                        senderNameInput.value = currentSenderName;
-                        backgroundMusicUrlInput.value = currentBackgroundMusicUrl;
-                        mainIntroTextInput.value = currentMainIntroText;
-                        finalMessageTextInput.value = currentFinalMessageText;
-                        countdownEventNameInput.value = currentCountdownEventName;
-                        countdownDateInput.value = currentCountdownDate;
-
-                        // Обновляем отображение имени получателя с учетом пола
-                        let greeting = "Дорогой(ая)";
-                        if (currentRecipientGender === "male") {
-                            greeting = "Дорогой";
-                        } else if (currentRecipientGender === "female") {
-                            greeting = "Дорогая";
-                        }
-                        recipientNameDisplay.textContent = `${greeting} ${currentRecipientName},`;
-                        senderNameDisplay.textContent = currentSenderName;
-                        mainIntroTextDisplay.textContent = currentMainIntroText;
-                        finalMessageTextDisplay.textContent = currentFinalMessageText;
-                        countdownEventNameDisplay.textContent = currentCountdownEventName;
-                        
-                        // Обновляем фото на главной странице
-                        if (currentRecipientPhotoUrl) {
-                            mainHeroImage.src = currentRecipientPhotoUrl;
-                            mainHeroImage.onerror = () => { // Обработка ошибки загрузки фото
-                                mainHeroImage.src = "https://placehold.co/150x150/FF6B6B/FFFFFF?text=Ошибка+фото";
-                                console.error("Не удалось загрузить фото по URL:", currentRecipientPhotoUrl);
-                            };
-                        } else {
-                            mainHeroImage.src = "https://placehold.co/150x150/FF6B6B/FFFFFF?text=Фото"; // Дефолтное фото
-                        }
-
-                        // Обновляем и проигрываем фоновую музыку
-                        if (currentBackgroundMusicUrl && backgroundMusic.src !== currentBackgroundMusicUrl) {
-                            backgroundMusic.src = currentBackgroundMusicUrl;
-                            backgroundMusic.load(); // Перезагружаем аудио
-                            backgroundMusic.play().catch(error => {
-                                console.warn("Автоматическое воспроизведение музыки заблокировано браузером. Пользователю нужно будет нажать на страницу.", error);
-                                // Можно добавить кнопку "Включить музыку"
-                            });
-                        } else if (!currentBackgroundMusicUrl) {
-                            backgroundMusic.pause();
-                            backgroundMusic.src = "";
-                        }
-
-                        // Запускаем или обновляем обратный отсчет
-                        if (countdownInterval) {
-                            clearInterval(countdownInterval); // Очищаем предыдущий интервал
-                        }
-                        if (currentCountdownDate) {
-                            startCountdown(currentCountdownDate, currentCountdownEventName);
-                        } else {
-                            countdownDescriptionDisplay.textContent = "Укажите дату события в настройках.";
-                            countdownDays.textContent = "00";
-                            countdownHours.textContent = "00";
-                            countdownMinutes.textContent = "00";
-                            countdownSeconds.textContent = "00";
-                            countdownFinishedMessage.style.display = 'none';
-                        }
-
-
-                    } else {
-                        // Если настроек нет, используем значения по умолчанию
-                        recipientNameInput.value = "";
-                        recipientGenderSelect.value = "unspecified";
-                        recipientPhotoUrlInput.value = "";
-                        senderNameInput.value = "";
-                        backgroundMusicUrlInput.value = "";
-                        mainIntroTextInput.value = "Добро пожаловать в историю, написанную моим сердцем, только для тебя.";
-                        finalMessageTextInput.value = "Каждый день, проведенный рядом с тобой, — это благословение. Ты наполнил(а) мою жизнь светом, смыслом и безграничной любовью. Я ценю каждую нашу минуту, каждый смех, каждую тихую беседу. Ты — тот(та) человек, который делает меня лучше, вдохновляет на новые свершения и дарит ощущение полного счастья. Я не могу представить свою жизнь без тебя. Ты — моя родственная душа, мой лучший друг и моя самая большая любовь. Я люблю тебя всем сердцем, сегодня, завтра и всегда.";
-                        countdownEventNameInput.value = "";
-                        countdownDateInput.value = "";
-
-                        recipientNameDisplay.textContent = "Дорогой(ая) [Имя получателя],";
-                        senderNameDisplay.textContent = "[Твое Имя]";
-                        mainHeroImage.src = "https://placehold.co/150x150/FF6B6B/FFFFFF?text=Фото"; // Дефолтное фото
-                        mainIntroTextDisplay.textContent = "Добро пожаловать в историю, написанную моим сердцем, только для тебя.";
-                        finalMessageTextDisplay.textContent = "Каждый день, проведенный рядом с тобой, — это благословение. Ты наполнил(а) мою жизнь светом, смыслом и безграничной любовью. Я ценю каждую нашу минуту, каждый смех, каждую тихую беседу. Ты — тот(та) человек, который делает меня лучше, вдохновляет на новые свершения и дарит ощущение полного счастья. Я не могу представить свою жизнь без тебя. Ты — моя родственная душа, мой лучший друг и моя самая большая любовь. Я люблю тебя всем сердцем, сегодня, завтра и всегда.";
-                        countdownEventNameDisplay.textContent = "[Событие]";
-                        countdownDescriptionDisplay.textContent = "Укажите дату события в настройках.";
-                        countdownDays.textContent = "00";
-                        countdownHours.textContent = "00";
-                        countdownMinutes.textContent = "00";
-                        countdownSeconds.textContent = "00";
-                        countdownFinishedMessage.style.display = 'none';
-                        backgroundMusic.pause();
-                        backgroundMusic.src = "";
-                    }
-                }, (error) => {
-                    console.error("Ошибка при получении настроек сайта: ", error);
-                    recipientNameMessage.textContent = "Не удалось загрузить настройки имени.";
-                    recipientNameMessage.classList.remove('text-green-500', 'text-gray-500');
-                    recipientNameMessage.classList.add('text-red-500');
-                });
+        // Сохранение ника пользователя в локальное хранилище
+        saveNicknameBtn.addEventListener('click', async () => {
+            const newNickname = nicknameInput.value.trim();
+            if (newNickname === '') {
+                console.warn("Ник пуст.");
+                return;
             }
 
-            // --- Функция обратного отсчета ---
-            function startCountdown(targetDateString, eventName) {
-                const targetDate = new Date(targetDateString).getTime();
+            userNickname = newNickname;
+            localStorage.setItem('userNickname', userNickname);
+            console.log("Ник успешно сохранен:", userNickname);
 
-                countdownInterval = setInterval(() => {
-                    const now = new Date().getTime();
-                    const distance = targetDate - now;
+            // Обновляем флаг "скрытой механики" после сохранения ника
+            updateAdminFeaturesVisibility();
 
-                    if (distance < 0) {
-                        clearInterval(countdownInterval);
-                        countdownDays.textContent = "00";
-                        countdownHours.textContent = "00";
-                        countdownMinutes.textContent = "00";
-                        countdownSeconds.textContent = "00";
-                        countdownFinishedMessage.style.display = 'block';
-                        countdownDescriptionDisplay.textContent = "";
-                        return;
-                    }
-
-                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                    countdownDays.textContent = String(days).padStart(2, '0');
-                    countdownHours.textContent = String(hours).padStart(2, '0');
-                    countdownMinutes.textContent = String(minutes).padStart(2, '0');
-                    countdownSeconds.textContent = String(seconds).padStart(2, '0');
-                    countdownDescriptionDisplay.textContent = `До ${eventName} осталось...`;
-                    countdownFinishedMessage.style.display = 'none';
-
-                }, 1000);
-            }
-
-
-            // --- Кнопка "Поделиться" ---
-            shareButton.addEventListener('click', async () => {
-                try {
-                    // Используем navigator.clipboard.writeText для копирования URL
-                    // В некоторых средах (например, в iframe) это может быть ограничено,
-                    // тогда можно использовать document.execCommand('copy') как запасной вариант.
-                    await navigator.clipboard.writeText(window.location.href);
-                    shareMessage.textContent = "Ссылка скопирована в буфер обмена!";
-                    shareMessage.classList.remove('text-red-500');
-                    shareMessage.classList.add('text-green-500');
-                } catch (err) {
-                    console.error('Не удалось скопировать ссылку: ', err);
-                    // Запасной вариант для старых браузеров или ограниченных сред
-                    const textarea = document.createElement('textarea');
-                    textarea.value = window.location.href;
-                    textarea.style.position = 'fixed'; // Чтобы не влияло на макет
-                    document.body.appendChild(textarea);
-                    textarea.focus();
-                    textarea.select();
-                    try {
-                        document.execCommand('copy');
-                        shareMessage.textContent = "Ссылка скопирована (запасной метод)!";
-                        shareMessage.classList.remove('text-red-500');
-                        shareMessage.classList.add('text-green-500');
-                    } catch (errCopy) {
-                        console.error('Не удалось скопировать ссылку запасным методом: ', errCopy);
-                        shareMessage.textContent = "Не удалось скопировать ссылку. Пожалуйста, скопируйте ее вручную из адресной строки.";
-                        shareMessage.classList.remove('text-green-500');
-                        shareMessage.classList.add('text-red-500');
-                    }
-                    document.body.removeChild(textarea);
-                }
-                // Скрываем сообщение через несколько секунд
-                setTimeout(() => {
-                    shareMessage.textContent = "";
-                }, 3000);
-            });
-
-
-            // Инициализация: показываем первую вкладку при загрузке
-            showTab('hero-tab');
-
-            // Добавляем обработчики событий для кнопок вкладок
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const tabId = button.dataset.tab;
-                    showTab(tabId);
-                });
-            });
+            // Предоставляем визуальное подтверждение
+            saveNicknameBtn.textContent = 'Сохранено!';
+            saveNicknameBtn.classList.add('bg-green-700');
+            setTimeout(() => {
+                saveNicknameBtn.textContent = 'Сохранить ник';
+                saveNicknameBtn.classList.remove('bg-green-700');
+            }, 1500);
         });
+
+        // Настройка прослушивания сообщений в реальном времени из Firestore
+        function setupRealtimeMessages() {
+            if (!isAuthReady || !db) {
+                console.log("Firebase не готов для прослушивания сообщений.");
+                return;
+            }
+
+            const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
+            const q = query(messagesCollectionRef, orderBy('timestamp'));
+
+            onSnapshot(q, (snapshot) => {
+                messagesDiv.innerHTML = ''; // Очищаем существующие сообщения
+                snapshot.forEach((doc) => {
+                    const message = doc.data();
+                    // Проверяем, забанен ли отправитель сообщения
+                    if (!bannedUsers.includes(message.userId)) {
+                        displayMessage(message, doc.id); // Передаем ID документа сообщения
+                    }
+                });
+                messagesDiv.scrollTop = messagesDiv.scrollHeight; // Прокручиваем до последнего сообщения
+            }, (error) => {
+                console.error("Ошибка получения сообщений в реальном времени:", error);
+                messagesDiv.innerHTML = '<div class="text-center text-red-500 py-4">Не удалось загрузить сообщения. Проверьте правила безопасности Firestore.</div>';
+            });
+        }
+
+        // Отображение сообщения в UI
+        function displayMessage(message, messageId) {
+            const messageElement = document.createElement('div');
+            const isMine = message.userId === userId;
+            messageElement.className = `message-bubble ${isMine ? 'mine' : 'other'}`;
+
+            const userDisplay = message.nickname || `Пользователь: ${message.userId.substring(0, 8)}...`; // Используем ник, если он есть, или усеченный ID
+            const timestamp = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '';
+
+            const userInfoDiv = document.createElement('div');
+            userInfoDiv.className = 'user-info';
+
+            const userNameSpan = document.createElement('span');
+            userNameSpan.textContent = isMine ? `Вы (${userNickname})` : userDisplay;
+
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'message-time';
+            timeSpan.textContent = showTimestamps ? timestamp : ''; // Показываем только если включено
+
+            userInfoDiv.appendChild(userNameSpan);
+            userInfoDiv.appendChild(timeSpan);
+
+            const messageText = document.createElement('div');
+            messageText.textContent = message.text;
+
+            messageElement.appendChild(userInfoDiv);
+            messageElement.appendChild(messageText);
+
+            // Если есть прикрепленное изображение, добавляем индикатор
+            if (message.imageFileName) {
+                const attachmentIndicator = document.createElement('span');
+                attachmentIndicator.className = 'attachment-indicator';
+                attachmentIndicator.textContent = `[Изображение прикреплено: ${message.imageFileName}]`;
+                messageElement.appendChild(attachmentIndicator);
+            }
+
+            // Добавляем кнопку удаления, если пользователь может видеть админ-функции
+            if (canSeeAdminFeatures) {
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'delete-message-btn';
+                deleteBtn.innerHTML = '&times;'; // Символ "умножить" для закрытия/удаления
+                deleteBtn.title = 'Удалить сообщение';
+                deleteBtn.addEventListener('click', () => deleteMessage(messageId)); // Используем ID документа Firestore
+                messageElement.appendChild(deleteBtn);
+            }
+
+            messagesDiv.appendChild(messageElement);
+        }
+
+        // Функция для удаления сообщения из Firestore
+        async function deleteMessage(messageIdToDelete) {
+            if (!db || !messageIdToDelete || !isRealAdmin) { // Удалять может только реальный админ
+                console.warn("Невозможно удалить сообщение: база данных не готова, ID сообщения отсутствует или пользователь не является реальным администратором.");
+                alert("У вас нет прав для удаления этого сообщения. Для полного доступа администратора, ваш UID должен быть добавлен в коллекцию 'admin_users' в Firebase.");
+                return;
+            }
+            if (!confirm('Вы уверены, что хотите удалить это сообщение?')) {
+                return;
+            }
+
+            const messageDocRef = doc(db, `artifacts/${appId}/public/data/messages`, messageIdToDelete);
+            try {
+                await deleteDoc(messageDocRef);
+                console.log("Сообщение успешно удалено:", messageIdToDelete);
+            } catch (error) {
+                console.error("Ошибка при удалении сообщения:", error);
+                alert("Не удалось удалить сообщение. Проверьте правила безопасности Firestore.");
+            }
+        }
+
+        // Обработчики для прикрепления файла
+        attachFileBtn.addEventListener('click', () => {
+            fileInput.click(); // Триггер клика по скрытому input type="file"
+        });
+
+        fileInput.addEventListener('change', (event) => {
+            selectedFile = event.target.files[0];
+            if (selectedFile) {
+                fileNameDisplay.textContent = selectedFile.name;
+            } else {
+                fileNameDisplay.textContent = '';
+            }
+        });
+
+        // Отправка сообщения в Firestore
+        sendMessageBtn.addEventListener('click', async () => {
+            const messageText = messageInput.value.trim();
+            // Проверяем, забанен ли пользователь (из Firestore)
+            if (bannedUsers.includes(userId)) {
+                alert("Вы забанены и не можете отправлять сообщения.");
+                return;
+            }
+
+            // Если сообщение пустое И нет выбранного файла, то не отправляем
+            if (messageText === '' && !selectedFile || !isAuthReady || !db) {
+                console.warn("Сообщение пустое или Firebase не готов, или нет выбранного файла.");
+                return;
+            }
+
+            // Показываем статус отправки
+            sendMessageBtn.textContent = 'Отправка...';
+            sendMessageBtn.disabled = true;
+
+            try {
+                const messageData = {
+                    text: messageText,
+                    userId: userId,
+                    nickname: userNickname, // Добавляем ник к сообщению
+                    timestamp: serverTimestamp() // Используем временную метку сервера
+                };
+
+                if (selectedFile) {
+                    // ВАЖНО: Мы не загружаем сам файл изображения в Firestore напрямую из-за ограничения в 1 МБ.
+                    // Вместо этого мы отправляем только имя файла, чтобы показать, что изображение было прикреплено.
+                    // Для полноценной загрузки и отображения изображений используйте Firebase Storage.
+                    messageData.imageFileName = selectedFile.name;
+                    console.log(`Изображение '${selectedFile.name}' выбрано, но не загружено в Firestore. Для загрузки используйте Firebase Storage.`);
+                }
+
+                await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), messageData);
+                messageInput.value = ''; // Очищаем поле ввода
+                selectedFile = null; // Сбрасываем выбранный файл
+                fileNameDisplay.textContent = ''; // Очищаем отображение имени файла
+            } catch (error) {
+                console.error("Ошибка при отправке сообщения:", error);
+                alert("Не удалось отправить сообщение. Проверьте подключение к интернету и правила безопасности Firebase.");
+            } finally {
+                sendMessageBtn.textContent = 'Отправить';
+                sendMessageBtn.disabled = false;
+            }
+        });
+
+        // Отправка сообщения по нажатию Enter
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessageBtn.click();
+            }
+        });
+
+        // Переключение видимости панели администратора
+        toggleAdminPanelBtn.addEventListener('click', () => {
+            adminPanel.classList.toggle('active');
+            settingsPanel.classList.remove('active'); // Закрываем настройки при открытии админки
+            if (adminPanel.classList.contains('active')) {
+                displayBannedUsers(); // Обновляем список забаненных пользователей при открытии
+            }
+        });
+
+        // Переключение видимости панели настроек
+        toggleSettingsPanelBtn.addEventListener('click', () => {
+            settingsPanel.classList.toggle('active');
+            adminPanel.classList.remove('active'); // Закрываем админку при открытии настроек
+        });
+
+        // Обработчик изменения фона чата (локальная настройка)
+        chatBackgroundSelect.addEventListener('change', (event) => {
+            chatBackground = event.target.value;
+            localStorage.setItem('chatBackground', chatBackground);
+            applyChatSettings();
+        });
+
+        // Обработчик переключения временных меток (локальная настройка)
+        toggleTimestampsCheckbox.addEventListener('change', (event) => {
+            showTimestamps = event.target.checked;
+            localStorage.setItem('showTimestamps', JSON.stringify(showTimestamps));
+            // Поскольку сообщения уже загружены, просто перерисовываем их
+            loadMessages(); // Это вызовет setupRealtimeMessages, который перерисует их
+        });
+
+        // Обработчик очистки чата (локальная настройка)
+        clearChatBtn.addEventListener('click', () => {
+            if (confirm('Вы уверены, что хотите очистить всю историю чата ЛОКАЛЬНО? Это действие необратимо для вашего браузера.')) {
+                localStorage.removeItem('chatMessages'); // Удаляем только из локального хранилища
+                // Чтобы очистить из Firebase, нужна отдельная функция администратора
+                alert('История чата очищена в вашем браузере. Сообщения на сервере не удалены.');
+                loadMessages(); // Перезагружаем сообщения, чтобы UI обновился
+            }
+        });
+
+        // Функция для применения настроек чата (локальная настройка)
+        function applyChatSettings() {
+            const body = document.body;
+            // Удаляем все классы фона, начинающиеся с 'chat-background-'
+            body.className = body.className.split(' ').filter(c => !c.startsWith('chat-background-')).join(' ');
+            // Добавляем новый класс фона
+            body.classList.add(`chat-background-${chatBackground}`);
+        }
+
+        // Копирование ID пользователя
+        copyUserIdBtn.addEventListener('click', () => {
+            // Используем document.execCommand('copy') для лучшей совместимости в iframe
+            const el = document.createElement('textarea');
+            el.value = userId;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            const originalText = copyUserIdBtn.textContent;
+            copyUserIdBtn.textContent = 'Скопировано!';
+            setTimeout(() => {
+                copyUserIdBtn.textContent = originalText;
+            }, 1500);
+        });
+
+        // Настройка прослушивания названия чата из Firestore
+        function setupRealtimeChatTitle() {
+            if (!isAuthReady || !db) return;
+            const chatSettingsDocRef = doc(db, `artifacts/${appId}/public/data/chat_settings`, 'main_title');
+            onSnapshot(chatSettingsDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const newTitle = docSnap.data().title || 'Чат с Сосей';
+                    chatTitleDisplay.textContent = newTitle;
+                    dynamicChatTitle.textContent = newTitle; // Обновляем тег <title>
+                    chatTitleInput.value = newTitle; // Обновляем поле ввода в админке
+                } else {
+                    chatTitleDisplay.textContent = 'Чат с Сосей';
+                    dynamicChatTitle.textContent = 'Чат с Сосей';
+                    chatTitleInput.value = 'Чат с Сосей';
+                }
+            }, (error) => {
+                console.error("Ошибка получения названия чата в реальном времени:", error);
+            });
+        }
+
+        // Сохранение названия чата в Firestore
+        saveChatTitleBtn.addEventListener('click', async () => {
+            if (!isRealAdmin) {
+                alert('У вас нет прав для изменения названия чата.');
+                return;
+            }
+            const newTitle = chatTitleInput.value.trim();
+            if (newTitle === '') {
+                alert('Название чата не может быть пустым.');
+                return;
+            }
+            const chatSettingsDocRef = doc(db, `artifacts/${appId}/public/data/chat_settings`, 'main_title');
+            try {
+                await setDoc(chatSettingsDocRef, { title: newTitle }, { merge: true });
+                alert('Название чата сохранено!');
+            } catch (error) {
+                console.error("Ошибка сохранения названия чата:", error);
+                alert("Не удалось сохранить название чата. Проверьте права доступа.");
+            }
+        });
+
+        // Настройка прослушивания забаненных пользователей из Firestore
+        function setupRealtimeBannedUsers() {
+            if (!isAuthReady || !db) return;
+            const bannedUsersCollectionRef = collection(db, `artifacts/${appId}/public/data/banned_users`);
+            onSnapshot(bannedUsersCollectionRef, (snapshot) => {
+                bannedUsers = [];
+                snapshot.forEach(doc => {
+                    bannedUsers.push(doc.id); // ID документа - это userId забаненного
+                });
+                console.log("Забаненные пользователи обновлены:", bannedUsers);
+                displayBannedUsers(); // Обновляем список в админке
+                loadMessages(); // Перезагружаем сообщения, чтобы применить фильтр
+            }, (error) => {
+                console.error("Ошибка получения списка забаненных пользователей:", error);
+            });
+        }
+
+        // Бан пользователя (в Firestore)
+        banUserBtn.addEventListener('click', async () => {
+            if (!isRealAdmin) {
+                alert('У вас нет прав для бана пользователей.');
+                return;
+            }
+            const idToBan = banUserInput.value.trim();
+            if (idToBan === '') {
+                alert('Пожалуйста, введите ID пользователя для бана.');
+                return;
+            }
+            if (bannedUsers.includes(idToBan)) {
+                alert(`Пользователь с ID ${idToBan} уже забанен.`);
+                return;
+            }
+            if (idToBan === userId) {
+                alert('Вы не можете забанить самого себя!');
+                return;
+            }
+
+            const banDocRef = doc(db, `artifacts/${appId}/public/data/banned_users`, idToBan);
+            try {
+                await setDoc(banDocRef, { bannedAt: serverTimestamp() });
+                alert(`Пользователь с ID ${idToBan} забанен.`);
+                banUserInput.value = '';
+            } catch (error) {
+                console.error("Ошибка бана пользователя:", error);
+                alert("Не удалось забанить пользователя. Проверьте права доступа.");
+            }
+        });
+
+        // Разбан пользователя (в Firestore)
+        unbanUserBtn.addEventListener('click', async () => {
+            if (!isRealAdmin) {
+                alert('У вас нет прав для разбана пользователей.');
+                return;
+            }
+            const idToUnban = banUserInput.value.trim();
+            if (idToUnban === '') {
+                alert('Пожалуйста, введите ID пользователя для разбана.');
+                return;
+            }
+            if (!bannedUsers.includes(idToUnban)) {
+                alert(`Пользователь с ID ${idToUnban} не найден в списке забаненных.`);
+                return;
+            }
+
+            const banDocRef = doc(db, `artifacts/${appId}/public/data/banned_users`, idToUnban);
+            try {
+                await deleteDoc(banDocRef);
+                alert(`Пользователь с ID ${idToUnban} разбанен.`);
+                banUserInput.value = '';
+            } catch (error) {
+                console.error("Ошибка разбана пользователя:", error);
+                alert("Не удалось разбанить пользователя. Проверьте права доступа.");
+            }
+        });
+
+        // Отображение списка забаненных пользователей (UI)
+        function displayBannedUsers() {
+            bannedUsersList.innerHTML = '';
+            if (bannedUsers.length === 0) {
+                const li = document.createElement('li');
+                li.textContent = 'Нет забаненных пользователей.';
+                bannedUsersList.appendChild(li);
+            } else {
+                bannedUsers.forEach(id => {
+                    const li = document.createElement('li');
+                    li.textContent = id;
+                    bannedUsersList.appendChild(li);
+                });
+            }
+        }
+
+        // Инициализация при загрузке окна
+        window.onload = initializeFirebase;
     </script>
+    <!--
+    *** ОЧЕНЬ ВАЖНО: НАСТРОЙКА FIREBASE FIRESTORE И ПРАВИЛА БЕЗОПАСНОСТИ ***
+
+    Это приложение теперь использует Firebase Firestore для синхронизации данных между всеми пользователями.
+    Для его корректной работы вам НЕОБХОДИМО настроить правила безопасности Firestore в вашей консоли Firebase.
+    Без этих правил вы будете получать ошибки "Missing or insufficient permissions".
+
+    Пожалуйста, выполните следующие шаги ТОЧНО:
+    1. Перейдите в консоль Firebase: https://console.firebase.google.com/
+    2. Выберите свой проект Firebase.
+    3. В меню слева перейдите в раздел "Firestore Database" (База данных Firestore).
+    4. Выберите вкладку "Rules" (Правила).
+    5. Замените ВСЕ существующие правила на следующие:
+
+    rules_version = '2';
+    service cloud.firestore {
+      match /databases/{database}/documents {
+        // Правила для публичных данных (доступны всем аутентифицированным пользователям)
+        // Это позволяет всем аутентифицированным пользователям читать и записывать сообщения в чат,
+        // а также читать профили пользователей (ники), настройки чата и список администраторов/забаненных.
+        match /artifacts/{appId}/public/data/{collection=**} {
+          allow read: if request.auth != null;
+          allow write: if request.auth != null;
+        }
+
+        // Уточненные правила для коллекции user_profiles (ники)
+        // Пользователь может записывать только свой собственный ник.
+        match /artifacts/{appId}/public/data/user_profiles/{userId} {
+          allow read: if request.auth != null;
+          allow write: if request.auth != null && request.auth.uid == userId;
+        }
+
+        // Уточненные правила для коллекции admin_users (список реальных администраторов)
+        // Только аутентифицированные пользователи могут читать список администраторов.
+        // Запись в эту коллекцию должна быть ограничена только владельцем проекта Firebase
+        // или выполняться вручную через консоль Firebase для обеспечения безопасности.
+        match /artifacts/{appId}/public/data/admin_users/{userId} {
+          allow read: if request.auth != null;
+          allow write: if false; // Запрещаем запись из клиентского приложения
+        }
+
+        // Уточненные правила для коллекции banned_users (список забаненных пользователей)
+        // Любой аутентифицированный пользователь может читать список забаненных.
+        // Записывать (банить/разбанивать) могут только реальные администраторы.
+        match /artifacts/{appId}/public/data/banned_users/{userId} {
+          allow read: if request.auth != null;
+          allow write: if request.auth != null && exists(/databases/$(database)/documents/artifacts/$(appId)/public/data/admin_users/$(request.auth.uid));
+        }
+
+        // Уточненные правила для коллекции chat_settings (название чата)
+        // Любой аутентифицированный пользователь может читать название чата.
+        // Записывать (менять название) могут только реальные администраторы.
+        match /artifacts/{appId}/public/data/chat_settings/{settingId} {
+          allow read: if request.auth != null;
+          allow write: if request.auth != null && exists(/databases/$(database)/documents/artifacts/$(appId)/public/data/admin_users/$(request.auth.uid));
+        }
+
+        // Уточненные правила для коллекции messages (сообщения)
+        // Любой аутентифицированный пользователь может читать и добавлять сообщения.
+        // Удалять сообщения могут только реальные администраторы.
+        match /artifacts/{appId}/public/data/messages/{messageId} {
+          allow read: if request.auth != null;
+          allow write: if request.auth != null;
+          allow delete: if request.auth != null && exists(/databases/$(database)/documents/artifacts/$(appId)/public/data/admin_users/$(request.auth.uid));
+        }
+
+        // Правила для приватных данных (доступны только владельцу)
+        // В этом приложении не используются, но включены для полноты.
+        match /artifacts/{appId}/users/{userId}/{collection=**} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+      }
+    }
+
+    6. После вставки правил нажмите кнопку "Publish" (Опубликовать), чтобы применить изменения.
+       Убедитесь, что вы видите сообщение об успешной публикации.
+
+    *** КАК СДЕЛАТЬ ПОЛЬЗОВАТЕЛЯ РЕАЛЬНЫМ АДМИНИСТРАТОРОМ (ДЛЯ УДАЛЕНИЯ СООБЩЕНИЙ, БАНА, ИЗМЕНЕНИЯ НАЗВАНИЯ): ***
+    1. Откройте консоль Firebase и перейдите в "Firestore Database".
+    2. Создайте новую коллекцию с именем `admin_users` (если ее нет).
+       Полный путь: `artifacts/{ваш_app_id}/public/data/admin_users`
+    3. Добавьте новый документ в эту коллекцию.
+    4. ID документа должен быть равен `userId` пользователя, которого вы хотите сделать администратором.
+       Вы можете найти `userId` текущего пользователя внизу чата ("Ваш ID пользователя: ...").
+    5. Добавьте любое поле в этот документ (например, `isAdmin: true`), хотя его содержимое не используется в коде,
+       важно лишь существование документа с соответствующим `userId`.
+
+    *** СКРЫТАЯ МЕХАНИКА (НИК "Оня"): ***
+    Если вы установите свой ник на "Оня" (без учета регистра), вы получите
+    визуальные права администратора в этом приложении (будут видны кнопки удаления сообщений
+    и панель администратора).
+    Однако, это НЕ дает реальных прав администратора на запись в базу данных (удаление, бан, изменение названия).
+    Для выполнения этих действий пользователь должен быть добавлен в коллекцию `admin_users` в Firebase.
+    Это сделано для обеспечения безопасности вашего приложения.
+    -->
 </body>
 </html>
