@@ -3,624 +3,370 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Интерфейс Дискорда</title>
-    <!-- Tailwind CSS CDN -->
+    <title>Измеритель либидо Win98</title>
+    <!-- Подключение Tailwind CSS для стилизации -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Font Awesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Font for a classic Windows feel (Arial or generic sans-serif) -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Set Inter font for the entire document */
+        /* Base styles for Windows 98 look */
         body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Custom scrollbar styles */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #2f3136; /* Background color of the scrollbar track */
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #4f545c; /* Color of the scrollbar thumb */
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #6a6e74;
-        }
-
-        /* Discord-like hover effects for server icons */
-        .server-icon {
-            position: relative;
-            transition: all 0.2s ease-in-out;
-        }
-        .server-icon:hover {
-            border-radius: 16px; /* Rounded corners on hover */
-        }
-        .server-icon.active::before {
-            content: '';
-            position: absolute;
-            left: -8px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 8px;
-            height: 40px; /* Adjust height as needed */
-            background-color: white;
-            border-radius: 4px;
-        }
-
-        /* Channel item hover effect */
-        .channel-item:hover .channel-plus-icon {
-            opacity: 1;
-        }
-
-        /* Hidden by default for category toggle */
-        .hidden-category {
-            display: none;
-        }
-
-        /* Modal styles */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stay in place */
-            z-index: 1000; /* Sit on top */
-            left: 0;
-            top: 0;
-            width: 100%; /* Full width */
-            height: 100%; /* Full height */
-            overflow: auto; /* Enable scroll if needed */
-            background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
+            font-family: 'Roboto', sans-serif; /* A more common system font */
+            background-color: #008080; /* Teal desktop background */
             display: flex;
             align-items: center;
             justify-content: center;
+            min-height: 100vh;
+            overflow: hidden; /* Prevent scrollbar during calibration */
         }
 
-        .modal-content {
-            background-color: #36393f;
-            margin: auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 80%;
-            max-width: 500px;
-            color: #dcddde;
-            position: relative;
+        /* Window frame */
+        .win98-window {
+            background-color: #C0C0C0; /* Classic grey */
+            border: 2px solid #FFFFFF;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            box-shadow: 2px 2px 0 #000000; /* Simple shadow */
+            padding: 2px;
+            width: 100%;
+            max-width: 450px; /* Adjust max width */
+            box-sizing: border-box;
         }
 
-        .close-button {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
+        /* Title bar */
+        .title-bar {
+            background: linear-gradient(to right, #0A246A, #A6CAF0); /* Blue gradient */
+            color: #FFFFFF;
+            font-family: 'Arial', sans-serif; /* More accurate font for title bar */
+            font-size: 14px;
             font-weight: bold;
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            cursor: pointer;
+            padding: 4px 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: default; /* Not draggable in this demo */
         }
 
-        .close-button:hover,
-        .close-button:focus {
-            color: white;
-            text-decoration: none;
+        .title-bar-buttons button {
+            background-color: #C0C0C0;
+            border: 2px solid #FFFFFF;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            line-height: 1;
+            padding: 0;
             cursor: pointer;
+            outline: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 2px;
+        }
+        .title-bar-buttons button:active {
+            border: 2px solid #808080;
+            border-right-color: #FFFFFF;
+            border-bottom-color: #FFFFFF;
+        }
+
+        /* Content area */
+        .win98-content {
+            background-color: #C0C0C0;
+            padding: 12px;
+            border-top: 1px solid #FFFFFF;
+            border-left: 1px solid #FFFFFF;
+            border-right: 1px solid #808080;
+            border-bottom: 1px solid #808080;
+            margin-top: 2px;
+        }
+
+        /* Input field styles */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 10px;
+            background-color: #808080; /* Darker grey track */
+            outline: none;
+            border: 1px solid #000000;
+            border-top-color: #FFFFFF;
+            border-left-color: #FFFFFF;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            border-radius: 0; /* Square edges */
+            cursor: pointer;
+            --thumb-bg: #C0C0C0;
+            --thumb-border: 2px solid #FFFFFF;
+            --thumb-border-right: #808080;
+            --thumb-border-bottom: #808080;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--thumb-bg);
+            border: var(--thumb-border);
+            border-right-color: var(--thumb-border-right);
+            border-bottom-color: var(--thumb-border-bottom);
+            cursor: pointer;
+            box-shadow: none;
+            margin-top: -5px; /* Adjust to center vertically */
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--thumb-bg);
+            border: var(--thumb-border);
+            border-right-color: var(--thumb-border-right);
+            border-bottom-color: var(--thumb-border-bottom);
+            cursor: pointer;
+            box-shadow: none;
+        }
+
+        /* Button styles */
+        .win98-button {
+            background-color: #C0C0C0;
+            border: 2px solid #FFFFFF;
+            border-right-color: #808080;
+            border-bottom-color: #808080;
+            color: #000000;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            padding: 4px 12px;
+            cursor: pointer;
+            outline: none;
+            text-transform: none;
+            letter-spacing: normal;
+            transform: none;
+            box-shadow: none;
+        }
+        .win98-button:active {
+            border: 2px solid #808080;
+            border-right-color: #FFFFFF;
+            border-bottom-color: #FFFFFF;
+            padding: 5px 11px 3px 13px; /* Shift text slightly for pressed effect */
+        }
+
+        /* Text display area */
+        .display-area {
+            background-color: #FFFFFF;
+            border: 1px solid #000000;
+            border-top-color: #808080;
+            border-left-color: #808080;
+            border-right-color: #FFFFFF;
+            border-bottom-color: #FFFFFF;
+            padding: 8px;
+            color: #000000;
+            font-family: 'MS Sans Serif', 'Arial', sans-serif; /* Classic text font */
+            font-size: 16px;
+            text-shadow: none;
+        }
+
+        /* History log */
+        #history-log {
+            background-color: #FFFFFF;
+            border: 1px solid #000000;
+            border-top-color: #808080;
+            border-left-color: #808080;
+            border-right-color: #FFFFFF;
+            border-bottom-color: #FFFFFF;
+            padding: 8px;
+            color: #000000;
+            font-family: 'VT323', monospace; /* Keep VT323 for a console-like log */
+            font-size: 12px;
+            max-height: 100px;
+            overflow-y: auto;
+            text-shadow: none;
+        }
+
+        /* Calibration screen styles */
+        #calibration-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            color: #FFFFFF; /* White text on black screen */
+            font-family: 'VT323', monospace; /* Console font */
+            font-size: 1.5rem;
+            text-shadow: none;
+        }
+
+        .boot-line {
+            width: 60%;
+            text-align: left;
+            margin: 5px 0;
+            opacity: 0;
+            animation: type-in 0.1s forwards;
+        }
+
+        @keyframes type-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
-<body class="flex h-screen bg-[#36393f] text-[#dcddde]">
+<body class="min-h-screen">
 
-    <!-- Server Sidebar -->
-    <div class="w-[72px] bg-[#202225] flex flex-col items-center py-3 space-y-2 overflow-y-auto rounded-r-lg shadow-lg">
-        <!-- Home/DM button -->
-        <div class="server-icon w-12 h-12 flex items-center justify-center rounded-full bg-[#5865f2] text-white text-2xl cursor-pointer hover:bg-[#5865f2] hover:rounded-2xl transition-all duration-200 active" data-server-id="home">
-            <i class="fab fa-discord"></i>
-        </div>
-        <!-- Divider -->
-        <div class="w-8 h-0.5 bg-[#424549] rounded-full"></div>
-        <!-- Server Icons -->
-        <div class="server-icon w-12 h-12 flex items-center justify-center rounded-full bg-[#36393f] text-white font-bold text-lg cursor-pointer hover:bg-[#5865f2] transition-all duration-200" data-server-id="server-d">
-            <img src="https://placehold.co/48x48/36393f/FFFFFF?text=D" alt="[Изображение иконки сервера Discord]" class="w-full h-full rounded-full object-cover">
-        </div>
-        <div class="server-icon w-12 h-12 flex items-center justify-center rounded-full bg-[#36393f] text-white font-bold text-lg cursor-pointer hover:bg-[#5865f2] transition-all duration-200" data-server-id="server-g">
-            <img src="https://placehold.co/48x48/36393f/FFFFFF?text=G" alt="[Изображение иконки игрового сервера]" class="w-full h-full rounded-full object-cover">
-        </div>
-        <div class="server-icon w-12 h-12 flex items-center justify-center rounded-full bg-[#36393f] text-white font-bold text-lg cursor-pointer hover:bg-[#5865f2] transition-all duration-200" data-server-id="server-c">
-            <img src="https://placehold.co/48x48/36393f/FFFFFF?text=C" alt="[Изображение иконки сервера сообщества]" class="w-full h-full rounded-full object-cover">
-        </div>
-        <!-- Add Server Button -->
-        <div class="server-icon w-12 h-12 flex items-center justify-center rounded-full bg-[#36393f] text-[#43b581] text-3xl cursor-pointer hover:bg-[#43b581] hover:text-white transition-all duration-200" data-action="add-server">
-            <i class="fas fa-plus"></i>
-        </div>
-        <!-- Explore Servers Button -->
-        <div class="server-icon w-12 h-12 flex items-center justify-center rounded-full bg-[#36393f] text-[#43b581] text-xl cursor-pointer hover:bg-[#43b581] hover:text-white transition-all duration-200" data-action="explore-servers">
-            <i class="fas fa-compass"></i>
-        </div>
+    <!-- Calibration Screen -->
+    <div id="calibration-screen">
+        <p class="boot-line" style="animation-delay: 0s;">Microsoft(R) Windows 98</p>
+        <p class="boot-line" style="animation-delay: 0.5s;">(C)Copyright Microsoft Corp 1981-1999.</p>
+        <p class="boot-line" style="animation-delay: 1s;">Initializing hardware...</p>
+        <p class="boot-line" style="animation-delay: 1.5s;">Loading Измеритель либидо.exe...</p>
+        <p class="boot-line" style="animation-delay: 2.0s;">_</p>
     </div>
 
-    <!-- Channel Sidebar -->
-    <div class="w-60 bg-[#2f3136] flex flex-col py-3 px-2 shadow-lg">
-        <!-- Server Name Header -->
-        <div class="flex items-center justify-between px-3 pb-3 border-b border-[#202225] mb-3 cursor-pointer hover:bg-[#36393f] rounded-md transition-colors duration-150" data-action="server-settings">
-            <h2 class="text-xl font-semibold text-white">Мой Сервер</h2>
-            <i class="fas fa-chevron-down text-[#8e9297] text-sm"></i>
-        </div>
-
-        <!-- Search -->
-        <div class="relative mb-3 px-1">
-            <input type="text" placeholder="Найти или начать разговор" class="w-full bg-[#202225] rounded-md py-2 px-3 pl-8 text-sm focus:outline-none focus:ring-1 focus:ring-[#5865f2] text-white placeholder-[#8e9297]">
-            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8e9297] text-xs"></i>
-        </div>
-
-        <!-- Categories and Channels -->
-        <div class="flex-grow overflow-y-auto pr-2">
-            <div class="mb-4">
-                <h3 class="text-xs font-semibold text-[#8e9297] uppercase mb-2 flex items-center justify-between px-2 cursor-pointer category-toggle" data-target="text-channels">
-                    <span class="flex items-center"><i class="fas fa-chevron-down mr-1 text-[10px] category-arrow"></i> ТЕКСТОВЫЕ КАНАЛЫ</span>
-                    <i class="fas fa-plus text-[#8e9297] text-sm cursor-pointer hover:text-white channel-plus-icon opacity-0 transition-opacity duration-150" data-action="add-channel"></i>
-                </h3>
-                <ul class="space-y-1" id="text-channels">
-                    <li class="flex items-center py-1 px-2 rounded-md hover:bg-[#393d43] cursor-pointer channel-item" data-channel-id="general">
-                        <i class="fas fa-hashtag text-[#8e9297] mr-2 text-base"></i>
-                        <span class="text-white">общий</span>
-                        <i class="fas fa-plus text-[#8e9297] text-sm ml-auto opacity-0 channel-plus-icon transition-opacity duration-150" data-action="add-channel"></i>
-                    </li>
-                    <li class="flex items-center py-1 px-2 rounded-md bg-[#4f545c] cursor-pointer channel-item" data-channel-id="rules">
-                        <i class="fas fa-hashtag text-[#8e9297] mr-2 text-base"></i>
-                        <span class="text-white font-semibold">правила</span>
-                        <i class="fas fa-plus text-[#8e9297] text-sm ml-auto opacity-0 channel-plus-icon transition-opacity duration-150" data-action="add-channel"></i>
-                    </li>
-                    <li class="flex items-center py-1 px-2 rounded-md hover:bg-[#393d43] cursor-pointer channel-item" data-channel-id="announcements">
-                        <i class="fas fa-hashtag text-[#8e9297] mr-2 text-base"></i>
-                        <span class="text-white">объявления</span>
-                        <i class="fas fa-plus text-[#8e9297] text-sm ml-auto opacity-0 channel-plus-icon transition-opacity duration-150" data-action="add-channel"></i>
-                    </li>
-                    <li class="flex items-center py-1 px-2 rounded-md hover:bg-[#393d43] cursor-pointer channel-item" data-channel-id="memes">
-                        <i class="fas fa-hashtag text-[#8e9297] mr-2 text-base"></i>
-                        <span class="text-white">мемы</span>
-                        <i class="fas fa-plus text-[#8e9297] text-sm ml-auto opacity-0 channel-plus-icon transition-opacity duration-150" data-action="add-channel"></i>
-                    </li>
-                </ul>
-            </div>
-
-            <div>
-                <h3 class="text-xs font-semibold text-[#8e9297] uppercase mb-2 flex items-center justify-between px-2 cursor-pointer category-toggle" data-target="voice-channels">
-                    <span class="flex items-center"><i class="fas fa-chevron-down mr-1 text-[10px] category-arrow"></i> ГОЛОСОВЫЕ КАНАЛЫ</span>
-                    <i class="fas fa-plus text-[#8e9297] text-sm cursor-pointer hover:text-white channel-plus-icon opacity-0 transition-opacity duration-150" data-action="add-channel"></i>
-                </h3>
-                <ul class="space-y-1" id="voice-channels">
-                    <li class="flex items-center py-1 px-2 rounded-md hover:bg-[#393d43] cursor-pointer channel-item" data-channel-id="voice-general">
-                        <i class="fas fa-volume-up text-[#8e9297] mr-2 text-base"></i>
-                        <span class="text-white">Общий</span>
-                        <i class="fas fa-plus text-[#8e9297] text-sm ml-auto opacity-0 channel-plus-icon transition-opacity duration-150" data-action="add-channel"></i>
-                    </li>
-                    <li class="flex items-center py-1 px-2 rounded-md hover:bg-[#393d43] cursor-pointer channel-item" data-channel-id="voice-gaming">
-                        <i class="fas fa-volume-up text-[#8e9297] mr-2 text-base"></i>
-                        <span class="text-white">Игры</span>
-                        <i class="fas fa-plus text-[#8e9297] text-sm ml-auto opacity-0 channel-plus-icon transition-opacity duration-150" data-action="add-channel"></i>
-                    </li>
-                </ul>
+    <div id="main-content" class="hidden win98-window">
+        <div class="title-bar">
+            <div class="title-bar-text">Измеритель либидо</div>
+            <div class="title-bar-buttons">
+                <button aria-label="Minimize">_</button>
+                <button aria-label="Maximize">⬜</button>
+                <button aria-label="Close">X</button>
             </div>
         </div>
+        <div class="win98-content">
+            <h1 class="text-xl font-bold text-black mb-4">ЛИБИДО МЕТР</h1>
 
-        <!-- User Settings -->
-        <div class="mt-auto bg-[#202225] p-2 rounded-lg flex items-center justify-between">
-            <div class="flex items-center">
-                <img src="https://placehold.co/32x32/2F3136/FFFFFF?text=U" alt="[Изображение аватара пользователя]" class="w-8 h-8 rounded-full mr-2">
-                <div>
-                    <p class="text-sm font-semibold text-white">Имя Пользователя</p>
-                    <p class="text-xs text-[#8e9297]">#1234</p>
-                </div>
+            <div class="mb-6">
+                <label for="libido-slider" class="block text-sm font-semibold text-black mb-2">НА СКОЛЬКО ВЫ СЕГОДНЯ...?</label>
+                <input type="range" id="libido-slider" min="0" max="100" value="50" class="w-full">
             </div>
-            <div class="flex space-x-2 text-[#8e9297]">
-                <i class="fas fa-microphone cursor-pointer hover:text-white" title="Отключить микрофон" data-action="toggle-mic" id="mic-icon"></i>
-                <i class="fas fa-headphones cursor-pointer hover:text-white" title="Отключить наушники" data-action="toggle-headphones" id="headphones-icon"></i>
-                <i class="fas fa-cog cursor-pointer hover:text-white" title="Настройки пользователя" data-action="user-settings"></i>
-            </div>
-        </div>
-    </div>
 
-    <!-- Main Chat Area -->
-    <div class="flex-grow flex flex-col bg-[#36393f] rounded-l-lg shadow-inner">
-        <!-- Channel Header -->
-        <div class="flex items-center px-4 py-3 border-b border-[#202225] bg-[#36393f]">
-            <i class="fas fa-hashtag text-[#8e9297] text-xl mr-2"></i>
-            <h2 class="text-xl font-semibold text-white" id="current-channel-name">правила</h2>
-            <div class="flex items-center ml-auto space-x-4 text-[#8e9297]">
-                <i class="fas fa-thumbtack cursor-pointer hover:text-white" title="Закрепленные сообщения" data-action="pinned-messages"></i>
-                <i class="fas fa-bell cursor-pointer hover:text-white" title="Настройки уведомлений" data-action="notification-settings"></i>
-                <i class="fas fa-user-friends cursor-pointer hover:text-white" title="Список участников" data-action="member-list"></i>
-                <i class="fas fa-search cursor-pointer hover:text-white" title="Поиск" data-action="search-chat"></i>
-                <i class="fas fa-inbox cursor-pointer hover:text-white" title="Входящие" data-action="inbox"></i>
-                <i class="fas fa-question-circle cursor-pointer hover:text-white" title="Помощь" data-action="help"></i>
-            </div>
-        </div>
+            <button id="randomize-btn" class="win98-button px-4 py-2 mb-6">
+                СЛУЧАЙНЫЙ УРОВЕНЬ
+            </button>
 
-        <!-- Message Area -->
-        <div class="flex-grow overflow-y-auto p-4 space-y-4" id="message-area">
-            <!-- Message Example 1 -->
-            <div class="flex items-start group relative hover:bg-[#32353b] p-2 -mx-2 rounded-md">
-                <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=А" alt="[Изображение аватара администратора]" class="w-10 h-10 rounded-full mr-3 mt-1">
-                <div>
-                    <div class="flex items-baseline">
-                        <p class="font-semibold text-white mr-2">Администратор</p>
-                        <span class="text-xs text-[#8e9297]">Сегодня в 10:30</span>
-                    </div>
-                    <p class="text-[#dcddde]">Добро пожаловать на сервер! Пожалуйста, ознакомьтесь с правилами.</p>
-                </div>
-                <!-- Message options on hover -->
-                <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
-                    <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
-                    <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
-                    <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
-                </div>
+            <div class="display-area mb-6">
+                <p class="text-lg font-bold text-black mb-1" id="libido-level-text">СРЕДНИЙ УРОВЕНЬ</p>
+                <p class="text-sm text-black" id="libido-description">ПЕРЕДВИНЬТЕ ПОЛЗУНОК ИЛИ НАЖМИТЕ КНОПКУ</p>
             </div>
-            <!-- Message Example 2 -->
-            <div class="flex items-start group relative hover:bg-[#32353b] p-2 -mx-2 rounded-md">
-                <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=П" alt="[Изображение аватара Пользователя1]" class="w-10 h-10 rounded-full mr-3 mt-1">
-                <div>
-                    <div class="flex items-baseline">
-                        <p class="font-semibold text-white mr-2">Пользователь1</p>
-                        <span class="text-xs text-[#8e9297]">Сегодня в 10:35</span>
-                    </div>
-                    <p class="text-[#dcddde]">Привет всем!</p>
-                </div>
-                <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
-                    <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
-                    <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
-                    <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
-                </div>
-            </div>
-            <!-- Message Example 3 -->
-            <div class="flex items-start group relative hover:bg-[#32353b] p-2 -mx-2 rounded-md">
-                <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=Б" alt="[Изображение аватара Бота]" class="w-10 h-10 rounded-full mr-3 mt-1">
-                <div>
-                    <div class="flex items-baseline">
-                        <p class="font-semibold text-white mr-2">Бот</p>
-                        <span class="text-xs text-[#8e9297]">Сегодня в 10:40</span>
-                    </div>
-                    <p class="text-[#dcddde]">Не забудьте прочитать <span class="text-[#00aff4] cursor-pointer hover:underline">#правила</span> перед началом общения!</p>
-                </div>
-                <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
-                    <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
-                    <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
-                    <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
-                </div>
-            </div>
-            <!-- Message Example 4 -->
-            <div class="flex items-start group relative hover:bg-[#32353b] p-2 -mx-2 rounded-md">
-                <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=И" alt="[Изображение аватара Игрока2]" class="w-10 h-10 rounded-full mr-3 mt-1">
-                <div>
-                    <div class="flex items-baseline">
-                        <p class="font-semibold text-white mr-2">Игрок2</p>
-                        <span class="text-xs text-[#8e9297]">Сегодня в 10:45</span>
-                    </div>
-                    <p class="text-[#dcddde]">Понял!</p>
-                </div>
-                <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
-                    <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
-                    <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
-                    <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
-                </div>
-            </div>
-            <!-- Message Example 5 -->
-            <div class="flex items-start group relative hover:bg-[#32353b] p-2 -mx-2 rounded-md">
-                <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=М" alt="[Изображение аватара Модератора]" class="w-10 h-10 rounded-full mr-3 mt-1">
-                <div>
-                    <div class="flex items-baseline">
-                        <p class="font-semibold text-white mr-2">Модератор</p>
-                        <span class="text-xs text-[#8e9297]">Сегодня в 10:50</span>
-                    </div>
-                    <p class="text-[#dcddde]">Отлично! Если есть вопросы, задавайте их в <span class="text-[#00aff4] cursor-pointer hover:underline">#общий</span>.</p>
-                </div>
-                <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
-                    <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
-                    <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
-                    <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
-                </div>
-            </div>
-            <!-- Message Example 6 -->
-            <div class="flex items-start group relative hover:bg-[#32353b] p-2 -mx-2 rounded-md">
-                <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=Н" alt="[Изображение аватара Новичка]" class="w-10 h-10 rounded-full mr-3 mt-1">
-                <div>
-                    <div class="flex items-baseline">
-                        <p class="font-semibold text-white mr-2">Новичок</p>
-                        <span class="text-xs text-[#8e9297]">Сегодня в 10:55</span>
-                    </div>
-                    <p class="text-[#dcddde]">Спасибо!</p>
-                </div>
-                <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
-                    <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
-                    <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
-                    <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
-                </div>
-            </div>
-            <!-- Hidden Love Message -->
-            <div class="flex items-start group relative hover:bg-[#32353b] p-2 -mx-2 rounded-md">
-                <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=❤️" alt="[Изображение аватара специального пользователя]" class="w-10 h-10 rounded-full mr-3 mt-1">
-                <div>
-                    <div class="flex items-baseline">
-                        <p class="font-semibold text-[#f47fff] mr-2">Твой(Твоя) Тайный(Тайная) Поклонник(Поклонница)</p>
-                        <span class="text-xs text-[#8e9297]">Сегодня в 11:00</span>
-                    </div>
-                    <p class="text-[#dcddde]">
-                        Привет! Хотел сказать, если бы мои чувства были кодом, это был бы бесконечный цикл, который всегда возвращается к тебе.
-                        Ты — переменная, которая определяет все мои функции. Мое сердце скомпилировано с любовью, и каждый бит и байт моей души принадлежит тебе.
-                        Ты — исключение, которое я всегда рад обработать. Я люблю тебя! ❤️
-                    </p>
-                </div>
-                <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
-                    <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
-                    <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
-                    <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
-                </div>
-            </div>
-            <!-- Typing indicator -->
-            <div id="typing-indicator" class="text-xs text-[#8e9297] mt-2 hidden">
-                <span class="font-semibold">Несколько пользователей</span> печатают...
-            </div>
-        </div>
 
-        <!-- Message Input Area -->
-        <div class="p-4 bg-[#36393f] border-t border-[#202225]">
-            <div class="flex items-center bg-[#40444b] rounded-lg px-3 py-2">
-                <i class="fas fa-plus-circle text-[#8e9297] text-xl mr-3 cursor-pointer hover:text-white" title="Прикрепить файл" data-action="attach-file"></i>
-                <input type="text" placeholder="Сообщение #правила" class="flex-grow bg-transparent text-white placeholder-[#8e9297] focus:outline-none" id="message-input">
-                <div class="flex space-x-3 ml-3 text-[#8e9297]">
-                    <i class="fas fa-gift cursor-pointer hover:text-white" title="Подарок" data-action="send-gift"></i>
-                    <i class="fas fa-gif cursor-pointer hover:text-white" title="GIF" data-action="send-gif"></i>
-                    <i class="fas fa-sticker-emoji cursor-pointer hover:text-white" title="Стикеры" data-action="send-sticker"></i>
-                    <i class="fas fa-smile-beam cursor-pointer hover:text-white" title="Выбрать эмодзи" data-action="select-emoji"></i>
+            <div class="mt-4">
+                <h2 class="text-base font-bold text-black mb-2">ИСТОРИЯ ПОКАЗАНИЙ</h2>
+                <div id="history-log">
+                    <!-- History entries will be added here -->
+                    <p>2025-07-19 22:00: СРЕДНИЙ УРОВЕНЬ (50)</p>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- User List Sidebar -->
-    <div class="w-60 bg-[#2f3136] flex flex-col py-3 px-2 overflow-y-auto rounded-l-lg shadow-lg">
-        <h3 class="text-xs font-semibold text-[#8e9297] uppercase mb-3 px-2">ОНЛАЙН — 4</h3>
-        <ul class="space-y-2 mb-4">
-            <li class="flex items-center px-2 py-1 rounded-md hover:bg-[#393d43] cursor-pointer" data-user-id="admin">
-                <div class="relative">
-                    <img src="https://placehold.co/32x32/2F3136/FFFFFF?text=А" alt="[Изображение аватара администратора]" class="w-8 h-8 rounded-full mr-2">
-                    <div class="absolute bottom-0 right-1 w-3 h-3 bg-[#43b581] rounded-full border-2 border-[#2f3136]"></div>
-                </div>
-                <span class="text-white">Администратор</span>
-            </li>
-            <li class="flex items-center px-2 py-1 rounded-md hover:bg-[#393d43] cursor-pointer" data-user-id="user1">
-                <div class="relative">
-                    <img src="https://placehold.co/32x32/2F3136/FFFFFF?text=П" alt="[Изображение аватара Пользователя1]" class="w-8 h-8 rounded-full mr-2">
-                    <div class="absolute bottom-0 right-1 w-3 h-3 bg-[#43b581] rounded-full border-2 border-[#2f3136]"></div>
-                </div>
-                <span class="text-white">Пользователь1</span>
-            </li>
-            <li class="flex items-center px-2 py-1 rounded-md hover:bg-[#393d43] cursor-pointer" data-user-id="player2">
-                <div class="relative">
-                    <img src="https://placehold.co/32x32/2F3136/FFFFFF?text=И" alt="[Изображение аватара Игрока2]" class="w-8 h-8 rounded-full mr-2">
-                    <div class="absolute bottom-0 right-1 w-3 h-3 bg-[#faa61a] rounded-full border-2 border-[#2f3136]"></div> <!-- Idle status -->
-                </div>
-                <span class="text-white">Игрок2</span>
-            </li>
-            <li class="flex items-center px-2 py-1 rounded-md hover:bg-[#393d43] cursor-pointer" data-user-id="secret-admirer">
-                <div class="relative">
-                    <img src="https://placehold.co/32x32/2F3136/FFFFFF?text=❤️" alt="[Изображение аватара специального пользователя]" class="w-8 h-8 rounded-full mr-2">
-                    <div class="absolute bottom-0 right-1 w-3 h-3 bg-[#f04747] rounded-full border-2 border-[#2f3136]"></div> <!-- DND status -->
-                </div>
-                <span class="text-[#f47fff]">Тайный Поклонник</span>
-            </li>
-        </ul>
-
-        <h3 class="text-xs font-semibold text-[#8e9297] uppercase mb-3 px-2">ОФФЛАЙН — 2</h3>
-        <ul class="space-y-2">
-            <li class="flex items-center px-2 py-1 rounded-md text-[#8e9297] cursor-pointer" data-user-id="newbie">
-                <div class="relative">
-                    <img src="https://placehold.co/32x32/2F3136/FFFFFF?text=Н" alt="[Изображение аватара Новичка]" class="w-8 h-8 rounded-full mr-2 opacity-50">
-                    <div class="absolute bottom-0 right-1 w-3 h-3 bg-[#747f8d] rounded-full border-2 border-[#2f3136]"></div> <!-- Offline status -->
-                </div>
-                <span>Новичок</span>
-            </li>
-            <li class="flex items-center px-2 py-1 rounded-md text-[#8e9297] cursor-pointer" data-user-id="guest">
-                <div class="relative">
-                    <img src="https://placehold.co/32x32/2F3136/FFFFFF?text=Г" alt="[Изображение аватара Гостя]" class="w-8 h-8 rounded-full mr-2 opacity-50">
-                    <div class="absolute bottom-0 right-1 w-3 h-3 bg-[#747f8d] rounded-full border-2 border-[#2f3136]"></div> <!-- Offline status -->
-                </div>
-                <span>Гость</span>
-            </li>
-        </ul>
-    </div>
-
-    <!-- Modal Placeholder -->
-    <div id="myModal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2 class="text-xl font-bold mb-4" id="modal-title"></h2>
-            <p id="modal-body"></p>
-            <div class="mt-4 text-sm text-[#8e9297]">
-                <p>Это имитация модального окна.</p>
-                <p>В реальном приложении здесь была бы соответствующая функциональность.</p>
             </div>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Server selection logic
-            const serverIcons = document.querySelectorAll('.server-icon');
-            serverIcons.forEach(icon => {
-                icon.addEventListener('click', () => {
-                    serverIcons.forEach(i => i.classList.remove('active', 'bg-[#5865f2]'));
-                    icon.classList.add('active');
-                    // Only change background for non-home icons
-                    if (icon.dataset.serverId !== 'home') {
-                        icon.classList.add('bg-[#5865f2]');
-                    } else {
-                        icon.classList.remove('bg-[#36393f]');
-                    }
-                    console.log(`Выбран сервер: ${icon.dataset.serverId}`);
-                });
-            });
+            const slider = document.getElementById('libido-slider');
+            const levelText = document.getElementById('libido-level-text');
+            const descriptionText = document.getElementById('libido-description');
+            const randomizeBtn = document.getElementById('randomize-btn');
+            const calibrationScreen = document.getElementById('calibration-screen');
+            const mainContent = document.getElementById('main-content');
+            const historyLog = document.getElementById('history-log');
 
-            // Channel selection logic
-            const channelItems = document.querySelectorAll('.channel-item');
-            const currentChannelName = document.getElementById('current-channel-name');
-            channelItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    channelItems.forEach(i => i.classList.remove('bg-[#4f545c]', 'font-semibold'));
-                    item.classList.add('bg-[#4f545c]', 'font-semibold');
-                    const channelName = item.querySelector('span').textContent;
-                    currentChannelName.textContent = channelName;
-                    console.log(`Выбран канал: ${item.dataset.channelId}`);
-                });
-            });
-
-            // Message input and sending
-            const messageInput = document.getElementById('message-input');
-            const messageArea = document.getElementById('message-area');
-            const typingIndicator = document.getElementById('typing-indicator');
-            let typingTimeout;
-
-            messageInput.addEventListener('focus', () => {
-                typingIndicator.classList.remove('hidden');
-            });
-
-            messageInput.addEventListener('blur', () => {
-                clearTimeout(typingTimeout);
-                typingIndicator.classList.add('hidden');
-            });
-
-            messageInput.addEventListener('input', () => {
-                clearTimeout(typingTimeout);
-                typingTimeout = setTimeout(() => {
-                    typingIndicator.classList.add('hidden');
-                }, 3000); // Hide after 3 seconds of no typing
-            });
-
-
-            messageInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter' && messageInput.value.trim() !== '') {
-                    const newMessageText = messageInput.value.trim();
-                    const now = new Date();
-                    const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`; // Basic time format
-
-                    const newMessageDiv = document.createElement('div');
-                    newMessageDiv.classList.add('flex', 'items-start', 'group', 'relative', 'hover:bg-[#32353b]', 'p-2', '-mx-2', 'rounded-md');
-                    newMessageDiv.innerHTML = `
-                        <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=Я" alt="[Изображение аватара текущего пользователя]" class="w-10 h-10 rounded-full mr-3 mt-1">
-                        <div>
-                            <div class="flex items-baseline">
-                                <p class="font-semibold text-white mr-2">Вы</p>
-                                <span class="text-xs text-[#8e9297]">Сегодня в ${timeString}</span>
-                            </div>
-                            <p class="text-[#dcddde]">${newMessageText}</p>
-                        </div>
-                        <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
-                            <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
-                            <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
-                            <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
-                        </div>
-                    `;
-                    messageArea.appendChild(newMessageDiv);
-                    messageArea.scrollTop = messageArea.scrollHeight; // Scroll to bottom
-                    messageInput.value = ''; // Clear input
-                    clearTimeout(typingTimeout); // Hide typing indicator immediately after sending
-                    typingIndicator.classList.add('hidden');
-                    console.log(`Отправлено сообщение: "${newMessageText}"`);
-                }
-            });
-
-            // Modal logic
-            const modal = document.getElementById('myModal');
-            const closeModalBtn = document.querySelector('.close-button');
-            const modalTitle = document.getElementById('modal-title');
-            const modalBody = document.getElementById('modal-body');
-
-            closeModalBtn.addEventListener('click', () => {
-                modal.style.display = 'none';
-            });
-
-            window.addEventListener('click', (event) => {
-                if (event.target == modal) {
-                    modal.style.display = 'none';
-                }
-            });
-
-            function showModal(title, body) {
-                modalTitle.textContent = title;
-                modalBody.textContent = body;
-                modal.style.display = 'flex'; // Use flex to center
+            // Function to format date and time for history log
+            function getFormattedDateTime() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                const day = now.getDate().toString().padStart(2, '0');
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                return `${year}-${month}-${day} ${hours}:${minutes}`;
             }
 
-            // General action handlers for icons (using event delegation)
-            document.body.addEventListener('click', (e) => {
-                const target = e.target.closest('[data-action]');
-                if (target) {
-                    const action = target.dataset.action;
-                    console.log(`Выполнено действие: ${action}`);
+            // Function to update text and styles based on slider value
+            function updateLibidoLevel(logHistory = true) {
+                const value = parseInt(slider.value);
+                let text = '';
+                let description = '';
+                let thumbBg = '#C0C0C0'; // Default grey for thumb
+                let thumbBorderRight = '#808080';
+                let thumbBorderBottom = '#808080';
 
-                    if (action === 'toggle-mic') {
-                        target.classList.toggle('text-red-500'); // Simple visual cue
-                        target.classList.toggle('fa-microphone-slash'); // Toggle slash icon
-                        target.classList.toggle('fa-microphone');
-                        console.log('Микрофон переключен');
-                    } else if (action === 'toggle-headphones') {
-                        target.classList.toggle('text-red-500'); // Simple visual cue
-                        target.classList.toggle('fa-headphones-slash'); // Toggle slash icon
-                        target.classList.toggle('fa-headphones');
-                        console.log('Наушники переключены');
-                    } else if (action === 'add-server') {
-                        showModal('Добавить сервер', 'Здесь будет форма для добавления нового сервера.');
-                    } else if (action === 'explore-servers') {
-                        showModal('Исследовать серверы', 'Здесь будет список серверов для исследования.');
-                    } else if (action === 'add-reaction') {
-                        const messageDiv = target.closest('.flex.items-start.group');
-                        let reactionContainer = messageDiv.querySelector('.reaction-container');
-                        if (!reactionContainer) {
-                            reactionContainer = document.createElement('div');
-                            reactionContainer.classList.add('reaction-container', 'flex', 'items-center', 'space-x-1', 'mt-2', 'ml-12', 'text-xs', 'text-[#8e9297]');
-                            messageDiv.appendChild(reactionContainer);
-                        }
-                        // Simple reaction: add a heart if not present, increment count if present
-                        let heartReaction = reactionContainer.querySelector('.heart-reaction');
-                        if (!heartReaction) {
-                            heartReaction = document.createElement('span');
-                            heartReaction.classList.add('heart-reaction', 'bg-[#40444b]', 'rounded-full', 'px-2', 'py-1', 'cursor-pointer', 'hover:bg-[#4f545c]');
-                            heartReaction.innerHTML = '❤️ <span class="reaction-count">1</span>';
-                            reactionContainer.appendChild(heartReaction);
-                        } else {
-                            let countSpan = heartReaction.querySelector('.reaction-count');
-                            let currentCount = parseInt(countSpan.textContent);
-                            countSpan.textContent = currentCount + 1;
-                        }
-                        console.log('Добавлена реакция');
+                if (value < 20) {
+                    text = 'НИЗКИЙ УРОВЕНЬ';
+                    description = 'СЕГОДНЯ ВЫ, КАЖЕТСЯ, СПОКОЙНЫ И РАССЛАБЛЕНЫ.';
+                } else if (value < 40) {
+                    text = 'УМЕРЕННЫЙ УРОВЕНЬ';
+                    description = 'ВЫ ЧУВСТВУЕТЕ СЕБЯ ДОВОЛЬНО СБАЛАНСИРОВАННО.';
+                } else if (value < 60) {
+                    text = 'СРЕДНИЙ УРОВЕНЬ';
+                    description = 'ВСЕ В ПРЕДЕЛАХ НОРМЫ, ВЫ В ХОРОШЕМ НАСТРОЕНИИ.';
+                } else if (value < 80) {
+                    text = 'ПОВЫШЕННЫЙ УРОВЕНЬ';
+                    description = 'ЧУВСТВУЕТЕ ПРИЛИВ ЭНЕРГИИ И СТРАСТИ!';
+                } else {
+                    text = 'ОЧЕНЬ ВЫСОКИЙ УРОВЕНЬ! 🔥';
+                    description = 'ВАША ЭНЕРГИЯ БЬЕТ ЧЕРЕЗ КРАЙ!';
+                }
+
+                levelText.textContent = text;
+                descriptionText.textContent = description;
+
+                // Update CSS variables for thumb styling
+                slider.style.setProperty('--thumb-bg', thumbBg);
+                slider.style.setProperty('--thumb-border-right', thumbBorderRight);
+                slider.style.setProperty('--thumb-border-bottom', thumbBorderBottom);
+
+                // Log history only if explicitly requested (e.g., on randomize or initial load)
+                if (logHistory) {
+                    const historyEntry = document.createElement('p');
+                    historyEntry.textContent = `${getFormattedDateTime()}: ${text} (${value})`;
+                    historyLog.prepend(historyEntry); // Add to the top
+                    // Limit history to 5 entries
+                    if (historyLog.children.length > 5) {
+                        historyLog.removeChild(historyLog.lastChild);
                     }
                 }
-            });
+            }
 
-            // Category toggle logic
-            const categoryToggles = document.querySelectorAll('.category-toggle');
-            categoryToggles.forEach(toggle => {
-                toggle.addEventListener('click', () => {
-                    const targetId = toggle.dataset.target;
-                    const targetUl = document.getElementById(targetId);
-                    const arrowIcon = toggle.querySelector('.category-arrow');
+            // Function to set a random slider value
+            function setRandomLibidoLevel() {
+                const randomValue = Math.floor(Math.random() * 101); // From 0 to 100
+                slider.value = randomValue;
+                updateLibidoLevel(); // Log history by default
+                randomizeBtn.classList.add('randomize-pulse');
+                randomizeBtn.addEventListener('animationend', () => {
+                    randomizeBtn.classList.remove('randomize-pulse');
+                }, { once: true });
+            }
 
-                    if (targetUl.classList.contains('hidden-category')) {
-                        targetUl.classList.remove('hidden-category');
-                        arrowIcon.classList.remove('fa-chevron-right');
-                        arrowIcon.classList.add('fa-chevron-down');
-                    } else {
-                        targetUl.classList.add('hidden-category');
-                        arrowIcon.classList.remove('fa-chevron-down');
-                        arrowIcon.classList.add('fa-chevron-right');
-                    }
+            // Calibration animation on load
+            function startCalibration() {
+                const bootLines = document.querySelectorAll('.boot-line');
+                let delay = 0;
+                bootLines.forEach((line, index) => {
+                    setTimeout(() => {
+                        line.style.opacity = '1';
+                    }, delay);
+                    delay += 500; // 0.5 seconds delay between lines
                 });
-            });
 
-            // User list item click (simple console log for now)
-            const userListItems = document.querySelectorAll('.w-60 ul li');
-            userListItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    console.log(`Клик по пользователю: ${item.dataset.userId || item.querySelector('span').textContent}`);
-                });
-            });
+                setTimeout(() => {
+                    calibrationScreen.style.display = 'none';
+                    mainContent.classList.remove('hidden');
+                    document.body.style.overflow = 'auto'; // Re-enable scrollbar if needed
+                    updateLibidoLevel(); // Initial update after calibration
+                }, delay + 1000); // Total delay + 1 second for the last line to show
+            }
+
+            // Initial setup
+            startCalibration();
+
+            // Update on slider input
+            slider.addEventListener('input', () => updateLibidoLevel(false)); // Don't log history on every slider move
+
+            // Handle randomize button click
+            randomizeBtn.addEventListener('click', setRandomLibidoLevel);
         });
     </script>
 </body>
