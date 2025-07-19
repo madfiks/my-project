@@ -228,7 +228,7 @@
 
     <div id="main-content" class="hidden win98-window">
         <div class="title-bar">
-            <div class="title-bar-text">Измеритель Сося</div>
+            <div class="title-bar-text">Измеритель либидо</div>
             <div class="title-bar-buttons">
                 <button aria-label="Minimize">_</button>
                 <button aria-label="Maximize">⬜</button>
@@ -236,7 +236,7 @@
             </div>
         </div>
         <div class="win98-content">
-            <h1 class="text-xl font-bold text-black mb-4">СОСЯ МЕТР</h1>
+            <h1 class="text-xl font-bold text-black mb-4">ЛИБИДО МЕТР</h1>
 
             <div class="mb-6">
                 <label for="libido-slider" class="block text-sm font-semibold text-black mb-2">НА СКОЛЬКО ВЫ СЕГОДНЯ...?</label>
@@ -288,34 +288,45 @@
                 const value = parseInt(slider.value);
                 let text = '';
                 let description = '';
-                let thumbBg = '#C0C0C0'; // Default grey for thumb
-                let thumbBorderRight = '#808080';
-                let thumbBorderBottom = '#808080';
 
-                if (value < 20) {
-                    text = 'НИЗКИЙ УРОВЕНЬ';
-                    description = 'СЕГОДНЯ ВЫ, КАЖЕТСЯ, СПОКОЙНЫ И РАССЛАБЛЕНЫ.';
-                } else if (value < 40) {
-                    text = 'УМЕРЕННЫЙ УРОВЕНЬ';
-                    description = 'ВЫ ЧУВСТВУЕТЕ СЕБЯ ДОВОЛЬНО СБАЛАНСИРОВАННО.';
-                } else if (value < 60) {
-                    text = 'СРЕДНИЙ УРОВЕНЬ';
-                    description = 'ВСЕ В ПРЕДЕЛАХ НОРМЫ, ВЫ В ХОРОШЕМ НАСТРОЕНИИ.';
-                } else if (value < 80) {
-                    text = 'ПОВЫШЕННЫЙ УРОВЕНЬ';
-                    description = 'ЧУВСТВУЕТЕ ПРИЛИВ ЭНЕРГИИ И СТРАСТИ!';
-                } else {
-                    text = 'ОЧЕНЬ ВЫСОКИЙ УРОВЕНЬ! 🔥';
-                    description = 'ВАША ЭНЕРГИЯ БЬЕТ ЧЕРЕЗ КРАЙ!';
+                // Define more granular and suggestive levels
+                if (value <= 5) {
+                    text = 'СОННЫЙ РЕЖИМ';
+                    description = 'ЭНЕРГИЯ НА НУЛЕ. ДАЖЕ КОФЕ НЕ ПОМОЖЕТ.';
+                } else if (value <= 15) {
+                    text = 'РЕЖИМ ОТДЫХА';
+                    description = 'СЕГОДНЯ ВЫ ПРЕДПОЧИТАЕТЕ ПОКОЙ. НИКАКИХ СЮРПРИЗОВ.';
+                } else if (value <= 25) {
+                    text = 'ЛЕГКОЕ ВОЛНЕНИЕ';
+                    description = 'ЕСТЬ ИСКРА, НО ПОКА ЧТО-ТО НЕ ХВАТАЕТ.';
+                } else if (value <= 35) {
+                    text = 'УМЕРЕННЫЙ ИНТЕРЕС';
+                    description = 'ВЫ ЧУВСТВУЕТЕ НЕБОЛЬШОЕ ПОБУЖДЕНИЕ. МОЖНО НАЧИНАТЬ.';
+                } else if (value <= 45) {
+                    text = 'В ИГРЕ';
+                    description = 'ВЫ В НАСТРОЕНИИ! ГОТОВЫ К ЛЕГКОМУ ФЛИРТУ.';
+                } else if (value <= 55) {
+                    text = 'В ПОЛНОЙ БОЕВОЙ ГОТОВНОСТИ';
+                    description = 'ВСЕ В ПРЕДЕЛАХ НОРМЫ, НО С ПЕРСПЕКТИВОЙ НА БОЛЬШЕЕ.';
+                } else if (value <= 65) {
+                    text = 'ПОДНИМАЕТСЯ ТЕМПЕРАТУРА';
+                    description = 'СТРАСТЬ НАРАСТАЕТ! ВОЗМОЖНО, ПОРА ДЕЙСТВОВАТЬ.';
+                } else if (value <= 75) {
+                    text = 'ГОРЯЧО!';
+                    description = 'ВЫ ЧУВСТВУЕТЕ НАСТОЯЩИЙ ПРИЛИВ ЖЕЛАНИЯ. 🌶️';
+                } else if (value <= 85) {
+                    text = 'ОЧЕНЬ ГОРЯЧО! 😈';
+                    description = 'ВАША ЭНЕРГИЯ ПРОСТО БЬЕТ КЛЮЧОМ! ПРИГОТОВЬТЕСЬ!';
+                } else if (value <= 95) {
+                    text = 'НЕУДЕРЖИМЫЙ УРОВЕНЬ! 🔥';
+                    description = 'ВЫ НА ПИКЕ! ВАС НЕ ОСТАНОВИТЬ! ИЩИТЕ ПРИКЛЮЧЕНИЙ!';
+                } else { // value <= 100
+                    text = 'ВЗРЫВНОЙ УРОВЕНЬ! 🚀🍆';
+                    description = 'ВАША ЭНЕРГИЯ ВЫХОДИТ ИЗ-ПОД КОНТРОЛЯ! ПОЖАР! ПОЖАР!';
                 }
 
                 levelText.textContent = text;
                 descriptionText.textContent = description;
-
-                // Update CSS variables for thumb styling
-                slider.style.setProperty('--thumb-bg', thumbBg);
-                slider.style.setProperty('--thumb-border-right', thumbBorderRight);
-                slider.style.setProperty('--thumb-border-bottom', thumbBorderBottom);
 
                 // Log history only if explicitly requested (e.g., on randomize or initial load)
                 if (logHistory) {
@@ -334,10 +345,6 @@
                 const randomValue = Math.floor(Math.random() * 101); // From 0 to 100
                 slider.value = randomValue;
                 updateLibidoLevel(); // Log history by default
-                randomizeBtn.classList.add('randomize-pulse');
-                randomizeBtn.addEventListener('animationend', () => {
-                    randomizeBtn.classList.remove('randomize-pulse');
-                }, { once: true });
             }
 
             // Calibration animation on load
