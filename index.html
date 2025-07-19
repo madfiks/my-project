@@ -3,910 +3,625 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="dynamicChatTitle">Чат с Сосей</title>
+    <title>Интерфейс Дискорда</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Inter Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Set Inter font for the entire document */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
         }
-        .chat-container {
-            background-color: #ffffff;
-            border-radius: 1rem; /* Rounded corners */
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 640px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            max-height: 90vh; /* Limit height for responsiveness */
+        /* Custom scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        .chat-header {
-            background-color: #3b82f6;
-            background-image: linear-gradient(to right, #3b82f6, #4f46e5);
-            color: #ffffff;
-            text-align: center;
-            padding: 1rem;
-            font-size: 2rem;
-            font-weight: bold;
-            border-top-left-radius: 1rem;
-            border-top-right-radius: 1rem;
+        ::-webkit-scrollbar-track {
+            background: #2f3136; /* Background color of the scrollbar track */
         }
-        .messages {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
+        ::-webkit-scrollbar-thumb {
+            background: #4f545c; /* Color of the scrollbar thumb */
+            border-radius: 4px;
         }
-        .message-input-area {
-            padding: 1.5rem;
-            border-top: 1px solid #e5e7eb;
-            background-color: #f9fafb;
-            display: flex;
-            gap: 0.5rem;
-            align-items: center; /* Align items vertically */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6a6e74;
         }
-        .message-bubble {
-            max-width: 80%;
-            padding: 0.75rem 1rem;
-            border-radius: 0.75rem;
-            word-wrap: break-word;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05); /* Subtle shadow for bubbles */
-            position: relative; /* For delete button positioning */
+
+        /* Discord-like hover effects for server icons */
+        .server-icon {
+            position: relative;
+            transition: all 0.2s ease-in-out;
         }
-        .message-bubble.mine {
-            background-color: #3b82f6;
-            color: #ffffff;
-            align-self: flex-end;
-            border-bottom-right-radius: 0.25rem;
+        .server-icon:hover {
+            border-radius: 16px; /* Rounded corners on hover */
         }
-        .message-bubble.other {
-            background-color: #e5e7eb;
-            color: #1f2937;
-            align-self: flex-start;
-            border-bottom-left-radius: 0.25rem;
-        }
-        .user-info { /* Changed from user-id for more general styling */
-            font-size: 0.75rem;
-            color: #6b7280;
-            margin-bottom: 0.25rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .message-time {
-            font-size: 0.65rem;
-            color: #9ca3af;
-            margin-left: 0.5rem;
-        }
-        .nickname-setup {
-            padding: 1rem 1.5rem;
-            background-color: #e0f2fe; /* Light blue background */
-            border-top: 1px solid #bfdbfe;
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-        .button-primary {
-            @apply px-5 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-150 ease-in-out;
-        }
-        .button-success {
-            @apply px-4 py-2 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition duration-150 ease-in-out;
-        }
-        .button-danger {
-            @apply px-3 py-1 bg-red-500 text-white rounded-md text-xs hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-150 ease-in-out;
-        }
-        .input-field {
-            @apply flex-grow p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500;
-        }
-        .input-field-small {
-            @apply flex-grow p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400;
-        }
-        .status-message {
-            @apply text-sm text-center py-2;
-        }
-        .attachment-indicator {
-            font-size: 0.7rem;
-            color: #4a5568;
-            margin-top: 0.25rem;
-            display: block;
-            font-style: italic;
-        }
-        .admin-panel-toggle, .settings-panel-toggle {
-            @apply px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition duration-150 ease-in-out;
-        }
-        .admin-panel, .settings-panel {
-            background-color: #f3e8ff; /* Light purple */
-            padding: 1rem;
-            border-top: 1px solid #d8b4fe;
-            display: none; /* Hidden by default */
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-        .admin-panel.active, .settings-panel.active {
-            display: flex;
-        }
-        .delete-message-btn {
+        .server-icon.active::before {
+            content: '';
             position: absolute;
-            top: 5px;
-            right: 5px;
-            cursor: pointer;
-            background: none;
-            border: none;
-            color: #ef4444; /* Red color */
-            font-size: 0.8rem;
-            padding: 0;
-            line-height: 1;
-            opacity: 0.7;
-            transition: opacity 0.2s ease-in-out;
+            left: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 8px;
+            height: 40px; /* Adjust height as needed */
+            background-color: white;
+            border-radius: 4px;
         }
-        .delete-message-btn:hover {
+
+        /* Channel item hover effect */
+        .channel-item:hover .channel-plus-icon {
             opacity: 1;
         }
-        .message-bubble.mine .delete-message-btn {
-            color: #fca5a5; /* Lighter red for own messages */
+
+        /* Hidden by default for category toggle */
+        .hidden-category {
+            display: none;
         }
-        /* Styles for chat background */
-        .chat-background-default { background-color: #f0f2f5; }
-        .chat-background-light-blue { background-color: #e0f7fa; }
-        .chat-background-light-green { background-color: #e8f5e9; }
-        .chat-background-light-yellow { background-color: #fffde7; }
-        .user-id-display-area {
-            @apply p-4 text-center text-sm text-gray-600 border-t border-gray-200 rounded-b-xl flex items-center justify-center gap-2;
+
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1000; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgba(0,0,0,0.7); /* Black w/ opacity */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .copy-button {
-            @apply px-2 py-1 bg-gray-200 text-gray-700 rounded-md text-xs hover:bg-gray-300 transition duration-150 ease-in-out;
+
+        .modal-content {
+            background-color: #36393f;
+            margin: auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 500px;
+            color: #dcddde;
+            position: relative;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+        }
+
+        .close-button:hover,
+        .close-button:focus {
+            color: white;
+            text-decoration: none;
+            cursor: pointer;
         }
     </style>
 </head>
-<body>
-    <div class="chat-container">
-        <div class="chat-header" id="chatTitleDisplay">
-            Чат с Сосей
+<body class="flex h-screen bg-[#36393f] text-[#dcddde]">
+
+    <!-- Server Sidebar -->
+    <div class="w-[72px] bg-[#202225] flex flex-col items-center py-3 space-y-2 overflow-y-auto rounded-r-lg shadow-lg">
+        <!-- Home/DM button -->
+        <div class="server-icon w-12 h-12 flex items-center justify-center rounded-full bg-[#5865f2] text-white text-2xl cursor-pointer hover:bg-[#5865f2] hover:rounded-2xl transition-all duration-200 active" data-server-id="home">
+            <i class="fab fa-discord"></i>
         </div>
-        <div class="messages" id="messages">
-            <!-- Сообщения будут загружены здесь -->
-            <div class="text-center text-gray-500 py-4">Загрузка сообщений...</div>
+        <!-- Divider -->
+        <div class="w-8 h-0.5 bg-[#424549] rounded-full"></div>
+        <!-- Server Icons -->
+        <div class="server-icon w-12 h-12 flex items-center justify-center rounded-full bg-[#36393f] text-white font-bold text-lg cursor-pointer hover:bg-[#5865f2] transition-all duration-200" data-server-id="server-d">
+            <img src="https://placehold.co/48x48/36393f/FFFFFF?text=D" alt="[Изображение иконки сервера Discord]" class="w-full h-full rounded-full object-cover">
         </div>
-        <div class="message-input-area">
-            <!-- Hidden file input -->
-            <input type="file" id="fileInput" accept="image/*" class="hidden">
-            <!-- Button to trigger file input -->
-            <button id="attachFileBtn" class="p-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 transition duration-150 ease-in-out">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13.5"/>
-                </svg>
-            </button>
-            <span id="fileNameDisplay" class="text-sm text-gray-500 ml-2 truncate max-w-[100px]"></span>
-            <input type="text" id="messageInput" placeholder="Введите ваше сообщение..." class="input-field">
-            <button id="sendMessageBtn" class="button-primary">
-                Отправить
-            </button>
+        <div class="server-icon w-12 h-12 flex items-center justify-center rounded-full bg-[#36393f] text-white font-bold text-lg cursor-pointer hover:bg-[#5865f2] transition-all duration-200" data-server-id="server-g">
+            <img src="https://placehold.co/48x48/36393f/FFFFFF?text=G" alt="[Изображение иконки игрового сервера]" class="w-full h-full rounded-full object-cover">
         </div>
-        <div class="nickname-setup">
-            <label for="nicknameInput" class="text-gray-700 font-medium">Ваш ник:</label>
-            <input type="text" id="nicknameInput" placeholder="Введите ваш ник" class="input-field-small">
-            <button id="saveNicknameBtn" class="button-success">
-                Сохранить ник
-            </button>
+        <div class="server-icon w-12 h-12 flex items-center justify-center rounded-full bg-[#36393f] text-white font-bold text-lg cursor-pointer hover:bg-[#5865f2] transition-all duration-200" data-server-id="server-c">
+            <img src="https://placehold.co/48x48/36393f/FFFFFF?text=C" alt="[Изображение иконки сервера сообщества]" class="w-full h-full rounded-full object-cover">
+        </div>
+        <!-- Add Server Button -->
+        <div class="server-icon w-12 h-12 flex items-center justify-center rounded-full bg-[#36393f] text-[#43b581] text-3xl cursor-pointer hover:bg-[#43b581] hover:text-white transition-all duration-200" data-action="add-server">
+            <i class="fas fa-plus"></i>
+        </div>
+        <!-- Explore Servers Button -->
+        <div class="server-icon w-12 h-12 flex items-center justify-center rounded-full bg-[#36393f] text-[#43b581] text-xl cursor-pointer hover:bg-[#43b581] hover:text-white transition-all duration-200" data-action="explore-servers">
+            <i class="fas fa-compass"></i>
+        </div>
+    </div>
+
+    <!-- Channel Sidebar -->
+    <div class="w-60 bg-[#2f3136] flex flex-col py-3 px-2 shadow-lg">
+        <!-- Server Name Header -->
+        <div class="flex items-center justify-between px-3 pb-3 border-b border-[#202225] mb-3 cursor-pointer hover:bg-[#36393f] rounded-md transition-colors duration-150" data-action="server-settings">
+            <h2 class="text-xl font-semibold text-white">Мой Сервер</h2>
+            <i class="fas fa-chevron-down text-[#8e9297] text-sm"></i>
         </div>
 
-        <!-- Settings and Admin Panel Section -->
-        <div class="p-4 text-center border-t border-gray-200 flex justify-center items-center gap-4">
-            <button id="toggleSettingsPanelBtn" class="settings-panel-toggle">
-                Настройки чата
-            </button>
-            <button id="toggleAdminPanelBtn" class="admin-panel-toggle hidden">
-                Панель администратора
-            </button>
+        <!-- Search -->
+        <div class="relative mb-3 px-1">
+            <input type="text" placeholder="Найти или начать разговор" class="w-full bg-[#202225] rounded-md py-2 px-3 pl-8 text-sm focus:outline-none focus:ring-1 focus:ring-[#5865f2] text-white placeholder-[#8e9297]">
+            <i class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-[#8e9297] text-xs"></i>
         </div>
 
-        <!-- Settings Panel -->
-        <div id="settingsPanel" class="settings-panel">
-            <h3 class="text-lg font-semibold text-gray-800">Настройки чата</h3>
-            <div class="flex flex-col gap-2">
-                <label class="text-gray-700 font-medium">Фон чата:</label>
-                <select id="chatBackgroundSelect" class="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
-                    <option value="default">По умолчанию</option>
-                    <option value="light-blue">Светло-голубой</option>
-                    <option value="light-green">Светло-зеленый</option>
-                    <option value="light-yellow">Светло-желтый</option>
-                </select>
-            </div>
-            <div class="flex items-center gap-2">
-                <input type="checkbox" id="toggleTimestamps" class="form-checkbox h-5 w-5 text-blue-600 rounded">
-                <label for="toggleTimestamps" class="text-gray-700">Показывать временные метки</label>
-            </div>
-            <button id="clearChatBtn" class="button-danger mt-2">
-                Очистить историю чата (локально)
-            </button>
-        </div>
-
-        <!-- Admin Panel -->
-        <div id="adminPanel" class="admin-panel">
-            <h3 class="text-lg font-semibold text-gray-800">Инструменты администратора</h3>
-            <p id="adminPanelMessage" class="text-sm text-yellow-700 bg-yellow-100 p-2 rounded hidden"></p>
-            
-            <div class="flex flex-col gap-2">
-                <label for="chatTitleInput" class="text-gray-700 font-medium">Название чата:</label>
-                <div class="flex gap-2">
-                    <input type="text" id="chatTitleInput" placeholder="Новое название чата" class="input-field-small">
-                    <button id="saveChatTitleBtn" class="button-success">Сохранить</button>
-                </div>
-            </div>
-
-            <div class="flex flex-col gap-2 mt-4">
-                <label class="text-gray-700 font-medium">Управление пользователями:</label>
-                <input type="text" id="banUserInput" placeholder="ID пользователя для бана/разбана" class="input-field-small">
-                <div class="flex gap-2">
-                    <button id="banUserBtn" class="button-danger">Забанить</button>
-                    <button id="unbanUserBtn" class="button-success">Разбанить</button>
-                </div>
+        <!-- Categories and Channels -->
+        <div class="flex-grow overflow-y-auto pr-2">
+            <div class="mb-4">
+                <h3 class="text-xs font-semibold text-[#8e9297] uppercase mb-2 flex items-center justify-between px-2 cursor-pointer category-toggle" data-target="text-channels">
+                    <span class="flex items-center"><i class="fas fa-chevron-down mr-1 text-[10px] category-arrow"></i> ТЕКСТОВЫЕ КАНАЛЫ</span>
+                    <i class="fas fa-plus text-[#8e9297] text-sm cursor-pointer hover:text-white channel-plus-icon opacity-0 transition-opacity duration-150" data-action="add-channel"></i>
+                </h3>
+                <ul class="space-y-1" id="text-channels">
+                    <li class="flex items-center py-1 px-2 rounded-md hover:bg-[#393d43] cursor-pointer channel-item" data-channel-id="general">
+                        <i class="fas fa-hashtag text-[#8e9297] mr-2 text-base"></i>
+                        <span class="text-white">общий</span>
+                        <i class="fas fa-plus text-[#8e9297] text-sm ml-auto opacity-0 channel-plus-icon transition-opacity duration-150" data-action="add-channel"></i>
+                    </li>
+                    <li class="flex items-center py-1 px-2 rounded-md bg-[#4f545c] cursor-pointer channel-item" data-channel-id="rules">
+                        <i class="fas fa-hashtag text-[#8e9297] mr-2 text-base"></i>
+                        <span class="text-white font-semibold">правила</span>
+                        <i class="fas fa-plus text-[#8e9297] text-sm ml-auto opacity-0 channel-plus-icon transition-opacity duration-150" data-action="add-channel"></i>
+                    </li>
+                    <li class="flex items-center py-1 px-2 rounded-md hover:bg-[#393d43] cursor-pointer channel-item" data-channel-id="announcements">
+                        <i class="fas fa-hashtag text-[#8e9297] mr-2 text-base"></i>
+                        <span class="text-white">объявления</span>
+                        <i class="fas fa-plus text-[#8e9297] text-sm ml-auto opacity-0 channel-plus-icon transition-opacity duration-150" data-action="add-channel"></i>
+                    </li>
+                    <li class="flex items-center py-1 px-2 rounded-md hover:bg-[#393d43] cursor-pointer channel-item" data-channel-id="memes">
+                        <i class="fas fa-hashtag text-[#8e9297] mr-2 text-base"></i>
+                        <span class="text-white">мемы</span>
+                        <i class="fas fa-plus text-[#8e9297] text-sm ml-auto opacity-0 channel-plus-icon transition-opacity duration-150" data-action="add-channel"></i>
+                    </li>
+                </ul>
             </div>
 
-            <div class="mt-4">
-                <h4 class="text-md font-semibold text-gray-800">Забаненные пользователи:</h4>
-                <ul id="bannedUsersList" class="list-disc list-inside text-sm text-gray-700">
-                    <!-- Забаненные пользователи будут здесь -->
+            <div>
+                <h3 class="text-xs font-semibold text-[#8e9297] uppercase mb-2 flex items-center justify-between px-2 cursor-pointer category-toggle" data-target="voice-channels">
+                    <span class="flex items-center"><i class="fas fa-chevron-down mr-1 text-[10px] category-arrow"></i> ГОЛОСОВЫЕ КАНАЛЫ</span>
+                    <i class="fas fa-plus text-[#8e9297] text-sm cursor-pointer hover:text-white channel-plus-icon opacity-0 transition-opacity duration-150" data-action="add-channel"></i>
+                </h3>
+                <ul class="space-y-1" id="voice-channels">
+                    <li class="flex items-center py-1 px-2 rounded-md hover:bg-[#393d43] cursor-pointer channel-item" data-channel-id="voice-general">
+                        <i class="fas fa-volume-up text-[#8e9297] mr-2 text-base"></i>
+                        <span class="text-white">Общий</span>
+                        <i class="fas fa-plus text-[#8e9297] text-sm ml-auto opacity-0 channel-plus-icon transition-opacity duration-150" data-action="add-channel"></i>
+                    </li>
+                    <li class="flex items-center py-1 px-2 rounded-md hover:bg-[#393d43] cursor-pointer channel-item" data-channel-id="voice-gaming">
+                        <i class="fas fa-volume-up text-[#8e9297] mr-2 text-base"></i>
+                        <span class="text-white">Игры</span>
+                        <i class="fas fa-plus text-[#8e9297] text-sm ml-auto opacity-0 channel-plus-icon transition-opacity duration-150" data-action="add-channel"></i>
+                    </li>
                 </ul>
             </div>
         </div>
 
-        <div class="user-id-display-area">
-            Ваш ID пользователя: <span id="userIdDisplay" class="font-medium">Загрузка...</span>
-            <button id="copyUserIdBtn" class="copy-button">Копировать ID</button>
+        <!-- User Settings -->
+        <div class="mt-auto bg-[#202225] p-2 rounded-lg flex items-center justify-between">
+            <div class="flex items-center">
+                <img src="https://placehold.co/32x32/2F3136/FFFFFF?text=U" alt="[Изображение аватара пользователя]" class="w-8 h-8 rounded-full mr-2">
+                <div>
+                    <p class="text-sm font-semibold text-white">Имя Пользователя</p>
+                    <p class="text-xs text-[#8e9297]">#1234</p>
+                </div>
+            </div>
+            <div class="flex space-x-2 text-[#8e9297]">
+                <i class="fas fa-microphone cursor-pointer hover:text-white" title="Отключить микрофон" data-action="toggle-mic" id="mic-icon"></i>
+                <i class="fas fa-headphones cursor-pointer hover:text-white" title="Отключить наушники" data-action="toggle-headphones" id="headphones-icon"></i>
+                <i class="fas fa-cog cursor-pointer hover:text-white" title="Настройки пользователя" data-action="user-settings"></i>
+            </div>
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, doc, setDoc, getDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- Main Chat Area -->
+    <div class="flex-grow flex flex-col bg-[#36393f] rounded-l-lg shadow-inner">
+        <!-- Channel Header -->
+        <div class="flex items-center px-4 py-3 border-b border-[#202225] bg-[#36393f]">
+            <i class="fas fa-hashtag text-[#8e9297] text-xl mr-2"></i>
+            <h2 class="text-xl font-semibold text-white" id="current-channel-name">правила</h2>
+            <div class="flex items-center ml-auto space-x-4 text-[#8e9297]">
+                <i class="fas fa-thumbtack cursor-pointer hover:text-white" title="Закрепленные сообщения" data-action="pinned-messages"></i>
+                <i class="fas fa-bell cursor-pointer hover:text-white" title="Настройки уведомлений" data-action="notification-settings"></i>
+                <i class="fas fa-user-friends cursor-pointer hover:text-white" title="Список участников" data-action="member-list"></i>
+                <i class="fas fa-search cursor-pointer hover:text-white" title="Поиск" data-action="search-chat"></i>
+                <i class="fas fa-inbox cursor-pointer hover:text-white" title="Входящие" data-action="inbox"></i>
+                <i class="fas fa-question-circle cursor-pointer hover:text-white" title="Помощь" data-action="help"></i>
+            </div>
+        </div>
 
-        // Глобальные переменные, предоставляемые средой Canvas
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        <!-- Message Area -->
+        <div class="flex-grow overflow-y-auto p-4 space-y-4" id="message-area">
+            <!-- Message Example 1 -->
+            <div class="flex items-start group relative hover:bg-[#32353b] p-2 -mx-2 rounded-md">
+                <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=А" alt="[Изображение аватара администратора]" class="w-10 h-10 rounded-full mr-3 mt-1">
+                <div>
+                    <div class="flex items-baseline">
+                        <p class="font-semibold text-white mr-2">Администратор</p>
+                        <span class="text-xs text-[#8e9297]">Сегодня в 10:30</span>
+                    </div>
+                    <p class="text-[#dcddde]">Добро пожаловать на сервер! Пожалуйста, ознакомьтесь с правилами.</p>
+                </div>
+                <!-- Message options on hover -->
+                <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
+                    <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
+                    <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
+                    <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
+                </div>
+            </div>
+            <!-- Message Example 2 -->
+            <div class="flex items-start group relative hover:bg-[#32353b] p-2 -mx-2 rounded-md">
+                <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=П" alt="[Изображение аватара Пользователя1]" class="w-10 h-10 rounded-full mr-3 mt-1">
+                <div>
+                    <div class="flex items-baseline">
+                        <p class="font-semibold text-white mr-2">Пользователь1</p>
+                        <span class="text-xs text-[#8e9297]">Сегодня в 10:35</span>
+                    </div>
+                    <p class="text-[#dcddde]">Привет всем!</p>
+                </div>
+                <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
+                    <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
+                    <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
+                    <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
+                </div>
+            </div>
+            <!-- Message Example 3 -->
+            <div class="flex items-start group relative hover:bg-[#32353b] p-2 -mx-2 rounded-md">
+                <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=Б" alt="[Изображение аватара Бота]" class="w-10 h-10 rounded-full mr-3 mt-1">
+                <div>
+                    <div class="flex items-baseline">
+                        <p class="font-semibold text-white mr-2">Бот</p>
+                        <span class="text-xs text-[#8e9297]">Сегодня в 10:40</span>
+                    </div>
+                    <p class="text-[#dcddde]">Не забудьте прочитать <span class="text-[#00aff4] cursor-pointer hover:underline">#правила</span> перед началом общения!</p>
+                </div>
+                <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
+                    <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
+                    <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
+                    <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
+                </div>
+            </div>
+            <!-- Message Example 4 -->
+            <div class="flex items-start group relative hover:bg-[#32353b] p-2 -mx-2 rounded-md">
+                <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=И" alt="[Изображение аватара Игрока2]" class="w-10 h-10 rounded-full mr-3 mt-1">
+                <div>
+                    <div class="flex items-baseline">
+                        <p class="font-semibold text-white mr-2">Игрок2</p>
+                        <span class="text-xs text-[#8e9297]">Сегодня в 10:45</span>
+                    </div>
+                    <p class="text-[#dcddde]">Понял!</p>
+                </div>
+                <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
+                    <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
+                    <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
+                    <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
+                </div>
+            </div>
+            <!-- Message Example 5 -->
+            <div class="flex items-start group relative hover:bg-[#32353b] p-2 -mx-2 rounded-md">
+                <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=М" alt="[Изображение аватара Модератора]" class="w-10 h-10 rounded-full mr-3 mt-1">
+                <div>
+                    <div class="flex items-baseline">
+                        <p class="font-semibold text-white mr-2">Модератор</p>
+                        <span class="text-xs text-[#8e9297]">Сегодня в 10:50</span>
+                    </div>
+                    <p class="text-[#dcddde]">Отлично! Если есть вопросы, задавайте их в <span class="text-[#00aff4] cursor-pointer hover:underline">#общий</span>.</p>
+                </div>
+                <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
+                    <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
+                    <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
+                    <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
+                </div>
+            </div>
+            <!-- Message Example 6 -->
+            <div class="flex items-start group relative hover:bg-[#32353b] p-2 -mx-2 rounded-md">
+                <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=Н" alt="[Изображение аватара Новичка]" class="w-10 h-10 rounded-full mr-3 mt-1">
+                <div>
+                    <div class="flex items-baseline">
+                        <p class="font-semibold text-white mr-2">Новичок</p>
+                        <span class="text-xs text-[#8e9297]">Сегодня в 10:55</span>
+                    </div>
+                    <p class="text-[#dcddde]">Спасибо!</p>
+                </div>
+                <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
+                    <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
+                    <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
+                    <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
+                </div>
+            </div>
+            <!-- Hidden Love Message -->
+            <div class="flex items-start group relative hover:bg-[#32353b] p-2 -mx-2 rounded-md">
+                <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=❤️" alt="[Изображение аватара специального пользователя]" class="w-10 h-10 rounded-full mr-3 mt-1">
+                <div>
+                    <div class="flex items-baseline">
+                        <p class="font-semibold text-[#f47fff] mr-2">Твой(Твоя) Тайный(Тайная) Поклонник(Поклонница)</p>
+                        <span class="text-xs text-[#8e9297]">Сегодня в 11:00</span>
+                    </div>
+                    <p class="text-[#dcddde]">
+                        Привет! Хотел сказать, если бы мои чувства были кодом, это был бы бесконечный цикл, который всегда возвращается к тебе.
+                        Ты — переменная, которая определяет все мои функции. Мое сердце скомпилировано с любовью, и каждый бит и байт моей души принадлежит тебе.
+                        Ты — исключение, которое я всегда рад обработать. Я люблю тебя! ❤️
+                    </p>
+                </div>
+                <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
+                    <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
+                    <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
+                    <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
+                </div>
+            </div>
+            <!-- Typing indicator -->
+            <div id="typing-indicator" class="text-xs text-[#8e9297] mt-2 hidden">
+                <span class="font-semibold">Несколько пользователей</span> печатают...
+            </div>
+        </div>
 
-        // Вывод конфигурации для отладки
-        console.log("App ID:", appId);
-        console.log("Firebase Config:", firebaseConfig);
+        <!-- Message Input Area -->
+        <div class="p-4 bg-[#36393f] border-t border-[#202225]">
+            <div class="flex items-center bg-[#40444b] rounded-lg px-3 py-2">
+                <i class="fas fa-plus-circle text-[#8e9297] text-xl mr-3 cursor-pointer hover:text-white" title="Прикрепить файл" data-action="attach-file"></i>
+                <input type="text" placeholder="Сообщение #правила" class="flex-grow bg-transparent text-white placeholder-[#8e9297] focus:outline-none" id="message-input">
+                <div class="flex space-x-3 ml-3 text-[#8e9297]">
+                    <i class="fas fa-gift cursor-pointer hover:text-white" title="Подарок" data-action="send-gift"></i>
+                    <i class="fas fa-gif cursor-pointer hover:text-white" title="GIF" data-action="send-gif"></i>
+                    <i class="fas fa-sticker-emoji cursor-pointer hover:text-white" title="Стикеры" data-action="send-sticker"></i>
+                    <i class="fas fa-smile-beam cursor-pointer hover:text-white" title="Выбрать эмодзи" data-action="select-emoji"></i>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        let app;
-        let db;
-        let auth;
-        let userId = 'anon'; // ID анонимного пользователя по умолчанию
-        let userNickname = localStorage.getItem('userNickname') || 'Аноним'; // Ник из локального хранилища
-        let isAuthReady = false; // Флаг готовности аутентификации Firebase
-        let selectedFile = null; // Переменная для хранения выбранного файла изображения
-        let isRealAdmin = false; // Флаг для определения, является ли пользователь реальным администратором (из Firestore)
-        let canSeeAdminFeatures = false; // Контролирует видимость панели админа и кнопок удаления (включая "Оня")
+    <!-- User List Sidebar -->
+    <div class="w-60 bg-[#2f3136] flex flex-col py-3 px-2 overflow-y-auto rounded-l-lg shadow-lg">
+        <h3 class="text-xs font-semibold text-[#8e9297] uppercase mb-3 px-2">ОНЛАЙН — 4</h3>
+        <ul class="space-y-2 mb-4">
+            <li class="flex items-center px-2 py-1 rounded-md hover:bg-[#393d43] cursor-pointer" data-user-id="admin">
+                <div class="relative">
+                    <img src="https://placehold.co/32x32/2F3136/FFFFFF?text=А" alt="[Изображение аватара администратора]" class="w-8 h-8 rounded-full mr-2">
+                    <div class="absolute bottom-0 right-1 w-3 h-3 bg-[#43b581] rounded-full border-2 border-[#2f3136]"></div>
+                </div>
+                <span class="text-white">Администратор</span>
+            </li>
+            <li class="flex items-center px-2 py-1 rounded-md hover:bg-[#393d43] cursor-pointer" data-user-id="user1">
+                <div class="relative">
+                    <img src="https://placehold.co/32x32/2F3136/FFFFFF?text=П" alt="[Изображение аватара Пользователя1]" class="w-8 h-8 rounded-full mr-2">
+                    <div class="absolute bottom-0 right-1 w-3 h-3 bg-[#43b581] rounded-full border-2 border-[#2f3136]"></div>
+                </div>
+                <span class="text-white">Пользователь1</span>
+            </li>
+            <li class="flex items-center px-2 py-1 rounded-md hover:bg-[#393d43] cursor-pointer" data-user-id="player2">
+                <div class="relative">
+                    <img src="https://placehold.co/32x32/2F3136/FFFFFF?text=И" alt="[Изображение аватара Игрока2]" class="w-8 h-8 rounded-full mr-2">
+                    <div class="absolute bottom-0 right-1 w-3 h-3 bg-[#faa61a] rounded-full border-2 border-[#2f3136]"></div> <!-- Idle status -->
+                </div>
+                <span class="text-white">Игрок2</span>
+            </li>
+            <li class="flex items-center px-2 py-1 rounded-md hover:bg-[#393d43] cursor-pointer" data-user-id="secret-admirer">
+                <div class="relative">
+                    <img src="https://placehold.co/32x32/2F3136/FFFFFF?text=❤️" alt="[Изображение аватара специального пользователя]" class="w-8 h-8 rounded-full mr-2">
+                    <div class="absolute bottom-0 right-1 w-3 h-3 bg-[#f04747] rounded-full border-2 border-[#2f3136]"></div> <!-- DND status -->
+                </div>
+                <span class="text-[#f47fff]">Тайный Поклонник</span>
+            </li>
+        </ul>
 
-        // Настройки, хранящиеся локально (не синхронизируются)
-        let showTimestamps = JSON.parse(localStorage.getItem('showTimestamps')) !== false; // По умолчанию true
-        let chatBackground = localStorage.getItem('chatBackground') || 'default';
+        <h3 class="text-xs font-semibold text-[#8e9297] uppercase mb-3 px-2">ОФФЛАЙН — 2</h3>
+        <ul class="space-y-2">
+            <li class="flex items-center px-2 py-1 rounded-md text-[#8e9297] cursor-pointer" data-user-id="newbie">
+                <div class="relative">
+                    <img src="https://placehold.co/32x32/2F3136/FFFFFF?text=Н" alt="[Изображение аватара Новичка]" class="w-8 h-8 rounded-full mr-2 opacity-50">
+                    <div class="absolute bottom-0 right-1 w-3 h-3 bg-[#747f8d] rounded-full border-2 border-[#2f3136]"></div> <!-- Offline status -->
+                </div>
+                <span>Новичок</span>
+            </li>
+            <li class="flex items-center px-2 py-1 rounded-md text-[#8e9297] cursor-pointer" data-user-id="guest">
+                <div class="relative">
+                    <img src="https://placehold.co/32x32/2F3136/FFFFFF?text=Г" alt="[Изображение аватара Гостя]" class="w-8 h-8 rounded-full mr-2 opacity-50">
+                    <div class="absolute bottom-0 right-1 w-3 h-3 bg-[#747f8d] rounded-full border-2 border-[#2f3136]"></div> <!-- Offline status -->
+                </div>
+                <span>Гость</span>
+            </li>
+        </ul>
+    </div>
 
-        const chatTitleDisplay = document.getElementById('chatTitleDisplay');
-        const dynamicChatTitle = document.getElementById('dynamicChatTitle'); // Для обновления тега <title>
-        const messagesDiv = document.getElementById('messages');
-        const messageInput = document.getElementById('messageInput');
-        const sendMessageBtn = document.getElementById('sendMessageBtn');
-        const userIdDisplay = document.getElementById('userIdDisplay');
-        const nicknameInput = document.getElementById('nicknameInput');
-        const saveNicknameBtn = document.getElementById('saveNicknameBtn');
-        const fileInput = document.getElementById('fileInput');
-        const attachFileBtn = document.getElementById('attachFileBtn');
-        const fileNameDisplay = document.getElementById('fileNameDisplay');
-        const adminPanel = document.getElementById('adminPanel');
-        const toggleAdminPanelBtn = document.getElementById('toggleAdminPanelBtn');
-        const adminPanelMessage = document.getElementById('adminPanelMessage');
-        const settingsPanel = document.getElementById('settingsPanel');
-        const toggleSettingsPanelBtn = document.getElementById('toggleSettingsPanelBtn');
-        const chatBackgroundSelect = document.getElementById('chatBackgroundSelect');
-        const toggleTimestampsCheckbox = document.getElementById('toggleTimestamps');
-        const clearChatBtn = document.getElementById('clearChatBtn');
-        const copyUserIdBtn = document.getElementById('copyUserIdBtn');
-        const chatTitleInput = document.getElementById('chatTitleInput');
-        const saveChatTitleBtn = document.getElementById('saveChatTitleBtn');
-        const banUserInput = document.getElementById('banUserInput');
-        const banUserBtn = document.getElementById('banUserBtn');
-        const unbanUserBtn = document.getElementById('unbanUserBtn');
-        const bannedUsersList = document.getElementById('bannedUsersList');
+    <!-- Modal Placeholder -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 class="text-xl font-bold mb-4" id="modal-title"></h2>
+            <p id="modal-body"></p>
+            <div class="mt-4 text-sm text-[#8e9297]">
+                <p>Это имитация модального окна.</p>
+                <p>В реальном приложении здесь была бы соответствующая функциональность.</p>
+            </div>
+        </div>
+    </div>
 
-        // Инициализация Firebase
-        function initializeFirebase() {
-            try {
-                app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                // Слушатель изменений состояния аутентификации
-                onAuthStateChanged(auth, async (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        console.log("Пользователь вошел в систему:", userId);
-                        userIdDisplay.textContent = userId;
-                        await loadUserNickname(); // Загружаем ник пользователя из локального хранилища
-                        await checkRealAdminStatus(); // Проверяем статус реального администратора
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Server selection logic
+            const serverIcons = document.querySelectorAll('.server-icon');
+            serverIcons.forEach(icon => {
+                icon.addEventListener('click', () => {
+                    serverIcons.forEach(i => i.classList.remove('active', 'bg-[#5865f2]'));
+                    icon.classList.add('active');
+                    // Only change background for non-home icons
+                    if (icon.dataset.serverId !== 'home') {
+                        icon.classList.add('bg-[#5865f2]');
                     } else {
-                        console.log("Пользователь вышел из системы. Попытка анонимного входа...");
-                        try {
-                            await signInAnonymously(auth);
-                            userId = auth.currentUser.uid;
-                            userIdDisplay.textContent = userId;
-                            console.log("Анонимный пользователь вошел в систему:", userId);
-                            await loadUserNickname(); // Загружаем ник для анонимного пользователя
-                            await checkRealAdminStatus(); // Проверяем статус реального администратора
-                        } catch (error) {
-                            console.error("Ошибка анонимного входа:", error);
-                            userIdDisplay.textContent = "Ошибка аутентификации";
+                        icon.classList.remove('bg-[#36393f]');
+                    }
+                    console.log(`Выбран сервер: ${icon.dataset.serverId}`);
+                });
+            });
+
+            // Channel selection logic
+            const channelItems = document.querySelectorAll('.channel-item');
+            const currentChannelName = document.getElementById('current-channel-name');
+            channelItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    channelItems.forEach(i => i.classList.remove('bg-[#4f545c]', 'font-semibold'));
+                    item.classList.add('bg-[#4f545c]', 'font-semibold');
+                    const channelName = item.querySelector('span').textContent;
+                    currentChannelName.textContent = channelName;
+                    console.log(`Выбран канал: ${item.dataset.channelId}`);
+                });
+            });
+
+            // Message input and sending
+            const messageInput = document.getElementById('message-input');
+            const messageArea = document.getElementById('message-area');
+            const typingIndicator = document.getElementById('typing-indicator');
+            let typingTimeout;
+
+            messageInput.addEventListener('focus', () => {
+                typingIndicator.classList.remove('hidden');
+            });
+
+            messageInput.addEventListener('blur', () => {
+                clearTimeout(typingTimeout);
+                typingIndicator.classList.add('hidden');
+            });
+
+            messageInput.addEventListener('input', () => {
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    typingIndicator.classList.add('hidden');
+                }, 3000); // Hide after 3 seconds of no typing
+            });
+
+
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && messageInput.value.trim() !== '') {
+                    const newMessageText = messageInput.value.trim();
+                    const now = new Date();
+                    const timeString = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`; // Basic time format
+
+                    const newMessageDiv = document.createElement('div');
+                    newMessageDiv.classList.add('flex', 'items-start', 'group', 'relative', 'hover:bg-[#32353b]', 'p-2', '-mx-2', 'rounded-md');
+                    newMessageDiv.innerHTML = `
+                        <img src="https://placehold.co/40x40/2F3136/FFFFFF?text=Я" alt="[Изображение аватара текущего пользователя]" class="w-10 h-10 rounded-full mr-3 mt-1">
+                        <div>
+                            <div class="flex items-baseline">
+                                <p class="font-semibold text-white mr-2">Вы</p>
+                                <span class="text-xs text-[#8e9297]">Сегодня в ${timeString}</span>
+                            </div>
+                            <p class="text-[#dcddde]">${newMessageText}</p>
+                        </div>
+                        <div class="absolute right-2 top-0 mt-2 mr-2 bg-[#36393f] rounded-md shadow-lg p-1 opacity-0 group-hover:opacity-100 transition-opacity duration-150 flex space-x-1">
+                            <i class="fas fa-smile text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer add-reaction-btn" title="Добавить реакцию" data-action="add-reaction"></i>
+                            <i class="fas fa-edit text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Редактировать" data-action="edit-message"></i>
+                            <i class="fas fa-ellipsis-h text-[#8e9297] text-lg p-1 hover:bg-[#40444b] rounded cursor-pointer" title="Больше" data-action="more-message-options"></i>
+                        </div>
+                    `;
+                    messageArea.appendChild(newMessageDiv);
+                    messageArea.scrollTop = messageArea.scrollHeight; // Scroll to bottom
+                    messageInput.value = ''; // Clear input
+                    clearTimeout(typingTimeout); // Hide typing indicator immediately after sending
+                    typingIndicator.classList.add('hidden');
+                    console.log(`Отправлено сообщение: "${newMessageText}"`);
+                }
+            });
+
+            // Modal logic
+            const modal = document.getElementById('myModal');
+            const closeModalBtn = document.querySelector('.close-button');
+            const modalTitle = document.getElementById('modal-title');
+            const modalBody = document.getElementById('modal-body');
+
+            closeModalBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (event) => {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            function showModal(title, body) {
+                modalTitle.textContent = title;
+                modalBody.textContent = body;
+                modal.style.display = 'flex'; // Use flex to center
+            }
+
+            // General action handlers for icons (using event delegation)
+            document.body.addEventListener('click', (e) => {
+                const target = e.target.closest('[data-action]');
+                if (target) {
+                    const action = target.dataset.action;
+                    console.log(`Выполнено действие: ${action}`);
+
+                    if (action === 'toggle-mic') {
+                        target.classList.toggle('text-red-500'); // Simple visual cue
+                        target.classList.toggle('fa-microphone-slash'); // Toggle slash icon
+                        target.classList.toggle('fa-microphone');
+                        console.log('Микрофон переключен');
+                    } else if (action === 'toggle-headphones') {
+                        target.classList.toggle('text-red-500'); // Simple visual cue
+                        target.classList.toggle('fa-headphones-slash'); // Toggle slash icon
+                        target.classList.toggle('fa-headphones');
+                        console.log('Наушники переключены');
+                    } else if (action === 'add-server') {
+                        showModal('Добавить сервер', 'Здесь будет форма для добавления нового сервера.');
+                    } else if (action === 'explore-servers') {
+                        showModal('Исследовать серверы', 'Здесь будет список серверов для исследования.');
+                    } else if (action === 'add-reaction') {
+                        const messageDiv = target.closest('.flex.items-start.group');
+                        let reactionContainer = messageDiv.querySelector('.reaction-container');
+                        if (!reactionContainer) {
+                            reactionContainer = document.createElement('div');
+                            reactionContainer.classList.add('reaction-container', 'flex', 'items-center', 'space-x-1', 'mt-2', 'ml-12', 'text-xs', 'text-[#8e9297]');
+                            messageDiv.appendChild(reactionContainer);
                         }
+                        // Simple reaction: add a heart if not present, increment count if present
+                        let heartReaction = reactionContainer.querySelector('.heart-reaction');
+                        if (!heartReaction) {
+                            heartReaction = document.createElement('span');
+                            heartReaction.classList.add('heart-reaction', 'bg-[#40444b]', 'rounded-full', 'px-2', 'py-1', 'cursor-pointer', 'hover:bg-[#4f545c]');
+                            heartReaction.innerHTML = '❤️ <span class="reaction-count">1</span>';
+                            reactionContainer.appendChild(heartReaction);
+                        } else {
+                            let countSpan = heartReaction.querySelector('.reaction-count');
+                            let currentCount = parseInt(countSpan.textContent);
+                            countSpan.textContent = currentCount + 1;
+                        }
+                        console.log('Добавлена реакция');
                     }
-                    isAuthReady = true;
-                    // Запускаем слушатели Firestore только после аутентификации
-                    setupRealtimeChatTitle();
-                    setupRealtimeBannedUsers();
-                    setupRealtimeMessages();
-                    updateAdminFeaturesVisibility(); // Обновляем видимость функций админа
-                });
-
-                // Анонимный вход при старте
-                signInAnonymously(auth).catch(error => {
-                    console.error("Ошибка анонимного входа:", error);
-                });
-
-            } catch (error) {
-                console.error("Ошибка инициализации Firebase:", error);
-                messagesDiv.innerHTML = '<div class="text-center text-red-500 py-4">Ошибка инициализации чата. Пожалуйста, проверьте консоль и Firebase Config.</div>';
-            }
-        }
-
-        // Загрузка ника пользователя из локального хранилища
-        async function loadUserNickname() {
-            // Ник теперь хранится только локально
-            userNickname = localStorage.getItem('userNickname') || 'Аноним';
-            nicknameInput.value = userNickname;
-            console.log("Ник пользователя загружен:", userNickname);
-        }
-
-        // Проверка статуса реального администратора из Firestore
-        async function checkRealAdminStatus() {
-            if (!db || !userId) {
-                isRealAdmin = false;
-                return;
-            }
-            const adminDocRef = doc(db, `artifacts/${appId}/public/data/admin_users`, userId);
-            try {
-                const adminDocSnap = await getDoc(adminDocRef);
-                isRealAdmin = adminDocSnap.exists();
-                console.log("Статус реального администратора (из Firestore):", isRealAdmin);
-                updateAdminFeaturesVisibility(); // Обновляем видимость функций админа
-            } catch (error) {
-                console.error("Ошибка проверки статуса реального администратора:", error);
-                isRealAdmin = false;
-            }
-        }
-
-        // Обновление видимости кнопки панели администратора и сообщения
-        function updateAdminFeaturesVisibility() {
-            // Если ник "Оня", то пользователь видит админ-функции (локально)
-            const isNicknameOnya = (userNickname.toLowerCase() === 'оня');
-            canSeeAdminFeatures = isRealAdmin || isNicknameOnya;
-
-            if (canSeeAdminFeatures) {
-                toggleAdminPanelBtn.classList.remove('hidden');
-                if (isNicknameOnya && !isRealAdmin) {
-                    adminPanelMessage.textContent = 'Вы вошли как администратор "Оня"! Для выполнения действий администратора (например, удаления сообщений) требуется полный доступ администратора (ваш UID должен быть добавлен в Firestore).';
-                    adminPanelMessage.classList.remove('hidden');
-                } else if (isRealAdmin) {
-                    adminPanelMessage.textContent = 'Вы являетесь реальным администратором и можете управлять чатом.';
-                    adminPanelMessage.classList.remove('hidden');
-                } else {
-                    adminPanelMessage.classList.add('hidden');
                 }
-            } else {
-                toggleAdminPanelBtn.classList.add('hidden');
-                adminPanel.classList.remove('active'); // Скрываем панель, если пользователь не админ
-                adminPanelMessage.classList.add('hidden');
-            }
-            // Перерисовываем сообщения, чтобы обновить видимость кнопок удаления
-            loadMessages();
-        }
+            });
 
-        // Сохранение ника пользователя в локальное хранилище
-        saveNicknameBtn.addEventListener('click', async () => {
-            const newNickname = nicknameInput.value.trim();
-            if (newNickname === '') {
-                console.warn("Ник пуст.");
-                return;
-            }
+            // Category toggle logic
+            const categoryToggles = document.querySelectorAll('.category-toggle');
+            categoryToggles.forEach(toggle => {
+                toggle.addEventListener('click', () => {
+                    const targetId = toggle.dataset.target;
+                    const targetUl = document.getElementById(targetId);
+                    const arrowIcon = toggle.querySelector('.category-arrow');
 
-            userNickname = newNickname;
-            localStorage.setItem('userNickname', userNickname);
-            console.log("Ник успешно сохранен:", userNickname);
-
-            // Обновляем флаг "скрытой механики" после сохранения ника
-            updateAdminFeaturesVisibility();
-
-            // Предоставляем визуальное подтверждение
-            saveNicknameBtn.textContent = 'Сохранено!';
-            saveNicknameBtn.classList.add('bg-green-700');
-            setTimeout(() => {
-                saveNicknameBtn.textContent = 'Сохранить ник';
-                saveNicknameBtn.classList.remove('bg-green-700');
-            }, 1500);
-        });
-
-        // Настройка прослушивания сообщений в реальном времени из Firestore
-        function setupRealtimeMessages() {
-            if (!isAuthReady || !db) {
-                console.log("Firebase не готов для прослушивания сообщений.");
-                return;
-            }
-
-            const messagesCollectionRef = collection(db, `artifacts/${appId}/public/data/messages`);
-            const q = query(messagesCollectionRef, orderBy('timestamp'));
-
-            onSnapshot(q, (snapshot) => {
-                messagesDiv.innerHTML = ''; // Очищаем существующие сообщения
-                snapshot.forEach((doc) => {
-                    const message = doc.data();
-                    // Проверяем, забанен ли отправитель сообщения
-                    if (!bannedUsers.includes(message.userId)) {
-                        displayMessage(message, doc.id); // Передаем ID документа сообщения
+                    if (targetUl.classList.contains('hidden-category')) {
+                        targetUl.classList.remove('hidden-category');
+                        arrowIcon.classList.remove('fa-chevron-right');
+                        arrowIcon.classList.add('fa-chevron-down');
+                    } else {
+                        targetUl.classList.add('hidden-category');
+                        arrowIcon.classList.remove('fa-chevron-down');
+                        arrowIcon.classList.add('fa-chevron-right');
                     }
                 });
-                messagesDiv.scrollTop = messagesDiv.scrollHeight; // Прокручиваем до последнего сообщения
-            }, (error) => {
-                console.error("Ошибка получения сообщений в реальном времени:", error);
-                messagesDiv.innerHTML = '<div class="text-center text-red-500 py-4">Не удалось загрузить сообщения. Проверьте правила безопасности Firestore.</div>';
             });
-        }
 
-        // Отображение сообщения в UI
-        function displayMessage(message, messageId) {
-            const messageElement = document.createElement('div');
-            const isMine = message.userId === userId;
-            messageElement.className = `message-bubble ${isMine ? 'mine' : 'other'}`;
-
-            const userDisplay = message.nickname || `Пользователь: ${message.userId.substring(0, 8)}...`; // Используем ник, если он есть, или усеченный ID
-            const timestamp = message.timestamp ? new Date(message.timestamp.toDate()).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '';
-
-            const userInfoDiv = document.createElement('div');
-            userInfoDiv.className = 'user-info';
-
-            const userNameSpan = document.createElement('span');
-            userNameSpan.textContent = isMine ? `Вы (${userNickname})` : userDisplay;
-
-            const timeSpan = document.createElement('span');
-            timeSpan.className = 'message-time';
-            timeSpan.textContent = showTimestamps ? timestamp : ''; // Показываем только если включено
-
-            userInfoDiv.appendChild(userNameSpan);
-            userInfoDiv.appendChild(timeSpan);
-
-            const messageText = document.createElement('div');
-            messageText.textContent = message.text;
-
-            messageElement.appendChild(userInfoDiv);
-            messageElement.appendChild(messageText);
-
-            // Если есть прикрепленное изображение, добавляем индикатор
-            if (message.imageFileName) {
-                const attachmentIndicator = document.createElement('span');
-                attachmentIndicator.className = 'attachment-indicator';
-                attachmentIndicator.textContent = `[Изображение прикреплено: ${message.imageFileName}]`;
-                messageElement.appendChild(attachmentIndicator);
-            }
-
-            // Добавляем кнопку удаления, если пользователь может видеть админ-функции
-            if (canSeeAdminFeatures) {
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-message-btn';
-                deleteBtn.innerHTML = '&times;'; // Символ "умножить" для закрытия/удаления
-                deleteBtn.title = 'Удалить сообщение';
-                deleteBtn.addEventListener('click', () => deleteMessage(messageId)); // Используем ID документа Firestore
-                messageElement.appendChild(deleteBtn);
-            }
-
-            messagesDiv.appendChild(messageElement);
-        }
-
-        // Функция для удаления сообщения из Firestore
-        async function deleteMessage(messageIdToDelete) {
-            if (!db || !messageIdToDelete || !isRealAdmin) { // Удалять может только реальный админ
-                console.warn("Невозможно удалить сообщение: база данных не готова, ID сообщения отсутствует или пользователь не является реальным администратором.");
-                alert("У вас нет прав для удаления этого сообщения. Для полного доступа администратора, ваш UID должен быть добавлен в коллекцию 'admin_users' в Firebase.");
-                return;
-            }
-            if (!confirm('Вы уверены, что хотите удалить это сообщение?')) {
-                return;
-            }
-
-            const messageDocRef = doc(db, `artifacts/${appId}/public/data/messages`, messageIdToDelete);
-            try {
-                await deleteDoc(messageDocRef);
-                console.log("Сообщение успешно удалено:", messageIdToDelete);
-            } catch (error) {
-                console.error("Ошибка при удалении сообщения:", error);
-                alert("Не удалось удалить сообщение. Проверьте правила безопасности Firestore.");
-            }
-        }
-
-        // Обработчики для прикрепления файла
-        attachFileBtn.addEventListener('click', () => {
-            fileInput.click(); // Триггер клика по скрытому input type="file"
-        });
-
-        fileInput.addEventListener('change', (event) => {
-            selectedFile = event.target.files[0];
-            if (selectedFile) {
-                fileNameDisplay.textContent = selectedFile.name;
-            } else {
-                fileNameDisplay.textContent = '';
-            }
-        });
-
-        // Отправка сообщения в Firestore
-        sendMessageBtn.addEventListener('click', async () => {
-            const messageText = messageInput.value.trim();
-            // Проверяем, забанен ли пользователь (из Firestore)
-            if (bannedUsers.includes(userId)) {
-                alert("Вы забанены и не можете отправлять сообщения.");
-                return;
-            }
-
-            // Если сообщение пустое И нет выбранного файла, то не отправляем
-            if (messageText === '' && !selectedFile || !isAuthReady || !db) {
-                console.warn("Сообщение пустое или Firebase не готов, или нет выбранного файла.");
-                return;
-            }
-
-            // Показываем статус отправки
-            sendMessageBtn.textContent = 'Отправка...';
-            sendMessageBtn.disabled = true;
-
-            try {
-                const messageData = {
-                    text: messageText,
-                    userId: userId,
-                    nickname: userNickname, // Добавляем ник к сообщению
-                    timestamp: serverTimestamp() // Используем временную метку сервера
-                };
-
-                if (selectedFile) {
-                    // ВАЖНО: Мы не загружаем сам файл изображения в Firestore напрямую из-за ограничения в 1 МБ.
-                    // Вместо этого мы отправляем только имя файла, чтобы показать, что изображение было прикреплено.
-                    // Для полноценной загрузки и отображения изображений используйте Firebase Storage.
-                    messageData.imageFileName = selectedFile.name;
-                    console.log(`Изображение '${selectedFile.name}' выбрано, но не загружено в Firestore. Для загрузки используйте Firebase Storage.`);
-                }
-
-                await addDoc(collection(db, `artifacts/${appId}/public/data/messages`), messageData);
-                messageInput.value = ''; // Очищаем поле ввода
-                selectedFile = null; // Сбрасываем выбранный файл
-                fileNameDisplay.textContent = ''; // Очищаем отображение имени файла
-            } catch (error) {
-                console.error("Ошибка при отправке сообщения:", error);
-                alert("Не удалось отправить сообщение. Проверьте подключение к интернету и правила безопасности Firebase.");
-            } finally {
-                sendMessageBtn.textContent = 'Отправить';
-                sendMessageBtn.disabled = false;
-            }
-        });
-
-        // Отправка сообщения по нажатию Enter
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessageBtn.click();
-            }
-        });
-
-        // Переключение видимости панели администратора
-        toggleAdminPanelBtn.addEventListener('click', () => {
-            adminPanel.classList.toggle('active');
-            settingsPanel.classList.remove('active'); // Закрываем настройки при открытии админки
-            if (adminPanel.classList.contains('active')) {
-                displayBannedUsers(); // Обновляем список забаненных пользователей при открытии
-            }
-        });
-
-        // Переключение видимости панели настроек
-        toggleSettingsPanelBtn.addEventListener('click', () => {
-            settingsPanel.classList.toggle('active');
-            adminPanel.classList.remove('active'); // Закрываем админку при открытии настроек
-        });
-
-        // Обработчик изменения фона чата (локальная настройка)
-        chatBackgroundSelect.addEventListener('change', (event) => {
-            chatBackground = event.target.value;
-            localStorage.setItem('chatBackground', chatBackground);
-            applyChatSettings();
-        });
-
-        // Обработчик переключения временных меток (локальная настройка)
-        toggleTimestampsCheckbox.addEventListener('change', (event) => {
-            showTimestamps = event.target.checked;
-            localStorage.setItem('showTimestamps', JSON.stringify(showTimestamps));
-            // Поскольку сообщения уже загружены, просто перерисовываем их
-            loadMessages(); // Это вызовет setupRealtimeMessages, который перерисует их
-        });
-
-        // Обработчик очистки чата (локальная настройка)
-        clearChatBtn.addEventListener('click', () => {
-            if (confirm('Вы уверены, что хотите очистить всю историю чата ЛОКАЛЬНО? Это действие необратимо для вашего браузера.')) {
-                localStorage.removeItem('chatMessages'); // Удаляем только из локального хранилища
-                // Чтобы очистить из Firebase, нужна отдельная функция администратора
-                alert('История чата очищена в вашем браузере. Сообщения на сервере не удалены.');
-                loadMessages(); // Перезагружаем сообщения, чтобы UI обновился
-            }
-        });
-
-        // Функция для применения настроек чата (локальная настройка)
-        function applyChatSettings() {
-            const body = document.body;
-            // Удаляем все классы фона, начинающиеся с 'chat-background-'
-            body.className = body.className.split(' ').filter(c => !c.startsWith('chat-background-')).join(' ');
-            // Добавляем новый класс фона
-            body.classList.add(`chat-background-${chatBackground}`);
-        }
-
-        // Копирование ID пользователя
-        copyUserIdBtn.addEventListener('click', () => {
-            // Используем document.execCommand('copy') для лучшей совместимости в iframe
-            const el = document.createElement('textarea');
-            el.value = userId;
-            document.body.appendChild(el);
-            el.select();
-            document.execCommand('copy');
-            document.body.removeChild(el);
-
-            const originalText = copyUserIdBtn.textContent;
-            copyUserIdBtn.textContent = 'Скопировано!';
-            setTimeout(() => {
-                copyUserIdBtn.textContent = originalText;
-            }, 1500);
-        });
-
-        // Настройка прослушивания названия чата из Firestore
-        function setupRealtimeChatTitle() {
-            if (!isAuthReady || !db) return;
-            const chatSettingsDocRef = doc(db, `artifacts/${appId}/public/data/chat_settings`, 'main_title');
-            onSnapshot(chatSettingsDocRef, (docSnap) => {
-                if (docSnap.exists()) {
-                    const newTitle = docSnap.data().title || 'Чат с Сосей';
-                    chatTitleDisplay.textContent = newTitle;
-                    dynamicChatTitle.textContent = newTitle; // Обновляем тег <title>
-                    chatTitleInput.value = newTitle; // Обновляем поле ввода в админке
-                } else {
-                    chatTitleDisplay.textContent = 'Чат с Сосей';
-                    dynamicChatTitle.textContent = 'Чат с Сосей';
-                    chatTitleInput.value = 'Чат с Сосей';
-                }
-            }, (error) => {
-                console.error("Ошибка получения названия чата в реальном времени:", error);
-            });
-        }
-
-        // Сохранение названия чата в Firestore
-        saveChatTitleBtn.addEventListener('click', async () => {
-            if (!isRealAdmin) {
-                alert('У вас нет прав для изменения названия чата.');
-                return;
-            }
-            const newTitle = chatTitleInput.value.trim();
-            if (newTitle === '') {
-                alert('Название чата не может быть пустым.');
-                return;
-            }
-            const chatSettingsDocRef = doc(db, `artifacts/${appId}/public/data/chat_settings`, 'main_title');
-            try {
-                await setDoc(chatSettingsDocRef, { title: newTitle }, { merge: true });
-                alert('Название чата сохранено!');
-            } catch (error) {
-                console.error("Ошибка сохранения названия чата:", error);
-                alert("Не удалось сохранить название чата. Проверьте права доступа.");
-            }
-        });
-
-        // Настройка прослушивания забаненных пользователей из Firestore
-        function setupRealtimeBannedUsers() {
-            if (!isAuthReady || !db) return;
-            const bannedUsersCollectionRef = collection(db, `artifacts/${appId}/public/data/banned_users`);
-            onSnapshot(bannedUsersCollectionRef, (snapshot) => {
-                bannedUsers = [];
-                snapshot.forEach(doc => {
-                    bannedUsers.push(doc.id); // ID документа - это userId забаненного
+            // User list item click (simple console log for now)
+            const userListItems = document.querySelectorAll('.w-60 ul li');
+            userListItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    console.log(`Клик по пользователю: ${item.dataset.userId || item.querySelector('span').textContent}`);
                 });
-                console.log("Забаненные пользователи обновлены:", bannedUsers);
-                displayBannedUsers(); // Обновляем список в админке
-                loadMessages(); // Перезагружаем сообщения, чтобы применить фильтр
-            }, (error) => {
-                console.error("Ошибка получения списка забаненных пользователей:", error);
             });
-        }
-
-        // Бан пользователя (в Firestore)
-        banUserBtn.addEventListener('click', async () => {
-            if (!isRealAdmin) {
-                alert('У вас нет прав для бана пользователей.');
-                return;
-            }
-            const idToBan = banUserInput.value.trim();
-            if (idToBan === '') {
-                alert('Пожалуйста, введите ID пользователя для бана.');
-                return;
-            }
-            if (bannedUsers.includes(idToBan)) {
-                alert(`Пользователь с ID ${idToBan} уже забанен.`);
-                return;
-            }
-            if (idToBan === userId) {
-                alert('Вы не можете забанить самого себя!');
-                return;
-            }
-
-            const banDocRef = doc(db, `artifacts/${appId}/public/data/banned_users`, idToBan);
-            try {
-                await setDoc(banDocRef, { bannedAt: serverTimestamp() });
-                alert(`Пользователь с ID ${idToBan} забанен.`);
-                banUserInput.value = '';
-            } catch (error) {
-                console.error("Ошибка бана пользователя:", error);
-                alert("Не удалось забанить пользователя. Проверьте права доступа.");
-            }
         });
-
-        // Разбан пользователя (в Firestore)
-        unbanUserBtn.addEventListener('click', async () => {
-            if (!isRealAdmin) {
-                alert('У вас нет прав для разбана пользователей.');
-                return;
-            }
-            const idToUnban = banUserInput.value.trim();
-            if (idToUnban === '') {
-                alert('Пожалуйста, введите ID пользователя для разбана.');
-                return;
-            }
-            if (!bannedUsers.includes(idToUnban)) {
-                alert(`Пользователь с ID ${idToUnban} не найден в списке забаненных.`);
-                return;
-            }
-
-            const banDocRef = doc(db, `artifacts/${appId}/public/data/banned_users`, idToUnban);
-            try {
-                await deleteDoc(banDocRef);
-                alert(`Пользователь с ID ${idToUnban} разбанен.`);
-                banUserInput.value = '';
-            } catch (error) {
-                console.error("Ошибка разбана пользователя:", error);
-                alert("Не удалось разбанить пользователя. Проверьте права доступа.");
-            }
-        });
-
-        // Отображение списка забаненных пользователей (UI)
-        function displayBannedUsers() {
-            bannedUsersList.innerHTML = '';
-            if (bannedUsers.length === 0) {
-                const li = document.createElement('li');
-                li.textContent = 'Нет забаненных пользователей.';
-                bannedUsersList.appendChild(li);
-            } else {
-                bannedUsers.forEach(id => {
-                    const li = document.createElement('li');
-                    li.textContent = id;
-                    bannedUsersList.appendChild(li);
-                });
-            }
-        }
-
-        // Инициализация при загрузке окна
-        window.onload = initializeFirebase;
     </script>
-    <!--
-    *** ОЧЕНЬ ВАЖНО: НАСТРОЙКА FIREBASE FIRESTORE И ПРАВИЛА БЕЗОПАСНОСТИ ***
-
-    Это приложение теперь использует Firebase Firestore для синхронизации данных между всеми пользователями.
-    Для его корректной работы вам НЕОБХОДИМО настроить правила безопасности Firestore в вашей консоли Firebase.
-    Без этих правил вы будете получать ошибки "Missing or insufficient permissions".
-
-    Пожалуйста, выполните следующие шаги ТОЧНО:
-    1. Перейдите в консоль Firebase: https://console.firebase.google.com/
-    2. Выберите свой проект Firebase.
-    3. В меню слева перейдите в раздел "Firestore Database" (База данных Firestore).
-    4. Выберите вкладку "Rules" (Правила).
-    5. Замените ВСЕ существующие правила на следующие:
-
-    rules_version = '2';
-    service cloud.firestore {
-      match /databases/{database}/documents {
-        // Правила для публичных данных (доступны всем аутентифицированным пользователям)
-        // Это позволяет всем аутентифицированным пользователям читать и записывать сообщения в чат,
-        // а также читать профили пользователей (ники), настройки чата и список администраторов/забаненных.
-        match /artifacts/{appId}/public/data/{collection=**} {
-          allow read: if request.auth != null;
-          allow write: if request.auth != null;
-        }
-
-        // Уточненные правила для коллекции user_profiles (ники)
-        // Пользователь может записывать только свой собственный ник.
-        match /artifacts/{appId}/public/data/user_profiles/{userId} {
-          allow read: if request.auth != null;
-          allow write: if request.auth != null && request.auth.uid == userId;
-        }
-
-        // Уточненные правила для коллекции admin_users (список реальных администраторов)
-        // Только аутентифицированные пользователи могут читать список администраторов.
-        // Запись в эту коллекцию должна быть ограничена только владельцем проекта Firebase
-        // или выполняться вручную через консоль Firebase для обеспечения безопасности.
-        match /artifacts/{appId}/public/data/admin_users/{userId} {
-          allow read: if request.auth != null;
-          allow write: if false; // Запрещаем запись из клиентского приложения
-        }
-
-        // Уточненные правила для коллекции banned_users (список забаненных пользователей)
-        // Любой аутентифицированный пользователь может читать список забаненных.
-        // Записывать (банить/разбанивать) могут только реальные администраторы.
-        match /artifacts/{appId}/public/data/banned_users/{userId} {
-          allow read: if request.auth != null;
-          allow write: if request.auth != null && exists(/databases/$(database)/documents/artifacts/$(appId)/public/data/admin_users/$(request.auth.uid));
-        }
-
-        // Уточненные правила для коллекции chat_settings (название чата)
-        // Любой аутентифицированный пользователь может читать название чата.
-        // Записывать (менять название) могут только реальные администраторы.
-        match /artifacts/{appId}/public/data/chat_settings/{settingId} {
-          allow read: if request.auth != null;
-          allow write: if request.auth != null && exists(/databases/$(database)/documents/artifacts/$(appId)/public/data/admin_users/$(request.auth.uid));
-        }
-
-        // Уточненные правила для коллекции messages (сообщения)
-        // Любой аутентифицированный пользователь может читать и добавлять сообщения.
-        // Удалять сообщения могут только реальные администраторы.
-        match /artifacts/{appId}/public/data/messages/{messageId} {
-          allow read: if request.auth != null;
-          allow write: if request.auth != null;
-          allow delete: if request.auth != null && exists(/databases/$(database)/documents/artifacts/$(appId)/public/data/admin_users/$(request.auth.uid));
-        }
-
-        // Правила для приватных данных (доступны только владельцу)
-        // В этом приложении не используются, но включены для полноты.
-        match /artifacts/{appId}/users/{userId}/{collection=**} {
-          allow read, write: if request.auth != null && request.auth.uid == userId;
-        }
-      }
-    }
-
-    6. После вставки правил нажмите кнопку "Publish" (Опубликовать), чтобы применить изменения.
-       Убедитесь, что вы видите сообщение об успешной публикации.
-
-    *** КАК СДЕЛАТЬ ПОЛЬЗОВАТЕЛЯ РЕАЛЬНЫМ АДМИНИСТРАТОРОМ (ДЛЯ УДАЛЕНИЯ СООБЩЕНИЙ, БАНА, ИЗМЕНЕНИЯ НАЗВАНИЯ): ***
-    1. Откройте консоль Firebase и перейдите в "Firestore Database".
-    2. Создайте новую коллекцию с именем `admin_users` (если ее нет).
-       Полный путь: `artifacts/{ваш_app_id}/public/data/admin_users`
-    3. Добавьте новый документ в эту коллекцию.
-    4. ID документа должен быть равен `userId` пользователя, которого вы хотите сделать администратором.
-       Вы можете найти `userId` текущего пользователя внизу чата ("Ваш ID пользователя: ...").
-    5. Добавьте любое поле в этот документ (например, `isAdmin: true`), хотя его содержимое не используется в коде,
-       важно лишь существование документа с соответствующим `userId`.
-
-    *** СКРЫТАЯ МЕХАНИКА (НИК "Оня"): ***
-    Если вы установите свой ник на "Оня" (без учета регистра), вы получите
-    визуальные права администратора в этом приложении (будут видны кнопки удаления сообщений
-    и панель администратора).
-    Однако, это НЕ дает реальных прав администратора на запись в базу данных (удаление, бан, изменение названия).
-    Для выполнения этих действий пользователь должен быть добавлен в коллекцию `admin_users` в Firebase.
-    Это сделано для обеспечения безопасности вашего приложения.
-    -->
 </body>
 </html>
