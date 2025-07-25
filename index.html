@@ -3,378 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Измеритель либидо Win98</title>
+    <title>100 вариаций нежности для Католика</title>
     <!-- Подключение Tailwind CSS для стилизации -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Font for a classic Windows feel (Arial or generic sans-serif) -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        /* Base styles for Windows 98 look */
+        /* Установка шрифта Inter */
         body {
-            font-family: 'Roboto', sans-serif; /* A more common system font */
-            background-color: #008080; /* Teal desktop background */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            overflow: hidden; /* Prevent scrollbar during calibration */
+            font-family: "Inter", sans-serif;
+            overflow: hidden; /* Скрытие полос прокрутки */
+            /* Романтический градиентный фон */
+            background: linear-gradient(135deg, #4A004A 0%, #8B008B 50%, #C71585 100%);
         }
-
-        /* Window frame */
-        .win98-window {
-            background-color: #C0C0C0; /* Classic grey */
-            border: 2px solid #FFFFFF;
-            border-right-color: #808080;
-            border-bottom-color: #808080;
-            box-shadow: 2px 2px 0 #000000; /* Simple shadow */
-            padding: 2px;
-            width: 100%;
-            max-width: 450px; /* Adjust max width */
-            box-sizing: border-box;
-        }
-
-        /* Title bar */
-        .title-bar {
-            background: linear-gradient(to right, #0A246A, #A6CAF0); /* Blue gradient */
-            color: #FFFFFF;
-            font-family: 'Arial', sans-serif; /* More accurate font for title bar */
-            font-size: 14px;
-            font-weight: bold;
-            padding: 4px 6px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: default; /* Not draggable in this demo */
-        }
-
-        .title-bar-buttons button {
-            background-color: #C0C0C0;
-            border: 2px solid #FFFFFF;
-            border-right-color: #808080;
-            border-bottom-color: #808080;
-            width: 18px;
-            height: 18px;
-            font-size: 12px;
-            line-height: 1;
-            padding: 0;
-            cursor: pointer;
-            outline: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-left: 2px;
-        }
-        .title-bar-buttons button:active {
-            border: 2px solid #808080;
-            border-right-color: #FFFFFF;
-            border-bottom-color: #FFFFFF;
-        }
-
-        /* Content area */
-        .win98-content {
-            background-color: #C0C0C0;
-            padding: 12px;
-            border-top: 1px solid #FFFFFF;
-            border-left: 1px solid #FFFFFF;
-            border-right: 1px solid #808080;
-            border-bottom: 1px solid #808080;
-            margin-top: 2px;
-        }
-
-        /* Input field styles */
-        input[type="range"] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 10px;
-            background-color: #808080; /* Darker grey track */
-            outline: none;
-            border: 1px solid #000000;
-            border-top-color: #FFFFFF;
-            border-left-color: #FFFFFF;
-            border-right-color: #808080;
-            border-bottom-color: #808080;
-            border-radius: 0; /* Square edges */
-            cursor: pointer;
-            --thumb-bg: #C0C0C0;
-            --thumb-border: 2px solid #FFFFFF;
-            --thumb-border-right: #808080;
-            --thumb-border-bottom: #808080;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            background: var(--thumb-bg);
-            border: var(--thumb-border);
-            border-right-color: var(--thumb-border-right);
-            border-bottom-color: var(--thumb-border-bottom);
-            cursor: pointer;
-            box-shadow: none;
-            margin-top: -5px; /* Adjust to center vertically */
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: var(--thumb-bg);
-            border: var(--thumb-border);
-            border-right-color: var(--thumb-border-right);
-            border-bottom-color: var(--thumb-border-bottom);
-            cursor: pointer;
-            box-shadow: none;
-        }
-
-        /* Button styles */
-        .win98-button {
-            background-color: #C0C0C0;
-            border: 2px solid #FFFFFF;
-            border-right-color: #808080;
-            border-bottom-color: #808080;
-            color: #000000;
-            font-family: 'Roboto', sans-serif;
-            font-size: 14px;
-            padding: 4px 12px;
-            cursor: pointer;
-            outline: none;
-            text-transform: none;
-            letter-spacing: normal;
-            transform: none;
-            box-shadow: none;
-        }
-        .win98-button:active {
-            border: 2px solid #808080;
-            border-right-color: #FFFFFF;
-            border-bottom-color: #FFFFFF;
-            padding: 5px 11px 3px 13px; /* Shift text slightly for pressed effect */
-        }
-
-        /* Text display area */
-        .display-area {
-            background-color: #FFFFFF;
-            border: 1px solid #000000;
-            border-top-color: #808080;
-            border-left-color: #808080;
-            border-right-color: #FFFFFF;
-            border-bottom-color: #FFFFFF;
-            padding: 8px;
-            color: #000000;
-            font-family: 'MS Sans Serif', 'Arial', sans-serif; /* Classic text font */
-            font-size: 16px;
-            text-shadow: none;
-        }
-
-        /* History log */
-        #history-log {
-            background-color: #FFFFFF;
-            border: 1px solid #000000;
-            border-top-color: #808080;
-            border-left-color: #808080;
-            border-right-color: #FFFFFF;
-            border-bottom-color: #FFFFFF;
-            padding: 8px;
-            color: #000000;
-            font-family: 'VT323', monospace; /* Keep VT323 for a console-like log */
-            font-size: 12px;
-            max-height: 100px;
-            overflow-y: auto;
-            text-shadow: none;
-        }
-
-        /* Calibration screen styles */
-        #calibration-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
+        .splash-container {
+            position: absolute;
             width: 100%;
             height: 100%;
-            background-color: #000000;
+            top: 0;
+            left: 0;
+            pointer-events: none; /* Позволяет кликам проходить сквозь контейнер */
+        }
+        .splash-particle {
+            position: absolute;
+            opacity: 0;
+            transform: scale(0);
+            animation: splash-animation 2.5s forwards; /* Увеличена длительность анимации для мягкости */
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
-            color: #FFFFFF; /* White text on black screen */
-            font-family: 'VT323', monospace; /* Console font */
-            font-size: 1.5rem;
-            text-shadow: none;
+            /* Более мягкая, органическая форма */
+            border-radius: 60% 40% 70% 30% / 50% 50% 50% 50%;
+            background-color: currentColor; /* Цвет будет задан через JS */
+            filter: blur(1px); /* Легкое размытие для мечтательного эффекта */
         }
 
-        .boot-line {
-            width: 60%;
-            text-align: left;
-            margin: 5px 0;
-            opacity: 0;
-            animation: type-in 0.1s forwards;
+        /* Определение ключевых кадров для анимации всплеска частиц */
+        @keyframes splash-animation {
+            0% {
+                opacity: 0;
+                transform: translate(0, 0) scale(0) rotate(0deg);
+            }
+            10% {
+                opacity: 0.8; /* Максимальная прозрачность немного ниже для мягкости */
+                transform: translate(var(--dx), var(--dy)) scale(1.1) rotate(var(--rotate-initial));
+            }
+            40% {
+                transform: translate(var(--dx), var(--dy)) scale(1) rotate(var(--rotate-mid));
+            }
+            80% {
+                transform: translate(var(--dx-final), var(--dy-final)) scale(0.7) rotate(var(--rotate-final));
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--dx-final), var(--dy-final)) scale(0.2) rotate(var(--rotate-final));
+            }
         }
 
-        @keyframes type-in {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        /* Анимация для текста */
+        @keyframes text-fade-out-up {
+            0% {
+                opacity: 1;
+                transform: translateY(0) translateX(-50%);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-80px) translateX(-50%); /* Движение вверх немного дальше */
+            }
+        }
+        .splash-text {
+            animation: text-fade-out-up 1.8s forwards; /* Увеличена длительность для плавности */
+            white-space: nowrap;
+            font-size: 2.5rem; /* Увеличенный размер шрифта для лучшей видимости */
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7); /* Добавляем свечение к тексту */
+        }
+
+        /* Стиль для центральной надписи */
+        .main-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            padding: 2rem;
+            background-color: rgba(74, 0, 74, 0.5); /* Полупрозрачный фон */
+            border-radius: 0.75rem; /* Закругленные углы */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Тень для выделения */
+            color: #FFD700; /* Золотой текст */
+            font-size: 3rem; /* Большой размер шрифта */
+            font-weight: bold;
+            z-index: 5; /* Над частицами */
+        }
+
+        @media (max-width: 768px) {
+            .main-message {
+                font-size: 2rem; /* Уменьшаем размер шрифта на мобильных */
+                padding: 1.5rem;
+            }
+            .splash-text {
+                font-size: 1.8rem; /* Уменьшаем размер текста всплеска на мобильных */
+            }
         }
     </style>
 </head>
-<body class="min-h-screen">
-
-    <!-- Calibration Screen -->
-    <div id="calibration-screen">
-        <p class="boot-line" style="animation-delay: 0s;">Microsoft(R) Windows 98</p>
-        <p class="boot-line" style="animation-delay: 0.5s;">(C)Copyright Microsoft Corp 1981-1999.</p>
-        <p class="boot-line" style="animation-delay: 1s;">Initializing hardware...</p>
-        <p class="boot-line" style="animation-delay: 1.5s;">Loading Измеритель либидо.exe...</p>
-        <p class="boot-line" style="animation-delay: 2.0s;">_</p>
+<body class="flex items-center justify-center min-h-screen">
+    <div class="main-message">
+        <p>Коснись меня, Католик...</p>
+        <p>и почувствуй мою любовь!</p>
     </div>
 
-    <div id="main-content" class="hidden win98-window">
-        <div class="title-bar">
-            <div class="title-bar-text">Измеритель либидо</div>
-            <div class="title-bar-buttons">
-                <button aria-label="Minimize">_</button>
-                <button aria-label="Maximize">⬜</button>
-                <button aria-label="Close">X</button>
-            </div>
-        </div>
-        <div class="win98-content">
-            <h1 class="text-xl font-bold text-black mb-4">ЛИБИДО МЕТР</h1>
-
-            <div class="mb-6">
-                <label for="libido-slider" class="block text-sm font-semibold text-black mb-2">НА СКОЛЬКО ВЫ СЕГОДНЯ...?</label>
-                <input type="range" id="libido-slider" min="0" max="100" value="50" class="w-full">
-            </div>
-
-            <button id="randomize-btn" class="win98-button px-4 py-2 mb-6">
-                СЛУЧАЙНЫЙ УРОВЕНЬ
-            </button>
-
-            <div class="display-area mb-6">
-                <p class="text-lg font-bold text-black mb-1" id="libido-level-text">СРЕДНИЙ УРОВЕНЬ</p>
-                <p class="text-sm text-black" id="libido-description">ПЕРЕДВИНЬТЕ ПОЛЗУНОК ИЛИ НАЖМИТЕ КНОПКУ</p>
-            </div>
-
-            <div class="mt-4">
-                <h2 class="text-base font-bold text-black mb-2">ИСТОРИЯ ПОКАЗАНИЙ</h2>
-                <div id="history-log">
-                    <!-- History entries will be added here -->
-                    <p>2025-07-19 22:00: СРЕДНИЙ УРОВЕНЬ (50)</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <div id="splashContainer" class="splash-container"></div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const slider = document.getElementById('libido-slider');
-            const levelText = document.getElementById('libido-level-text');
-            const descriptionText = document.getElementById('libido-description');
-            const randomizeBtn = document.getElementById('randomize-btn');
-            const calibrationScreen = document.getElementById('calibration-screen');
-            const mainContent = document.getElementById('main-content');
-            const historyLog = document.getElementById('history-log');
+        // Получаем ссылку на контейнер для частиц всплеска
+        const splashContainer = document.getElementById('splashContainer');
 
-            // Function to format date and time for history log
-            function getFormattedDateTime() {
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = (now.getMonth() + 1).toString().padStart(2, '0');
-                const day = now.getDate().toString().padStart(2, '0');
-                const hours = now.getHours().toString().padStart(2, '0');
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                return `${year}-${month}-${day} ${hours}:${minutes}`;
-            }
+        // Список романтических фраз для Католика (100+ вариантов)
+        const romanticPhrases = [
+            'Мой дорогой Католик!', 'Ты моё солнышко, Католик!', 'Люблю тебя, Католик!', 'Ты самый лучший, Католик!',
+            'Моя нежность для тебя, Католик!', 'Скучаю по тебе, Католик!', 'Ты моё счастье, Католик!', 'Всегда рядом, Католик...',
+            'Мой единственный, Католик!', 'Католик, ты моё вдохновение!', 'Ты — моё всё, Католик!', 'Обожаю тебя, Католик!',
+            'Мой милый Католик!', 'Ты в моём сердце, Католик!', 'Католик, ты чудо!', 'Я твоя, Католик!',
+            'Ты мой герой, Католик!', 'Мой любимый Католик!', 'Ты даришь мне радость, Католик!', 'Мой Католик, моя жизнь!',
+            'Католик, ты волшебный!', 'Ты — моя мечта, Католик!', 'Мой прекрасный Католик!', 'Католик, обними меня!',
+            'Хочу к тебе, Католик!', 'Ты самый нежный, Католик!', 'Мой Католик, моё сокровище!', 'Ты мой ангел, Католик!',
+            'Католик, ты так важен для меня!', 'Мой Католик, моя душа!', 'Ты делаешь меня счастливой, Католик!', 'Мой родной Католик!',
+            'Католик, ты мой свет!', 'Ты — моя вселенная, Католик!', 'Мой сладкий Католик!', 'Ты всегда в моих мыслях, Католик!',
+            'Католик, ты мой космос!', 'Ты — моё желание, Католик!', 'Мой неповторимый Католик!', 'Католик, ты мой бриллиант!',
+            'Ты моя путеводная звезда, Католик!', 'Мой Католик, моё утешение!', 'Ты — моё самое дорогое, Католик!', 'Католик, ты мой мир!',
+            'Ты мой воздух, Католик!', 'Мой Католик, моя опора!', 'Ты — моя сказка, Католик!', 'Католик, ты моя мелодия!',
+            'Ты мой рассвет, Католик!', 'Мой Католик, моя нежность!', 'Ты — моё тепло, Католик!', 'Католик, ты моя страсть!',
+            'Ты мой океан, Католик!', 'Мой Католик, моя гавань!', 'Ты — моё спокойствие, Католик!', 'Католик, ты моя сила!',
+            'Ты мой цветок, Католик!', 'Мой Католик, моя роза!', 'Ты — моё вдохновение, Католик!', 'Католик, ты мой идеал!',
+            'Ты мой компас, Католик!', 'Мой Католик, моя карта!', 'Ты — моё приключение, Католик!', 'Католик, ты моя цель!',
+            'Ты мой огонь, Католик!', 'Мой Католик, моё пламя!', 'Ты — мой жар, Католик!', 'Католик, ты мой вулкан!',
+            'Ты мой дождь, Католик!', 'Мой Католик, моя свежесть!', 'Ты — моя роса, Католик!', 'Католик, ты мой водопад!',
+            'Ты мой ветер, Католик!', 'Мой Католик, моя свобода!', 'Ты — мой полёт, Католик!', 'Католик, ты мой горизонт!',
+            'Ты мой шепот, Католик!', 'Мой Католик, моя песня!', 'Ты — моя симфония, Католик!', 'Католик, ты мой ритм!',
+            'Ты мой поцелуй, Католик!', 'Мой Католик, мои объятия!', 'Ты — моё прикосновение, Католик!', 'Католик, ты мой пульс!',
+            'Ты мой смех, Католик!', 'Мой Католик, моя улыбка!', 'Ты — моя радость, Католик!', 'Католик, ты мой восторг!',
+            'Ты мой секрет, Католик!', 'Мой Католик, моя тайна!', 'Ты — моё откровение, Католик!', 'Католик, ты мой ответ!',
+            'Ты мой сон, Католик!', 'Мой Католик, моя реальность!', 'Ты — моё пробуждение, Католик!', 'Католик, ты мой рассвет!',
+            'Ты мой закат, Католик!', 'Мой Католик, моя ночь!', 'Ты — моё утро, Католик!', 'Католик, ты мой день!',
+            'Ты мой Католик, и это всё!', 'Католик, ты просто... ты!', 'Мой Католик, моя бесконечность!', 'Ты — моё навсегда, Католик!'
+        ];
 
-            // Function to update text and styles based on slider value
-            function updateLibidoLevel(logHistory = true) {
-                const value = parseInt(slider.value);
-                let text = '';
-                let description = '';
+        // Функция для создания эффекта всплеска
+        function createSplash(x, y) {
+            const numberOfParticles = 35; // Увеличено количество частиц для более насыщенного эффекта
+            // Романтические цвета: розовый, фиолетовый, золотой, мягкий красный
+            const colors = ['#FFC0CB', '#FF69B4', '#EE82EE', '#DDA0DD', '#F08080', '#FFD700', '#ADD8E6'];
 
-                // Define more granular and suggestive levels
-                if (value <= 5) {
-                    text = 'СОННЫЙ РЕЖИМ';
-                    description = 'ЭНЕРГИЯ НА НУЛЕ. ДАЖЕ КОФЕ НЕ ПОМОЖЕТ.';
-                } else if (value <= 15) {
-                    text = 'РЕЖИМ ОТДЫХА';
-                    description = 'СЕГОДНЯ ВЫ ПРЕДПОЧИТАЕТЕ ПОКОЙ. НИКАКИХ СЮРПРИЗОВ.';
-                } else if (value <= 25) {
-                    text = 'ЛЕГКОЕ ВОЛНЕНИЕ';
-                    description = 'ЕСТЬ ИСКРА, НО ПОКА ЧТО-ТО НЕ ХВАТАЕТ.';
-                } else if (value <= 35) {
-                    text = 'УМЕРЕННЫЙ ИНТЕРЕС';
-                    description = 'ВЫ ЧУВСТВУЕТЕ НЕБОЛЬШОЕ ПОБУЖДЕНИЕ. МОЖНО НАЧИНАТЬ.';
-                } else if (value <= 45) {
-                    text = 'В ИГРЕ';
-                    description = 'ВЫ В НАСТРОЕНИИ! ГОТОВЫ К ЛЕГКОМУ ФЛИРТУ.';
-                } else if (value <= 55) {
-                    text = 'В ПОЛНОЙ БОЕВОЙ ГОТОВНОСТИ';
-                    description = 'ВСЕ В ПРЕДЕЛАХ НОРМЫ, НО С ПЕРСПЕКТИВОЙ НА БОЛЬШЕЕ.';
-                } else if (value <= 65) {
-                    text = 'ПОДНИМАЕТСЯ ТЕМПЕРАТУРА';
-                    description = 'СТРАСТЬ НАРАСТАЕТ! ВОЗМОЖНО, ПОРА ДЕЙСТВОВАТЬ.';
-                } else if (value <= 75) {
-                    text = 'ГОРЯЧО!';
-                    description = 'ВЫ ЧУВСТВУЕТЕ НАСТОЯЩИЙ ПРИЛИВ ЖЕЛАНИЯ. 🌶️';
-                } else if (value <= 85) {
-                    text = 'ОЧЕНЬ ГОРЯЧО! 😈';
-                    description = 'ВАША ЭНЕРГИЯ ПРОСТО БЬЕТ КЛЮЧОМ! ПРИГОТОВЬТЕСЬ!';
-                } else if (value <= 95) {
-                    text = 'НЕУДЕРЖИМЫЙ УРОВЕНЬ! 🔥';
-                    description = 'ВЫ НА ПИКЕ! ВАС НЕ ОСТАНОВИТЬ! ИЩИТЕ ПРИКЛЮЧЕНИЙ!';
-                } else { // value <= 100
-                    text = 'ВЗРЫВНОЙ УРОВЕНЬ! 🚀🍆';
-                    description = 'ВАША ЭНЕРГИЯ ВЫХОДИТ ИЗ-ПОД КОНТРОЛЯ! ПОЖАР! ПОЖАР!';
-                }
+            // Создание частиц
+            for (let i = 0; i < numberOfParticles; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('splash-particle');
 
-                levelText.textContent = text;
-                descriptionText.textContent = description;
+                // Случайный выбор угла для разлета
+                const angle = Math.random() * Math.PI * 2;
+                // Случайное начальное и конечное расстояние для разлета частиц
+                const initialDistance = Math.random() * 50 + 30; // Большее начальное расстояние
+                const finalDistance = Math.random() * 120 + 90; // Большее конечное расстояние
 
-                // Log history only if explicitly requested (e.g., on randomize or initial load)
-                if (logHistory) {
-                    const historyEntry = document.createElement('p');
-                    historyEntry.textContent = `${getFormattedDateTime()}: ${text} (${value})`;
-                    historyLog.prepend(historyEntry); // Add to the top
-                    // Limit history to 5 entries
-                    if (historyLog.children.length > 5) {
-                        historyLog.removeChild(historyLog.lastChild);
-                    }
-                }
-            }
+                // Вычисление смещений для анимации
+                const dxInitial = Math.cos(angle) * initialDistance;
+                const dyInitial = Math.sin(angle) * initialDistance;
+                const dxFinal = Math.cos(angle) * finalDistance;
+                const dyFinal = Math.sin(angle) * finalDistance;
 
-            // Function to set a random slider value
-            function setRandomLibidoLevel() {
-                const randomValue = Math.floor(Math.random() * 101); // From 0 to 100
-                slider.value = randomValue;
-                updateLibidoLevel(); // Log history by default
-            }
+                // Случайные углы поворота для "игривости"
+                const rotateInitial = (Math.random() - 0.5) * 90; // От -45 до 45 градусов
+                const rotateMid = (Math.random() - 0.5) * 120; // От -60 до 60 градусов
+                const rotateFinal = (Math.random() - 0.5) * 180; // От -90 до 90 градусов
 
-            // Calibration animation on load
-            function startCalibration() {
-                const bootLines = document.querySelectorAll('.boot-line');
-                let delay = 0;
-                bootLines.forEach((line, index) => {
-                    setTimeout(() => {
-                        line.style.opacity = '1';
-                    }, delay);
-                    delay += 500; // 0.5 seconds delay between lines
+                // Установка CSS переменных для анимации
+                particle.style.setProperty('--dx', `${dxInitial}px`);
+                particle.style.setProperty('--dy', `${dyInitial}px`);
+                particle.style.setProperty('--dx-final', `${dxFinal}px`);
+                particle.style.setProperty('--dy-final', `${dyFinal}px`);
+                particle.style.setProperty('--rotate-initial', `${rotateInitial}deg`);
+                particle.style.setProperty('--rotate-mid', `${rotateMid}deg`);
+                particle.style.setProperty('--rotate-final', `${rotateFinal}deg`);
+
+                // Случайный размер частицы от 25px до 50px для более заметных форм
+                const size = Math.random() * 25 + 25;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+
+                // Начальное положение частицы (немного смещено от центра клика)
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+
+                // Случайная задержка анимации для более естественного эффекта
+                particle.style.animationDelay = `${Math.random() * 0.5}s`;
+
+                // Случайный выбор цвета для частицы
+                particle.style.color = colors[Math.floor(Math.random() * colors.length)];
+
+                // Добавляем частицу в контейнер
+                splashContainer.appendChild(particle);
+
+                // Удаляем частицу после завершения анимации, чтобы не накапливать элементы
+                particle.addEventListener('animationend', () => {
+                    particle.remove();
                 });
-
-                setTimeout(() => {
-                    calibrationScreen.style.display = 'none';
-                    mainContent.classList.remove('hidden');
-                    document.body.style.overflow = 'auto'; // Re-enable scrollbar if needed
-                    updateLibidoLevel(); // Initial update after calibration
-                }, delay + 1000); // Total delay + 1 second for the last line to show
             }
 
-            // Initial setup
-            startCalibration();
+            // Выбираем случайную фразу из списка
+            const randomPhrase = romanticPhrases[Math.floor(Math.random() * romanticPhrases.length)];
 
-            // Update on slider input
-            slider.addEventListener('input', () => updateLibidoLevel(false)); // Don't log history on every slider move
+            // Создание текстового элемента с выбранной фразой
+            const textElement = document.createElement('div');
+            textElement.textContent = randomPhrase; // Устанавливаем случайную фразу
+            textElement.classList.add('splash-text', 'absolute', 'font-extrabold', 'text-pink-200', 'drop-shadow-lg', 'z-10');
+            textElement.style.left = `${x}px`;
+            textElement.style.top = `${y}px`;
+            textElement.style.transform = 'translate(-50%, -50%)'; // Центрирование текста по координатам клика
 
-            // Handle randomize button click
-            randomizeBtn.addEventListener('click', setRandomLibidoLevel);
+            splashContainer.appendChild(textElement);
+
+            // Удаляем текст после завершения анимации
+            textElement.addEventListener('animationend', () => {
+                textElement.remove();
+            });
+        }
+
+        // Добавляем слушатель события клика по всему документу
+        document.addEventListener('click', (event) => {
+            // Получаем координаты клика
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+            // Вызываем функцию создания всплеска по этим координатам
+            createSplash(mouseX, mouseY);
         });
+
+        // Добавляем слушатели событий для сенсорных экранов
+        document.addEventListener('touchstart', (event) => {
+            // Проверяем, есть ли касания
+            if (event.touches.length > 0) {
+                const touchX = event.touches[0].clientX;
+                const touchY = event.touches[0].clientY;
+                createSplash(touchX, touchY);
+                event.preventDefault(); // Предотвращаем стандартное поведение (например, прокрутку)
+            }
+        }, { passive: false }); // Указываем passive: false, чтобы можно было использовать preventDefault
+
+        // Добавляем начальный всплеск при загрузке страницы
+        window.onload = () => {
+            // Создаем всплеск в центре экрана при загрузке
+            createSplash(window.innerWidth / 2, window.innerHeight / 2);
+        };
     </script>
 </body>
 </html>
